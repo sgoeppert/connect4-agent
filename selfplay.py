@@ -29,7 +29,7 @@ def write_json_results_to_file(file, data):
         json.dump(data, f)
 
 
-def parse_json_config(json_data):
+def parse_json_config(json_data, override_steps=None):
     name = json_data["name"]
     module = json_data["module"]
     imported_mod = importlib.import_module(module)
@@ -61,15 +61,18 @@ def parse_json_config(json_data):
         sett = base_setting.copy()
         for i, key in enumerate(keys):
             sett[key] = cmb[i]
+        if override_steps is not None:
+            sett["steps"] = override_steps
+
         all_settings.append(sett)
     return all_settings
 
 
-def load_configuration(file):
+def load_configuration(file, override_steps=None):
     try:
         with open(file, "r") as f:
             json_data = json.load(f)
-            settings = parse_json_config(json_data)
+            settings = parse_json_config(json_data, override_steps)
     except FileNotFoundError:
         print("Could not open configuration file {}".format(file))
         exit(1)
@@ -124,6 +127,8 @@ if __name__ == "__main__":
     parser.add_argument("-p", type=int,
                         help="Number of processes run in parallel. If the number provided is higher than the number of "
                              "available logical cores, this will use all but one core.", default=8)
+    parser.add_argument("-steps", type=int,
+                        help="Override the number of iterations each agent executes before making a choice")
 
     args = parser.parse_args()
 
@@ -154,7 +159,11 @@ if __name__ == "__main__":
     if num_processes > mp.cpu_count():
         num_processes = mp.cpu_count()
 
-    player_settings = [load_configuration(f) for f in player_config_files]
+    override_steps = None
+    if args.steps is not None:
+        override_steps = args.steps
+
+    player_settings = [load_configuration(f, override_steps) for f in player_config_files]
 
     if (watch_param not in player_settings[0][0].keys()) or (watch_param not in player_settings[1][0].keys()):
         print("WARNING: Could not find watch_param \"{}\" in configurations. ".format(watch_param))
@@ -162,6 +171,7 @@ if __name__ == "__main__":
 
     if args.logfile is not None:
         logger = setup_logger("experiment", args.logfile.format(datetime.now().strftime("%Y-%m-%d_%H-%M")))
+
 
     combinations = list(itertools.product(*player_settings))
 
