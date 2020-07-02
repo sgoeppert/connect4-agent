@@ -151,11 +151,8 @@ if __name__ == "__main__":
     games_per_value = args.games
 
     num_processes = max(1, args.p)  # limit num_processes to positive values
-    if num_processes >= mp.cpu_count():
-        if mp.cpu_count() == 1:  # if only one core is available, use that
-            num_processes = 1
-        else:  # else use all but one core
-            num_processes = mp.cpu_count() - 1
+    if num_processes > mp.cpu_count():
+        num_processes = mp.cpu_count()
 
     player_settings = [load_configuration(f) for f in player_config_files]
 
