@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List
 import time
 import logging
+import os
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 
 @dataclass
@@ -42,6 +43,8 @@ def play_game(p1, p2):
 
 
 def setup_logger(name, log_file, level=logging.INFO):
+
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
     handler = logging.FileHandler(log_file)
     handler.setFormatter(formatter)
