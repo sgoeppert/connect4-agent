@@ -24,7 +24,7 @@ class Node:
         return self.total_value / self.number_visits
 
     def best_child(self, c_p):
-        n_p = 2 * math.log(self.number_visits)
+        n_p = math.log(self.number_visits)
         return max(self.children, key=lambda c: c.Q() + c_p * math.sqrt(n_p/c.number_visits))
 
     def expand_random_child(self):

@@ -34,7 +34,7 @@ class Node:
     def explo(self, log_parent_visits):
         if self.number_visits == 0:
             return 10
-        return math.sqrt(2 * log_parent_visits / max(1, self.number_visits))
+        return math.sqrt(log_parent_visits / max(1, self.number_visits))
 
     def best_child_rave(self, c_p, beta):
         log_p_visits = math.log(self.number_visits)
