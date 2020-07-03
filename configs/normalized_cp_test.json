@@ -1,0 +1,9 @@
+{
+  "name": "normalized Q value MCTS",
+  "module": "mcts.normalized",
+  "func": "agent",
+  "settings": {
+    "steps": 500,
+    "cp": [0.5, 0.6, 0.8, 1.0]
+  }
+}
