@@ -170,8 +170,7 @@ if __name__ == "__main__":
         watch = False
 
     if args.logfile is not None:
-        logger = setup_logger("experiment", args.logfile.format(datetime.now().strftime("%Y-%m-%d_%H-%M")))
-
+        logger = setup_logger("experiment", args.logfile.format(datetime.now().strftime("%Y-%m-%d")))
 
     combinations = list(itertools.product(*player_settings))
 
@@ -202,9 +201,18 @@ if __name__ == "__main__":
                     comparison.append("{}: {}".format(watch_param, watch_val))
                     labels[i] += f"({comparison[-1]})"
 
-            work = pool.imap_unordered(play_game_mp, (pair for _ in range(games_per_value)))
-            for game_result in tqdm(work, total=games_per_value):
+            # normal order
+            n_games = games_per_value // 2
+            work = pool.imap_unordered(play_game_mp, (pair for _ in range(n_games)))
+            for game_result in tqdm(work, total=n_games):
                 result_set["results"].append(game_result)
+
+            # p2 going first, so reverse the pair
+            n_games = games_per_value - n_games
+            work = pool.imap_unordered(play_game_mp, (pair[::-1] for _ in range(n_games)))
+            for game_result in tqdm(work, total=n_games):
+                # players were reversed, results need to be reversed again to match up with actual players
+                result_set["results"].append(game_result[::-1])
 
             mean_scores = (1 + np.mean(result_set["results"], axis=0)) / 2
             msg = " ".join([f"{lbl} {mn}" for lbl, mn in zip(labels, mean_scores)])
