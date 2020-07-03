@@ -1,0 +1,9 @@
+{
+  "name": "regular MCTS",
+  "module": "mcts.regular",
+  "func": "agent",
+  "settings": {
+    "steps": 500,
+    "cp": [0.6, 0.7, 0.8, 0.9, 1.0]
+  }
+}
