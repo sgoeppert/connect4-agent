@@ -48,10 +48,12 @@ if __name__ == "__main__":
     print(label, p1_name, "vs", p2_name)
     print("Comparing p1 {} with p2 {}".format(p1_changing, p2_changing))
 
-    def get_changing_label(player_dict, changing_keys):
+    def get_changing_label(player_dict, changing_keys, pnum):
         parts = []
         for k in changing_keys:
             parts.append(f"{k}: {str(player_dict[k])}")
+        if len(parts) == 0:
+            return f"P{pnum}"
         return ", ".join(parts)
 
     combined_results = defaultdict(list)
@@ -60,7 +62,7 @@ if __name__ == "__main__":
         players = res["players"]
         # mean_results = (1 + np.mean(results, axis=0)) / 2
 
-        lbl = tuple(map(lambda x: get_changing_label(*x), zip(players, [p1_changing, p2_changing])))
+        lbl = tuple(map(lambda x: get_changing_label(*x), zip(players, [p1_changing, p2_changing], [1,2])))
         combined_results[lbl].extend(results)
         flip_results = [match[::-1] for match in results]
         combined_results[lbl[::-1]].extend(list(flip_results))
