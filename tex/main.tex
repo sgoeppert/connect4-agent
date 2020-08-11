@@ -1,0 +1,52 @@
+% !TeX spellcheck = de_DE_frami
+\documentclass[a4paper, 11pt]{scrartcl}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usetikzlibrary{tikzmark}
+
+\usepackage[german]{babel}
+\usepackage{csquotes}
+\MakeOuterQuote{"}
+
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+
+\author{Stefan Göppert}
+
+\title{Entwicklung eines Agenten für Vier Gewinnt mit Monte-Carlo Baumsuche und neuronalen Netzen}
+
+\begin{document}
+\maketitle
+\newpage
+
+\input{1_einleitung}
+\newpage
+
+\input{2_mcts_theorie}
+\newpage
+
+\input{3_mcts_verbesserungen}
+\newpage
+
+\input{4_kaggle_umgebung}
+\newpage
+
+
+\input{5_implementierung_mcts}
+\newpage
+
+\input{knns}
+\newpage
+
+\bibliographystyle{acm}
+\bibliography{references}
+\end{document}

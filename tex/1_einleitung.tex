@@ -1,0 +1,35 @@
+\section{Einleitung}
+\par
+Im Oktober 2015 wurde zum ersten Mal ein Profi-Spieler im Brettspiel Go unter Turnierbedingungen von einem Computerprogramm geschlagen. Fan Hui, 2015 Europameister in Go, unterlag dem von Google Deepmind entwickelten Programm AlphaGo fünf zu null. Ein halbes Jahr später wurde auch der 18-fache Weltmeister Lee Sedol von AlphaGo vier zu eins geschlagen. AlphaGo ist ein Meilenstein in der Entwicklung von Go-Computerprogrammen. Vor 2015 konnten sich Go-Programme nur auf kleineren Spielfeldern und mit zusätzlichen Steinen zu Beginn des Spiels mit guten Spielern messen.
+\par
+Aufgrund des hohen Verzweigungsgrads und der Schwierigkeit Spielpositionen gut zu bewerten, stoßen traditionelle Suchverfahren wie die Alpha-Beta-Suche mit Go schnell an ihre Grenzen. Seit 2006 wurde daher für viele Go-Programme die Monte-Carlo-Baumsuche eingesetzt. Anstatt alle möglichen Spielpositionen auszuprobieren, wie es in der Alpha-Beta-Suche der Fall ist, werden in der Monte-Carlo-Baumsuche zufällige Spiele simuliert und das vielversprechendste Ergebnis weiterverfolgt.
+\par
+AlphaGo setzt ebenfalls auf die Monte-Carlo-Baumsuche, ersetzt aber die Simulation von Zufallsspielen durch ein neuronales Netz. Der Einsatz von neuronalen Netzen und Deep (Reinforcement) Learning hat auch in anderen Spielen zu großem Erfolg geführt. In 2017 hat OpenAI mit einem Deep Learning Programm einen Profi-Spieler im Computerspiel Dota 2 besiegt und konnte in 2019 das weltbeste Dota 2-Team in fünf von fünf Spielen schlagen. Und auch das von Google Deepmind entwickelte AlphaStar konnte in 2019 zwei Profi-Spieler im Computerspiel Starcraft 2 zehn zu null besiegen.
+\par
+Einfachere Brettspiele wie Vier Gewinnt können effektiv mit einer Alpha-Beta-Suche gelöst werden, da ihr Verzweigungsgrad deutlich geringer ist als der von Go. Aber auch wenn der Aufwand verhältnismäßig gering ausfällt, kann ein moderner Computer immer noch einige Sekunden benötigen, um einen optimalen Spielzug zu bestimmen.
+\par
+Auf der Online-Plattform Kaggle gibt es seit Januar 2020 einen neuen Wettbewerb, in dem Teilnehmer mit ihren Vier Gewinnt-Programmen um einen Platz auf der Rangliste kämpfen. In diesem Wettbewerb und im Rahmen der Limitierungen des Wettbewerbs soll das in dieser Arbeit vorgestellte Vier-Gewinnt-Programm möglichst gut abschneiden.\\
+\par
+Wie gut kann die Monte-Carlo-Baumsuche ein Spiel wie Vier Gewinnt spielen und kann sie auch in diesem einfacheren Anwendungsfall von Deep Learning profitieren? 
+
+\subsection{Aufbau der Arbeit}
+Nach einer Erklärung der Regeln von Vier Gewinnt und dem allgemeineren Spiel “Connect X”, wird die Online-Plattform Kaggle vorgestellt, sowie die Regeln des Wettbewerbs erklärt. Nach dieser Einführung werden die verschiedenen Verfahren, die zum Einsatz kommen, vorgestellt. Die Monte-Carlo-Baumsuche wird im Detail erklärt und Optimierungsansätze der Baumsuche betrachtet. Ein kurzer Überblick behandelt die wichtigsten Konzepte des maschinellen Lernens und stellt die beiden eingesetzten Netzwerktypen, MLP und ConvNet, vor.
+\par
+Die darauf folgenden Abschnitte behandeln die Implementierung des Vier Gewinnt-Programms. Nach einer Einführung in die Schnittstelle, die durch den Wettbewerb vorgegeben ist, wird zuerst eine einfache Monte-Carlo-Baumsuche ohne Verbesserungen implementiert und Schritt für Schritt erweitert. Die Baumsuche wird dann um neuronale Netze ergänzt. Die beiden ausgewählten Netzwerktypen werden miteinander verglichen und verschiedene Kombinationen aus Baumsuche und neuronalem Netz evaluiert. Zum Schluss werden die gesammelten Ergebnisse noch einmal gegenüber gestellt und ein bestes Programm gewählt, das für den Wettbewerb als finale Version eingereicht wird.
+
+
+\subsection{Das Spiel Vier Gewinnt}
+“Vier Gewinnt” ist ein zwei Spieler Brettspiel das auf einem vertikal stehenden, hohlen rechteckigen Spielbrett gespielt wird. Das klassische Spielbrett hat sieben Spalten und sechs Zeilen. Beide Spieler haben zu Beginn des Spieles 21 Spielsteine einer Farbe, klassisch rot und gelb. Abwechselnd setzen beide Spieler einen Spielstein in eine freie Spalte und lassen den Spielstein so auf das unterste freie Feld fallen. Eine Spalte ist frei, solange sich darin weniger als sechs Spielsteine befinden.
+\par
+Ein Spieler hat das Spiel gewonnen, wenn es ihm/ihr gelingt eine Viererreihe von Spielsteinen seiner/ihrer eigenen Farbe zu bilden. Viererreihen können vertikal, horizontal oder diagonal gebildet werden.
+\par
+Gelingt es keinem Spieler eine Viererreihe zu bilden bevor alle Spalten mit Spielsteinen gefüllt sind, im klassischen Spiel nach 42 Spielsteinen, so endet das Spiel unentschieden.\\
+\par
+Das Setzen eines Spielsteins wird in dieser Arbeit als “Zug” bezeichnet. In der englischen Literatur gibt es hierfür unterschiedliche Namen wie “ply” oder “half-ply” was wörtlich übersetzt “Schicht” bzw. “Halbschicht” bedeutet. Dabei ist in der Regel ein “ply” die Kombination der Züge beider Spieler, und ein “half-ply” ist der Zug eines einzelnen Spielers.\\
+\par
+Vier Gewinnt gehört zur Gruppe der kombinatorischen Spiele. Kombinatorische Spiele zeichnen sich dadurch aus, dass sie deterministisch sind, es keine verborgenen Informationen gibt, abwechselnd gezogen wird und das Spiel nach einer endlichen Anzahl an Zügen zu Ende ist. Als Zufalls-freies Spiel mit perfekter Information ist “Vier Gewinnt” ein lösbares Spiel und wurde bereits 1988 von Victor Allis und unabhängig davon im selben Jahr von James D. Allen schwach gelöst. Victor Allis hat mithilfe eines Computerprogramms “VICTOR” gezeigt, dass der erste Spieler bei perfektem Spiel immer gewinnt, wenn er den ersten Stein in die mittlere Spalte setzt, das Spiel mindestens unentschieden endet, wenn er in die Spalten direkt daneben setzt, und verliert, wenn er in einer der anderen Spalten beginnt.
+
+
+\subsection{Kaggle}
+Kaggle ist eine Online-Plattform für Data-Science Experimente und Wettbewerbe. 
+Inhalt dieser Arbeit ist der Kaggle Wettbewerb “Connect X”, welcher am 03. Januar 2020 gestartet ist. Die Herausforderung im Wettbewerb ist es, einen Spieler (Agent) hochzuladen, der “Connect X” spielen kann.

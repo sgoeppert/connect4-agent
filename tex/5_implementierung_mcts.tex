@@ -1,0 +1,47 @@
+\section{Implementierung der Monte-Carlo Baumsuche}
+
+Die entwickelten Agenten werden mit der Programmiersprache Python entwickelt, da der Kaggle-Wettbewerb nur das Einreichen von Python-Code erlaubt und das Tooling für maschinelles Lernen für Python sehr umfangreich ist.
+
+\subsection{Überblick über die Klassen}
+Die Funktionalität des Agenten ist auf mehrere Klassen aufgeteilt.
+
+\subsubsection{ConnectFour}
+Diese Klasse kapselt den Spielzustand. Intern wird der Spielzustand als 1D-Array gespeichert. Ein Stein für Spieler 1 wird durch eine 1 und ein Stein von Spieler zwei durch eine 2 repräsentiert. Freie Felder werden durch eine 0 dargestellt.
+
+Die notwendigen Funktionen um ein Spiel zu spielen sind
+\begin{itemize}
+	\item \texttt{play\_move(column)} Setzt einen Stein für den aktuellen Spieler in die angegebene Spalte
+	\item \texttt{list\_moves()} Listet alle legalen Spielzüge
+	\item \texttt{is\_terminal()} Gibt \texttt{True} zurück, wenn das Spiel vorbei ist, sonst \texttt{False}
+	\item \texttt{get\_reward(player)} Gibt die Belohnung für den angegebenen Spieler zurück. 1 bei einem Sieg, -1 bei einer Niederlage und sonst 0.
+\end{itemize}
+
+\subsubsection{Node}
+Dies ist ein Knoten im Spielbaum. Unterschiedliche Implementationen speichern unterschiedliche Daten in den Knoten. Minimal muss aber eine Baumstruktur abgebildet werden können. Das heißt jeder Knoten kann Kinder und ein oder mehrere Elternknoten haben und muss einen Verweis auf diese Knoten speichern.
+
+Alle Knoten erben von einer \texttt{AbstractTreeNode} Klasse, die eine Methode \texttt{best\_child} vorgibt. Diese Methode soll den, abhängig vom Algorithmus, besten Kindknoten des aktuellen Knotens zurückgeben.
+
+\subsubsection{Player}
+Der \texttt{Player} ist die Haupt-Klasse jedes Agenten. Sie erben alle von der \texttt{AbstractPlayer} Klasse. Ein Aufruf der Methode \texttt{get\_move(observation, configuration)} führt die Baumsuche aus, bis ein gesetztes Resourcenlimit erreicht ist, und gibt dann die Aktion des Agenten zurück.\\
+Die Player-Klasse verwaltet einen Spielbaum aus \texttt{AbstractTreeNode} Knoten, der auch zwischen Spielzügen erhalten bleiben kann.
+
+
+\subsection{Normale Monte-Carlo Baumsuche}
+
+Die normale Baumsuche implementiert die MCTS ohne jegliche Verbesserungen. Jeder Knoten speichert seine eigenen Informationen, die Simulation geschieht durch eine zufällige Default-Policy und die Tree-Policy benutzt die UCT-Formel, um das beste Kind zu bestimmen.
+
+Diese Implementierung dient als Vergleichswert zu allen weiteren Varianten und Verbesserungen der Baumsuche.
+
+\texttt{Pseudocode für den normalen MCTS Algorithmus nochmal aufschreiben}
+
+\subsection{Transpositionen}
+
+Die Erweiterung der Baumsuche, sodass Transpositionen berücksichtigt werden ist relativ einfach. Wenn ein neuer Kindknoten erzeugt wird muss nur geprüft werden, ob er sich bereits in einer Transpositionstabelle befindet und wenn ja muss der Knoten aus der Tabelle verwendet werden, anstatt einen neuen anzulegen. Befindet er sich nicht in der Tabelle wird ein neuer angelegt und dieser wird in der Tabelle hinterlegt.
+
+\texttt{Pseudocode für MCTS mit transposition}
+
+Die Transpositionstabelle ist eine Hash-Map mit einem Hash des Spielzustandes als Schlüssel um dem Knoten selbst als Element.
+
+Durch Einsatz der Transpositionstabelle teilen sich identische Knoten an unterschiedlichen Stellen im Baum ihre Statistiken. Dadurch wird es notwendig, die Statistiken eines Knotens in Abhängigkeit vom Elternknoten zu speichern, da sonst die UCT-Formel verfälscht wird (siehe Kapitel \ref{transpos}).
+
+Der TranspositionPlayer implementiert mehrere Varianten des UCT Algorithmus mit Anpassungen an Transpositionen. Beim Erstellen eines Spieler-Objektes kann konfiguriert werden, welche Funktion verwendet werden soll.

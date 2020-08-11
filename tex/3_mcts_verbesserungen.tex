@@ -1,0 +1,53 @@
+\section{Monte-Carlo Baumsuche Verbesserungen}
+Im Paper A Survey of MCTS methods wird eine Reihe von Verbesserungen der Baumsuche vorgestellt und ihre Anwendungsfälle für verschiedene klassische Brettspiele beschrieben. Im Folgenden werden ein paar dieser Verbesserungen aufgegriffen, die ich sinnvoll für Vier Gewinnt erachte und in dieser Bacherlorarbeit evaluieren möchte.
+
+\subsection{Transpositionen}
+\label{transpos}
+Unter Transpositionen versteht man identische Spielzustände, die über unterschiedliche Zugkombinationen erreicht werden. Ein solcher Spielzustand wird zum Beispiel über die Zugfolge d1,e1;c1,d2 erreicht. 
+
+Platzhalter Bild
+
+Eine andere Zugfolge, die zum selben Spielzustand führt, ist d1,d2;c1,e1. Durch diese unterschiedlichen Pfade werden die beiden identischen Zustände normalerweise als separate Knoten mit separaten Statistiken gespeichert. Es würde aber sehr viel Sinn ergeben, diese Knoten zu kombinieren, denn der Weg wie ich zu einem Zustand gekommen bin hat keinen Einfluss darauf, welches die beste Aktion in diesem Zustand ist. Childs et al. schlagen drei Anpassungen der UCT Tree policy vor, um mit Transpositionen umzugehen. Sie können ignoriert werden (UCT0), sie können identifiziert werden und ihre Informationen die zur move selection notwendig sind, werden über alle identischen Knoten kumuliert (UCT1), anstatt der Information Q(s,a) wird die Information Q(g(s,a)) geteilt, wodurch die Informationen aus den Kindern eines Knotens verwendet werden anstatt der Informationen aus dem Elternknoten über diese Kinder. Dies verfeinert die Schätzung, da sowohl die Informationen aus Elternknoten A in diese Bewertung einfließen als auch die aus anderen Elternknoten B .. p (UCT2). Die letzte Variante UCT3 berechnet den Wert der Kinder Q(g(s,a)) rekursiv als gewichteter Durchschnitt aller Kinder des Knotens. Offen bleibt die Frage, wie die Backup-Phase des MCTS Algorithmus aussehen soll. Die vorgeschlagenen Vorgehensweisen sind “Update-All”, welches ausgehend vom Blatt den Baum wieder hinaufsteigt und alle Vorfahren jedes Knotens aktualisiert, und “Update-Descend” welches nur die Knoten aktualisiert, die auf dem Abstiegspfad liegen.\\
+\par
+Durch das Kombinieren der Knoten entsteht ein gerichteter azyklischer Graph. Es kann nützlich sein, zur Bewertung eines Knotens nicht nur die direkten Kinder und Eltern zu betrachten, sondern beliebig tief im Graph auf- und abzusteigen. Cazenave, Mehat und Saffidine schlagen einen parametrisierbaren UCT Algorithmus, den sie Upper confidence bound for rooted directed acyclic graphs (UCD) nennen, vor.
+
+\subsection{All Moves as First(AMAF)}
+All Moves as First (AMAF) gehört zu den sogenannten History Heuristiken. Anhand der besuchten Knoten während der Selektion und Simulation werden andere Knoten im Baum oder die Simulationsphase beeinflusst. AMAF nimmt an, dass das Spielen eines Spielzuges X aus dem Zustand A einen ähnlichen Wert hat, wie wenn der Spielzug X aus dem Zustand A2 gespielt wird. Dies gilt sowohl für Spielzüge innerhalb des Suchbaumes als auch für Spielzüge, die in der Simulation gewählt werden.
+\par
+Verschiedene History heuristic Verfahren unterscheiden sich darin, wie sie diese zusätzlichen Informationen verwenden. Move Average Sampling nutzt die Daten um den Simulationsschritt in der Default Policy zu steuern. Rapid Action Value Estimation (RAVE) nutzt die Daten zum Bootstrapping der Knoten. Die zusätzlichen Informationen geben bereits ein gewisses Vorwissen über die Werte eines Knotens, solange der Knoten noch nicht ausreichend oft besucht wurde.
+\par
+Unterschieden wird hier zwischen Algorithmen, die die Bewertung der Knoten direkt verändern und solchen, die zusätzliche Informationen in den Knoten speichern.
+
+
+\subsection{Score bounded MCTS}
+Score bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts in Minimax Suchalgorithmen. Jeder Knoten speichert eine optimistische und pessimistische Einschätzung. Ein Knoten gilt als gelöst, wenn er terminal ist, oder alle Kindknoten gelöst sind. Ein terminaler Knoten hat eine optimistische = pessimistische Grenze = tatsächliche Bewertung dieses Knotens.\\
+\par
+Diese Grenzen können benutzt werden, um die Auswahl der Kindknoten zu steuern. Ein Kindknoten dessen optimistische Grenze schlechter ist, als die pessimistische Grenze des Elternknotens kann getrost ignoriert werden, da er zu keiner Verbesserung der Bewertung dieses Knotens beitragen kann.\\
+\par
+Wenn sich die Bewertung eines Knotens ändert, muss die Änderung der pess. und opt. Grenzen den Baum hinauf propagiert werden. Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor.
+
+\subsection{Temporal Difference Learning}
+Temporal difference learning ist der klassische Reinforcement Learning Ansatz der letzten Zeit. Das Ziel ist es, einen Q-Wert (State-Action Value) oder V-Wert (State-Value) zu lernen. Das Grundprinzip hinter TD Learning entstammt der Gleichung der Monte Carlo Methoden
+
+\begin{equation}
+V(S_t) \leftarrow V(S_t) + [G_t-V(S_t)] 
+\end{equation}
+
+wobei $G_t$ die tatsächliche Belohnung nach Zeit $t$ mit der konstanten Schrittgröße $a$ ist. Am Ende einer Episode aktualisieren Monte Carlo Methoden den State-Value V(St)mit dem Monte-Carlo Fehler Gt-V(St). Monte-Carlo Methoden können Aktualisierungen erst am Ende einer Episode durchführen, weil erst dann $G_t$ bekannt ist. Der Fehler berechnet wie weit die aktuelle Bewertung des Zustandes vom tatsächlichen Ergebnis der Simulation $G_t$ abweicht und nähert sich dem Ergebnis $G_t$ um einen Schritt alpha an.
+\par
+Temporal Difference Methoden funktionieren ähnlich, müssen aber nicht warten bis die Episode vorbei ist. Im nächsten Zeitschritt $t+1$ können bereits die Bewertungen des Zeitschritts $t$ aktualisiert werden
+\begin{equation}
+V(S_t) \leftarrow V(S_t)+[R_{t+1}+V(S_{t+1})-V(S_t)]
+\end{equation}
+
+Diese Temporal Difference Methode ist auch als TD(0) oder one-step TD bekannt. TD(0) basiert die Aktualisierung des geschätzten Wertes auf bereits existierenden Schätzungen und wird dadurch als Bootstrapping Methode bezeichnet. Der Discountfaktor (0,1]kann benutzt werden, um Bewertungen aus näheren Zeitschritten höher zu gewichten ($\gamma \rightarrow 0$) oder alle Zeitschritte gleichmäßig zu beteiligen ($\gamma \rightarrow 1$).\\
+\par
+Ansätze aus dem TD Learning können auch in den MCTS Backups Anwendung finden. Anstatt das tatsächliche Ergebnis einer Simulation den gesamten Baum vom Blatt zu propagieren, kann ein TD-Fehler verwendet werden.
+t=Rt+1+Q(St+1,at+1)-Q(St,at)
+Der Wert eines Knotens wird dann durch
+Q(St,at)Q(St,at)+t
+aktualisiert, wobei alpha im einfachen Fall =1N(S,a)entspricht.\\
+\par
+Da bei klassischen Spielen wie Vier Gewinnt die Belohnung allerdings erst zum Ende eines Spiels bestimmt wird, setzt sich der TD-Fehler nur im Fall der Blattknoten wie oben beschrieben zusammen. Alle inneren Knoten aktualisieren sich relativ zu ihren Kindknoten\\
+innent=Q(St+1,at+1)-Q(St,at)\\
+Der Discountfaktor gamma steuert dabei wie sehr Knoten aktualisiert werden sollen, die sich weit vom Blattknoten entfernt befinden. Außerdem kann ebenfalls die Anzahl an Schritten während der Simulation benutzt werden, um die Belohnung Rt+1bereits im Blatt abhängig von der Länge der Simulation zu reduzieren. Wenn die Simulation in einem Blatt bereits nach 2 Schritten zu Ende ist, ist das Ergebnis vermutlich aussagekräftiger als wenn die Simulation erst nach 10 Schritten endet. 
