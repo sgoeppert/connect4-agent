@@ -1,4 +1,4 @@
 /venv/
 .idea
-/log/
-/data/
+/old/log/
+/old/data/
