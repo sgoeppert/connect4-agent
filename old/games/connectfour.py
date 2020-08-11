@@ -1,6 +1,3 @@
-
-EMPTY = 0
-
 class ConnectFour:
     def __init__(self, columns=7, rows=6, inarow=4, mark=1, board=None):
         if board is not None:
@@ -34,7 +31,7 @@ class ConnectFour:
 
     def play_move(self, col):
         try:
-            row = max([r for r in range(self.rows) if self.board[col + (r * self.cols)] == EMPTY])
+            row = max([r for r in range(self.rows) if self.board[col + (r * self.cols)] == 0])
             self.board[col + (row * self.cols)] = self.mark
         except ValueError:
             raise RuntimeError("Invalid play")
@@ -55,7 +52,7 @@ class ConnectFour:
         row = (
             min([r for r in range(rows) if self.board[column + (r * columns)] == mark])
             if has_played
-            else max([r for r in range(rows) if self.board[column + (r * columns)] == EMPTY])
+            else max([r for r in range(rows) if self.board[column + (r * columns)] == 0])
         )
 
         def count(offset_row, offset_column):
@@ -84,7 +81,7 @@ class ConnectFour:
 
     def get_reward(self, mark):
         if not self.finished:
-            raise RuntimeError("get_score called on non terminal game")
+            raise RuntimeError("get_reward called on non terminal game")
 
         if mark == self.winner:
             return 1
@@ -105,3 +102,6 @@ class ConnectFour:
 
     def hash(self):
         return hash(str(self.board))
+
+    def __hash__(self):
+        return self.hash()

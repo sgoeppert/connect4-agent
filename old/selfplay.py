@@ -8,7 +8,7 @@ import argparse
 
 from datetime import datetime
 from tqdm import tqdm
-from tools import play_game, setup_logger
+from old.tools import play_game, setup_logger
 
 
 def play_game_mp(params):

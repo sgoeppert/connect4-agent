@@ -1,4 +1,4 @@
-from games.connectfour import ConnectFour
+from old.games.connectfour import ConnectFour
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import List

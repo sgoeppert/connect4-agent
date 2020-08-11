@@ -1,7 +1,7 @@
 import math
 import random
 import time
-from games.connectfour import ConnectFour
+from old.games.connectfour import ConnectFour
 
 
 class Node:

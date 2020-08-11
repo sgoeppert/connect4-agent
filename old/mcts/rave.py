@@ -2,7 +2,6 @@ import math
 import random
 import time
 import numpy as np
-from games.connectfour import ConnectFour
 
 
 class Node:
@@ -189,9 +188,9 @@ def play_game_kaggle(obs, conf):
 
 
 if __name__ == "__main__":
-    from tools import play_game
-    from mcts.regular import agent as regular_agent
-    from games.connectfour import ConnectFour
+    from old.tools import play_game
+    from old.mcts import agent as regular_agent
+    from old.games.connectfour import ConnectFour
 
     results = []
     for _ in range(10):

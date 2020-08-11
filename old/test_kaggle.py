@@ -1,7 +1,6 @@
-from kaggle_environments import evaluate
-from mcts.regular import agent
+from old.mcts import agent
 import numpy as np
-from tools import play_game
+from old.tools import play_game
 #
 # res = evaluate("connectx", [p.play_game, "random"], num_episodes=10)
 # res = np.array(res)
