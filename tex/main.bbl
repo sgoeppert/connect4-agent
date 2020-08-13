@@ -1,9 +1,8 @@
 \begin{thebibliography}{1}
 
 \bibitem{cholletDeepLearningPython2017}
-F.~Chollet.
-\newblock {\em {Deep Learning with Python}}.
-\newblock {Manning Publications}, {Shelter Island, New York}, 1st edition, Dec.
-  2017.
+{\sc Chollet, F.}
+\newblock {\em {Deep Learning with Python}}, 1st~ed.
+\newblock {Manning Publications}, {Shelter Island, New York}, Dec. 2017.
 
 \end{thebibliography}

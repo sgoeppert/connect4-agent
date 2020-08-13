@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 from typing import List
 
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
@@ -35,7 +36,8 @@ class Node:
         move = random.choice(self.possible_moves)
         child_state = self.game_state.copy()
         child_state.play_move(move)
-        self.children[move] = Node(child_state, parent=self, move=move)
+        myclass = type(self)
+        self.children[move] = myclass(game_state=child_state, parent=self, move=move)
         self.possible_moves.remove(move)
         if len(self.possible_moves) == 0:
             self.expanded = True
@@ -152,3 +154,17 @@ class MCTSPlayer(Player):
             self.root.parent = None
 
         return best
+
+
+if __name__ == "__main__":
+    from bachelorarbeit.games import Observation, Configuration, ConnectFour
+    from bachelorarbeit.tools import timer
+
+    steps = 2000
+    p = MCTSPlayer(max_steps=steps)
+    conf = Configuration()
+    game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
+    obs = Observation(board=game.board.copy(), mark=game.mark)
+
+    with timer(f"{steps} steps"):
+        p.get_move(obs, conf)
