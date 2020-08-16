@@ -165,14 +165,18 @@ class ScoreboundedPlayer(MCTSPlayer):
 
     def get_move(self, observation: Observation, conf: Configuration) -> int:
         self.reset()
-        root_game = ConnectFour(
-            columns=conf.columns,
-            rows=conf.rows,
-            inarow=conf.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
-        root = ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
+
+        root = self._restore_root(observation, conf)
+
+        if root is None:
+            root_game = ConnectFour(
+                columns=conf.columns,
+                rows=conf.rows,
+                inarow=conf.inarow,
+                mark=observation.mark,
+                board=observation.board
+            )
+            root = ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
 
         while self.has_resources():
             leaf = self.tree_policy(root)
@@ -186,6 +190,7 @@ class ScoreboundedPlayer(MCTSPlayer):
         #         print("\t\t", mm, cc)
 
         best = self.best_move(root)
+        self._store_root(root.children[best])
         return best
 
 if __name__ == "__main__":

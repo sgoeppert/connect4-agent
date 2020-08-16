@@ -105,17 +105,7 @@ class SarsaPlayer(RavePlayer):
     def get_move(self, observation: Observation, conf: Configuration) -> int:
         self.reset()
 
-        root = None
-        # if we're keeping the tree and have a stored node, try to determine the opponents move and apply that move
-        # the resulting node is out starting root-node
-        if self.keep_tree and self.root is not None:
-            root = self.root
-            opp_move = self.determine_opponent_move(observation.board, self.root.game_state.board, conf.columns)
-            if opp_move in root.children:
-                root = root.children[opp_move]
-                root.parent = None
-            else:
-                root = None
+        root = self._restore_root(observation, conf)
 
         # if no root could be determined, create a new tree from scratch
         if root is None:
@@ -141,9 +131,7 @@ class SarsaPlayer(RavePlayer):
 
         # print(root.children)
         best = self.best_move(root)
-        if self.keep_tree:
-            self.root = root.children[best]
-            self.root.parent = None
+        self._store_root(root.children[best])
 
         return best
 
