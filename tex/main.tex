@@ -1,6 +1,7 @@
 % !TeX spellcheck = de_DE_frami
-\documentclass[a4paper, 11pt]{article}
+\documentclass[a4paper, 11pt]{scrartcl}
 
+%\usepackage[utf8]{inputenc}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{tikzmark}
@@ -8,18 +9,25 @@
 \usepackage[german]{babel}
 \usepackage{csquotes}
 \MakeOuterQuote{"}
-
+\usepackage[T1]{fontenc}
 
 \usepackage{amsmath}
 \usepackage{graphicx}
 
+%\usepackage{biblatex}
+\usepackage[notes,backend=biber]{biblatex-chicago}
+\usepackage{ftnxtra}
+\bibliography{ref2}
 
 \makeatletter
 \newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
 \newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
 \makeatother
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
 
-
+\usepackage[Algorithmus]{algorithm}
+\usepackage[noend]{algpseudocode}
 \author{Stefan Göppert}
 
 \title{Entwicklung eines Agenten für Vier Gewinnt mit Monte-Carlo Baumsuche und neuronalen Netzen}
@@ -29,24 +37,42 @@
 \newpage
 
 \input{1_einleitung}
+%\input{einleitung_v2}
 \newpage
 
-\input{2_mcts_theorie}
+\input{mcts_theorie}
+\newpage
+\input{mcts_implementierung}
 \newpage
 
-\input{3_mcts_verbesserungen}
+\input{nn_theorie}
+\newpage
+\input{nn_implementierung}
+\newpage
+\input{ergebnisse}
+\newpage
+\input{fazit}
 \newpage
 
-\input{4_kaggle_umgebung}
-\newpage
 
+%\input{theorie}
+%\newpage
+%
+%\input{2_mcts_theorie}
+%\newpage
+%
+%\input{3_mcts_verbesserungen}
+%\newpage
+%
+%\input{4_kaggle_umgebung}
+%\newpage
+%
+%\input{5_implementierung_mcts}
+%\newpage
+%
+%\input{knns}
+%\newpage
 
-\input{5_implementierung_mcts}
-\newpage
+\printbibliography
 
-\input{knns}
-\newpage
-
-\bibliographystyle{acm}
-\bibliography{references}
 \end{document}

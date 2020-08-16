@@ -1,8 +1,8 @@
 \section{Monte-Carlo Baumsuche}
 
-In diesem Kapitel werde ich die theoretischen Hintergründe der Monte-Carlo Baumsuche erklären. Angefangen mit einem kurzen Einstieg in das Reinforcement-Learning und einer Einordnung in das größere Feld des maschinellen Lernens werde ich danach die in dieser Arbeit verwendete Notation erklären und die Monte-Carlo Baumsuche aus Reinforcement-Learning Sicht beschreiben. In diesem Zusammenhang wird auch das Exploration Exploitation Dilemma erklärt.\\
-\par
-Die Monte-Carlo Baumsuche wurde 2006 von Coulom “erfunden”. Er kombinierte erstmals die schrittweise Erstellung eines Spielbaumes mit Monte-Carlo Simulationen. Spielbäume finden schon seit Jahrzehnten Anwendung in der Spieltheorie und der Entwicklung von Algorithmen für Spiele. 
+In diesem Kapitel werde ich die theoretischen Hintergründe der Monte-Carlo Baumsuche erklären. Angefangen mit einem kurzen Einstieg in das Reinforcement-Learning und einer Einordnung in das größere Feld des maschinellen Lernens werde ich danach die in dieser Arbeit verwendete Notation erklären und die Monte-Carlo Baumsuche aus Reinforcement-Learning Sicht beschreiben. In diesem Zusammenhang wird auch das Exploration Exploitation Dilemma erklärt.
+
+Die Monte-Carlo Baumsuche wurde 2006 von Coulom "erfunden". Er kombinierte erstmals die schrittweise Erstellung eines Spielbaumes mit Monte-Carlo Simulationen. Spielbäume finden schon seit Jahrzehnten Anwendung in der Spieltheorie und der Entwicklung von Algorithmen für Spiele. 
 
 \subsection{Spielbäume}
 Brettspiele wie Vier Gewinnt, Schach und Go lassen sich mit Spielbäumen untersuchen und erklären. Die Knoten eines Spielbaumes sind die (legalen) Zustände des Spiels und die Kanten zwischen den Knoten sind die Aktionen, die ausgeführt werden können um von einem Zustand zu einem anderen Zustand zu wechseln. Die Wurzel des Spielbaumes ist der aktuelle Spielzustand. Hat ein Knoten keine hinausführenden Kanten, so ist er ein Blatt. Blätter sind in der Regel terminale Zustände und haben einen Wert - Sieg, Niederlage oder wenn es das Spiel erlaubt Unentschieden.
