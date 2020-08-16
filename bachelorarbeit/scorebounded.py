@@ -97,12 +97,6 @@ class ScoreboundedPlayer(MCTSPlayer):
         self.cut_gamma = cut_gamma
         self.use_heavy_score = use_heavy_score
 
-    def __repr__(self) -> str:
-        return self.name
-
-    def reset(self):
-        super(ScoreboundedPlayer, self).reset()
-
     def prop_pess(self, s: ScoreboundedNode):
         if s.parent:
             n = s.parent
@@ -163,35 +157,24 @@ class ScoreboundedPlayer(MCTSPlayer):
         move, n = max(node.children.items(), key=lambda c: c[1].Q() + c[1].opti + c[1].pess)
         return move
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=configuration.columns,
+            rows=configuration.rows,
+            inarow=configuration.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
 
-        root = self._restore_root(observation, conf)
-
-        if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
-
+    def perform_search(self, root):
         while self.has_resources():
             leaf = self.tree_policy(root)
             reward = self.evaluate_game_state(leaf.game_state)
             self.backup(leaf, reward)
 
-        # print(root)
-        # for m, c in root.children.items():
-        #     print("\t",m,c)
-        #     for mm, cc in c.children.items():
-        #         print("\t\t", mm, cc)
+        return self.best_move(root)
 
-        best = self.best_move(root)
-        self._store_root(root.children[best])
-        return best
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour

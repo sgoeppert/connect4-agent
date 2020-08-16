@@ -2,6 +2,7 @@ import random
 import math
 import numpy as np
 from typing import List
+import time
 
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
 from bachelorarbeit.base_players import Player
@@ -56,6 +57,7 @@ class MCTSPlayer(Player):
             exploration_constant: float = 0.8,
             max_steps: int = 1000,
             keep_tree: bool = False,
+            time_buffer: float = 0.3,
             **kwargs
     ):
         super(MCTSPlayer, self).__init__(**kwargs)
@@ -67,17 +69,30 @@ class MCTSPlayer(Player):
         self.keep_tree = keep_tree
         self.root = None
 
+        self.start_time = 0
+        self.time_limit = 0
+        self.time_buffer = time_buffer
+
     def __repr__(self) -> str:
         return self.name
 
-    def reset(self):
+    def reset(self, conf: Configuration = None):
         self.steps_taken = 0
+        self.start_time = time.time()
+
         if not self.keep_tree:
             self.root = None
 
+        if conf is not None:
+            if conf.timeout > 0:
+                self.time_limit = conf.timeout - self.time_buffer
+
     def has_resources(self) -> bool:
-        self.steps_taken += 1
-        return self.steps_taken <= self.max_steps
+        if self.time_limit > 0:
+            return time.time() - self.start_time < self.time_limit
+        else:
+            self.steps_taken += 1
+            return self.steps_taken <= self.max_steps
 
     def evaluate_game_state(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
@@ -148,30 +163,35 @@ class MCTSPlayer(Player):
             self.root = new_root
             self.root.parent = None
 
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=configuration.columns,
+            rows=configuration.rows,
+            inarow=configuration.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return Node(root_game)
+
+    def perform_search(self, root):
+        while self.has_resources():
+            leaf = self.tree_policy(root)
+            reward = self.evaluate_game_state(leaf.game_state)
+            self.backup(leaf, reward)
+        return self.best_move(root)
 
     def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
+        self.reset(conf)
 
         # load the root if it was persisted
         root = self._restore_root(observation, conf)
 
         # if no root could be determined, create a new tree from scratch
         if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = Node(root_game)
+            root = self.init_root_node(observation, conf)
 
-        while self.has_resources():
-            leaf = self.tree_policy(root)
-            reward = self.evaluate_game_state(leaf.game_state)
-            self.backup(leaf, reward)
-
-        best = self.best_move(root)
+        # run the search
+        best = self.perform_search(root)
         # persist the root if we're keeping the tree
         self._store_root(root.children[best])
 

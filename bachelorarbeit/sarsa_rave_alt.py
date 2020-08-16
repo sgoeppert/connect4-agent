@@ -102,12 +102,6 @@ class SarsaPlayer(RavePlayer):
                     child.rave_score += reward
             current = current.parent
 
-    def reset(self):
-        super(SarsaPlayer, self).reset()
-
-        if not self.keep_tree:
-            self.global_stats = {"max": 0, "min": 0}
-
     def evaluate_game_state_rave(self, game_state: ConnectFour, moves: List[int], move_counts: List[int]) -> float:
         game = game_state.copy()
         while not game.is_terminal():
@@ -119,24 +113,17 @@ class SarsaPlayer(RavePlayer):
 
         return (game.get_reward(self.mark) + 1) / 2
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=configuration.columns,
+            rows=configuration.rows,
+            inarow=configuration.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return SarsaNode(game_state=root_game, is_max=True)
 
-        root = self._restore_root(observation, conf)
-
-        # if no root could be determined, create a new tree from scratch
-        if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = SarsaNode(game_state=root_game, is_max=True)
-
-        self.mark = observation.mark
-
+    def perform_search(self, root):
         while self.has_resources():
             moves = []
             move_counts = SarsaPlayer.init_move_counts(root.game_state)
@@ -148,19 +135,14 @@ class SarsaPlayer(RavePlayer):
 
             self.backup_sarsa(leaf, reward, moves, sim_steps)
 
-        # print(root.children)
-        best = self.best_move(root)
-
-        self._store_root(root.children[best])
-
-        return best
+        return self.best_move(root)
 
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 20
+    steps = 2000
     pl = SarsaPlayer(max_steps=steps, exploration_constant=0.1, beta=0.5, gamma=1.0, lamda=0.98)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)

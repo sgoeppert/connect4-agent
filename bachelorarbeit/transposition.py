@@ -67,8 +67,8 @@ class TranspositionPlayer(MCTSPlayer):
     def __repr__(self) -> str:
         return self.name
 
-    def reset(self):
-        super(TranspositionPlayer, self).reset()
+    def reset(self, *args, **kwargs):
+        super(TranspositionPlayer, self).reset(*args, **kwargs)
         self.transpositions = {}
 
     def tree_policy(self, root: TranspositionNode) -> List[TranspositionNode]:
@@ -103,35 +103,22 @@ class TranspositionPlayer(MCTSPlayer):
             prev = _node
             reward = -reward
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
-
-        # load the root if it was persisted
-        root = self._restore_root(observation, conf)
-
-        # if no root could be determined, create a new tree from scratch
-        if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = TranspositionNode(root_game)
-
+    def perform_search(self, root):
         while self.has_resources():
             path = self.tree_policy(root)
-            # path = self.find_leaf(root)
-            # child = self.expand(path)
             reward = self.evaluate_game_state(path[-1].game_state)
             self.backup(path, reward)
+        return self.best_move(root)
 
-        # print(root)
-        # print(root.children)
-        best = self.best_move(root)
-        self._store_root(root.children[best])
-        return best
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=configuration.columns,
+            rows=configuration.rows,
+            inarow=configuration.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return TranspositionNode(root_game)
 
 
 if __name__ == "__main__":
@@ -146,6 +133,3 @@ if __name__ == "__main__":
 
     with timer(f"{steps} steps"):
         m = p.get_move(obs, conf)
-        game.play_move(m)
-        game.play_move(3)
-        p.get_move(Observation(board=game.board.copy(), mark=game.mark), conf)

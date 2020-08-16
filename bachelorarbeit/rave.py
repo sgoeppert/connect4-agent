@@ -72,9 +72,6 @@ class RavePlayer(MCTSPlayer):
         self.beta = beta
         self.expand_all = expand_all
 
-    def reset(self):
-        super(RavePlayer, self).reset()
-
     @staticmethod
     def init_move_counts(state):
         board = state.board
@@ -138,22 +135,17 @@ class RavePlayer(MCTSPlayer):
         move, n = max(node.children.items(), key=lambda c: (1 - self.beta) * c[1].Q() + self.beta * c[1].QRave())
         return move
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=conf.columns,
+            rows=conf.rows,
+            inarow=conf.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return RaveNode(game_state=root_game)
 
-        root = self._restore_root(observation, conf)
-
-        # if no root could be determined, create a new tree from scratch
-        if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = RaveNode(game_state=root_game)
-
+    def perform_search(self, root):
         while self.has_resources():
             moves = []
             move_counts = RavePlayer.init_move_counts(root.game_state)
@@ -162,20 +154,15 @@ class RavePlayer(MCTSPlayer):
             reward = self.evaluate_game_state_rave(leaf.game_state, moves, move_counts)
             self.backup_rave(leaf, reward, moves)
 
-        # print(root.children)
-        best = self.best_move(root)
-
-        self._store_root(root.children[best])
-
-        return best
+        return self.best_move(root)
 
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 20
-    pl = RavePlayer(max_steps=steps, exploration_constant=0.9,expand_all=True,beta=0.9)
+    steps = 2000
+    pl = RavePlayer(max_steps=steps, exploration_constant=0.9,expand_all=False,beta=0.9)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)

@@ -8,31 +8,15 @@ from bachelorarbeit.rave import RaveNode, RavePlayer
 
 
 class SarsaNode(RaveNode):
-    def __init__(self, global_stats: Union[Dict[str, float], None] = None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(SarsaNode, self).__init__(*args, **kwargs)
         self.v = 0
         self.max_v = 0.01
         self.min_v = -0.01
 
-        if global_stats is None:
-            self.global_stats = self.parent.global_stats
-        else:
-            self.global_stats = global_stats
-
     def normalizeQ(self):
-        # max_v = min(self.parent.max_v, self.global_stats["max"])
-        # min_v = max(self.parent.min_v, self.global_stats["min"])
         max_v = self.parent.max_v
         min_v = self.parent.min_v
-        #
-        # if max_v == min_v:
-        #     max_v = self.global_stats["max"]
-        #     min_v = self.global_stats["min"]
-
-        # if max_v <= -1:
-        #     max_v = self.global_stats["max"]
-        # if min_v >= 1:
-        #     min_v = self.global_stats["min"]
 
         return (self.v - min_v) / (max_v - min_v)
 
@@ -50,7 +34,6 @@ class SarsaPlayer(RavePlayer):
         super(SarsaPlayer, self).__init__(beta=beta, *args, **kwargs)
         self.gamma = gamma
         self.lamda = lamda
-        self.global_stats = {"max": 0, "min": 0}
 
     def backup_sarsa(self, node: SarsaNode, reward: float, moves: List[int], sim_steps: int):
         move_set = set(moves)
@@ -76,13 +59,9 @@ class SarsaPlayer(RavePlayer):
 
             if last_v > current.max_v:
                 current.max_v = last_v
-                if last_v > self.global_stats["max"]:
-                    self.global_stats["max"] = last_v
 
             if last_v < current.min_v:
                 current.min_v = last_v
-                if last_v < self.global_stats["min"]:
-                    self.global_stats["min"] = last_v
 
             last_v = current.v
             # print(current)
@@ -96,28 +75,17 @@ class SarsaPlayer(RavePlayer):
             reward = -reward
             current = current.parent
 
-    def reset(self):
-        super(SarsaPlayer, self).reset()
+    def init_root_node(self, observation, configuration):
+        root_game = ConnectFour(
+            columns=configuration.columns,
+            rows=configuration.rows,
+            inarow=configuration.inarow,
+            mark=observation.mark,
+            board=observation.board
+        )
+        return SarsaNode(game_state=root_game)
 
-        if not self.keep_tree:
-            self.global_stats = {"max": 0, "min": 0}
-
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
-
-        root = self._restore_root(observation, conf)
-
-        # if no root could be determined, create a new tree from scratch
-        if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
-            root = SarsaNode(game_state=root_game, global_stats=self.global_stats)
-
+    def perform_search(self, root):
         while self.has_resources():
             moves = []
             move_counts = SarsaPlayer.init_move_counts(root.game_state)
@@ -129,11 +97,7 @@ class SarsaPlayer(RavePlayer):
 
             self.backup_sarsa(leaf, reward, moves, sim_steps)
 
-        # print(root.children)
-        best = self.best_move(root)
-        self._store_root(root.children[best])
-
-        return best
+        return self.best_move(root)
 
 
 if __name__ == "__main__":

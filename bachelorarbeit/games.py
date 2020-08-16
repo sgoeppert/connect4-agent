@@ -7,7 +7,7 @@ class Configuration:
     rows: int = 6
     columns: int = 7
     inarow: int = 4
-    timeout: int = 1
+    timeout: int = 0
 
 
 @dataclass
