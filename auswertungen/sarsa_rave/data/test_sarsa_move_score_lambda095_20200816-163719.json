@@ -1,0 +1,104 @@
+[
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 20,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.4435,
+    "good_pct": 0.787,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 887,
+      "good": 1574
+    }
+  },
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 50,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.6035,
+    "good_pct": 0.863,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 1207,
+      "good": 1726
+    }
+  },
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 100,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.6605,
+    "good_pct": 0.8865,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 1321,
+      "good": 1773
+    }
+  },
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 200,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.6985,
+    "good_pct": 0.89,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 1397,
+      "good": 1780
+    }
+  },
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 400,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.7425,
+    "good_pct": 0.91,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 1485,
+      "good": 1820
+    }
+  },
+  {
+    "title": "Sarsa player",
+    "player": "SarsaPlayer",
+    "configuration": {
+      "max_steps": 800,
+      "lamda": 0.95
+    },
+    "repeats": 2,
+    "n_positions": 1000,
+    "perfect_pct": 0.743,
+    "good_pct": 0.9215,
+    "raw_results": {
+      "total": 2000,
+      "perfect": 1486,
+      "good": 1843
+    }
+  }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "title": "Random",
+    "player": "RandomPlayer",
+    "configuration": null,
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.2528,
+    "good_pct": 0.6718,
+    "raw_results": {
+      "total": 5000,
+      "perfect": 1264,
+      "good": 3359
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 20
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.3874,
+    "good_pct": 0.7487,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 3874,
+      "good": 7487
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 50
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.4928,
+    "good_pct": 0.8103,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 4928,
+      "good": 8103
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 100
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.5712,
+    "good_pct": 0.8447,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 5712,
+      "good": 8447
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 200
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6331,
+    "good_pct": 0.8771,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 6331,
+      "good": 8771
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 400
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6812,
+    "good_pct": 0.8967,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 6812,
+      "good": 8967
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 800
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7032,
+    "good_pct": 0.9076,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 7032,
+      "good": 9076
+    }
+  }
+]
