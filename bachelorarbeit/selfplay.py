@@ -17,6 +17,7 @@ class Arena:
             players: Tuple[Callable, Callable],
             constructor_args: Tuple[any, any] = (None, None),
             num_games: int = 30,
+            flip_halfway: bool = True,
             num_processes: int = config.NUM_PROCESSES
     ):
         assert len(players) == 2, "Arena requires two players"
@@ -24,7 +25,9 @@ class Arena:
         self.player_classes = players
         self.constructor_args = constructor_args
         self.num_games = num_games
+        self.flip_halfway = flip_halfway
         self.num_processes = num_processes
+        self.flip_players = False
 
     def update_players(self, player_classes: Tuple[Callable, Callable], constructor_args: Tuple[any, any] = (None, None)):
         self.player_classes = player_classes
@@ -37,6 +40,9 @@ class Arena:
                 players.append(pclass(**arg))
             else:
                 players.append(pclass())
+
+        if self.flip_players:
+            players = players[::-1]
         return players
 
     def run_game(self, _dummy=0) -> GameResult:
@@ -56,23 +62,38 @@ class Arena:
         return game.get_reward(1), game.get_reward(2)
 
     def run_game_mp(self, show_progress_bar: bool = True) -> List[GameResult]:
-        with mp.Pool(self.num_processes, maxtasksperchild=10) as pool:
-            pending_results = pool.imap_unordered(self.run_game, range(self.num_games))
-            game_results = []
+        self.flip_players = False
 
-            if show_progress_bar:
-                pending_results = tqdm(pending_results, total=self.num_games)
+        pbar = None
+        if show_progress_bar:
+            pbar = tqdm(total=self.num_games)
 
-            for res in pending_results:
-                game_results.append(res)
-                if show_progress_bar:
-                    mean_results = np.mean((np.array(game_results) + 1) / 2, axis=0)
-                    pending_results.set_postfix({
-                        "Mean result": mean_results
-                    })
+        n_games = [self.num_games]
+        if self.flip_halfway:
+            n_games = [self.num_games // 2, self.num_games - (self.num_games // 2)]
 
-            if show_progress_bar:
-                pending_results.close()
+        game_results = []
+        for num_games in n_games:
+            with mp.Pool(self.num_processes, maxtasksperchild=10) as pool:
+                pending_results = pool.imap_unordered(self.run_game, range(num_games))
+
+                for res in pending_results:
+                    if self.flip_players:
+                        game_results.append(res[::-1])
+                    else:
+                        game_results.append(res)
+
+                    if show_progress_bar:
+                        mean_results = np.mean((np.array(game_results) + 1) / 2, axis=0)
+                        pbar.set_postfix({
+                            "Mean result": mean_results
+                        }, refresh=False)
+                        pbar.update()
+
+            self.flip_players = True
+
+        if show_progress_bar:
+            pbar.close()
 
         return game_results
 
@@ -110,7 +131,8 @@ class MoveEvaluation:
         player = self.instantiate_player()
         _conf = Configuration()
 
-        agent_move = player.get_move(Observation(board=board), _conf)
+        mark = (np.count_nonzero(board) % 2) + 1
+        agent_move = player.get_move(Observation(board=board, mark=mark), _conf)
 
         moves = data["move score"]
         perfect_score = max(moves)
