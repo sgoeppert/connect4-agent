@@ -44,6 +44,9 @@ class Node:
 
         return self.children[move]
 
+    def add_child(self, node: "Node", move: int):
+        self.children[move] = node
+
 
 class MCTSPlayer(Player):
     name = "MCTSPlayer"
@@ -81,7 +84,17 @@ class MCTSPlayer(Player):
         scoring = game.get_other_player(game.get_current_player())
         while not game.is_terminal():
             game.play_move(random.choice(game.list_moves()))
+
         return game.get_reward(scoring)
+
+    def tree_policy(self, root: Node) -> Node:
+        current = root
+        while not current.game_state.is_terminal():
+            if current.is_expanded():
+                current = current.best_child(self.exploration_constant)
+            else:
+                return current.expand_one_child()
+        return current
 
     def find_leaf(self, root: Node) -> Node:
         current = root
@@ -116,20 +129,31 @@ class MCTSPlayer(Player):
             i += 1
         return -1
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset()
-
+    def _restore_root(self, observation, configuration):
         root = None
         # if we're keeping the tree and have a stored node, try to determine the opponents move and apply that move
         # the resulting node is out starting root-node
         if self.keep_tree and self.root is not None:
             root = self.root
-            opp_move = self.determine_opponent_move(observation.board, self.root.game_state.board, conf.columns)
+            opp_move = self.determine_opponent_move(observation.board, self.root.game_state.board, configuration.columns)
             if opp_move in root.children:
                 root = root.children[opp_move]
                 root.parent = None
             else:
                 root = None
+        return root
+
+    def _store_root(self, new_root):
+        if self.keep_tree:
+            self.root = new_root
+            self.root.parent = None
+
+
+    def get_move(self, observation: Observation, conf: Configuration) -> int:
+        self.reset()
+
+        # load the root if it was persisted
+        root = self._restore_root(observation, conf)
 
         # if no root could be determined, create a new tree from scratch
         if root is None:
@@ -143,15 +167,13 @@ class MCTSPlayer(Player):
             root = Node(root_game)
 
         while self.has_resources():
-            leaf = self.find_leaf(root)
-            child = self.expand(leaf)
-            reward = self.evaluate_game_state(child.game_state)
-            self.backup(child, reward)
+            leaf = self.tree_policy(root)
+            reward = self.evaluate_game_state(leaf.game_state)
+            self.backup(leaf, reward)
 
         best = self.best_move(root)
-        if self.keep_tree:
-            self.root = root.children[best]
-            self.root.parent = None
+        # persist the root if we're keeping the tree
+        self._store_root(root.children[best])
 
         return best
 
