@@ -2,3 +2,10 @@
 .idea
 /old/log/
 /old/data/
+/tex/main.synctex.gz
+/tex/main.log
+/tex/main.blg
+/tex/main.aux
+/tex/main.run.xml
+/tex/main.bbl
+/tex/main.bcf
