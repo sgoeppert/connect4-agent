@@ -3,13 +3,13 @@ from bachelorarbeit.scorebounded import ScoreboundedPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Scorebounded exploration"
-NUM_GAMES = 200
-NUM_PROCESSES = 6
+NUM_GAMES = 300
+NUM_PROCESSES = 10
 
-p1_values = [0.5, 0.8, 1.0, 1.2, 1.5]
+p1_values = [0.8, 1.0, 1.2, 1.5, 1.7]
 p2 = 0.9
 
-steps = 400
+steps = 500
 
 if __name__ == "__main__":
     experiments = []

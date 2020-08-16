@@ -4,7 +4,7 @@ from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Transposition vs MCTS"
 NUM_GAMES = 500
-NUM_PROCESSES = 6
+NUM_PROCESSES = 9
 
 if __name__ == "__main__":
     res = run_selfplay_experiment(TITLE,

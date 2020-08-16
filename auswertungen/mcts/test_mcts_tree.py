@@ -2,11 +2,11 @@ from bachelorarbeit.mcts import MCTSPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "MCTS Keep tree"
-NUM_GAMES = 100
-NUM_PROCESSES = 4
+NUM_GAMES = 500
+NUM_PROCESSES = 9
 
-p1_values = [True, False]
-p2_values = [True, False]
+p1_values = [True]
+p2_values = [False]
 
 exploration_constant = 0.9
 

@@ -2,7 +2,7 @@ from bachelorarbeit.mcts import MCTSPlayer
 from bachelorarbeit.base_players import RandomPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
-NUM_PROCESSES = 6
+NUM_PROCESSES = 10
 
 if __name__ == "__main__":
     results = []
@@ -18,7 +18,7 @@ if __name__ == "__main__":
             player=MCTSPlayer,
             player_config={"max_steps": steps},
             num_processes=NUM_PROCESSES,
-            repeats=5
+            repeats=10
         )
         results.append(res)
         print(res)

@@ -1,7 +1,7 @@
 from bachelorarbeit.transposition import TranspositionPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
-NUM_PROCESSES = 6
+NUM_PROCESSES = 8
 
 if __name__ == "__main__":
     results = []
@@ -11,10 +11,10 @@ if __name__ == "__main__":
         res = run_move_evaluation_experiment(
             title="Transposition player",
             player=TranspositionPlayer,
-            player_config={"max_steps": steps},
+            player_config={"max_steps": steps, "uct_method": "UCT"},
             num_processes=NUM_PROCESSES,
             repeats=5
         )
         results.append(res)
         print(res)
-    dump_json("data/test_transposition_move_score_{}.json", results)
+    dump_json("data/test_transposition_move_score_baseline_{}.json", results)

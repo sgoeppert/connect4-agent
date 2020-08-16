@@ -13,7 +13,7 @@ if __name__ == "__main__":
             player=ScoreboundedPlayer,
             player_config={"max_steps": steps},
             num_processes=NUM_PROCESSES,
-            repeats=5
+            repeats=2
         )
         results.append(res)
         print(res)
