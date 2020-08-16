@@ -135,14 +135,7 @@ class RavePlayer(MCTSPlayer):
         move, n = max(node.children.items(), key=lambda c: (1 - self.beta) * c[1].Q() + self.beta * c[1].QRave())
         return move
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=conf.columns,
-            rows=conf.rows,
-            inarow=conf.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return RaveNode(game_state=root_game)
 
     def perform_search(self, root):

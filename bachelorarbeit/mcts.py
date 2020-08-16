@@ -163,14 +163,7 @@ class MCTSPlayer(Player):
             self.root = new_root
             self.root.parent = None
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=configuration.columns,
-            rows=configuration.rows,
-            inarow=configuration.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return Node(root_game)
 
     def perform_search(self, root):
@@ -188,7 +181,14 @@ class MCTSPlayer(Player):
 
         # if no root could be determined, create a new tree from scratch
         if root is None:
-            root = self.init_root_node(observation, conf)
+            root_game = ConnectFour(
+                columns=conf.columns,
+                rows=conf.rows,
+                inarow=conf.inarow,
+                mark=observation.mark,
+                board=observation.board
+            )
+            root = self.init_root_node(root_game)
 
         # run the search
         best = self.perform_search(root)

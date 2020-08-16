@@ -110,14 +110,7 @@ class TranspositionPlayer(MCTSPlayer):
             self.backup(path, reward)
         return self.best_move(root)
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=configuration.columns,
-            rows=configuration.rows,
-            inarow=configuration.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return TranspositionNode(root_game)
 
 

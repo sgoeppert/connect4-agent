@@ -75,14 +75,7 @@ class SarsaPlayer(RavePlayer):
             reward = -reward
             current = current.parent
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=configuration.columns,
-            rows=configuration.rows,
-            inarow=configuration.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return SarsaNode(game_state=root_game)
 
     def perform_search(self, root):

@@ -157,14 +157,7 @@ class ScoreboundedPlayer(MCTSPlayer):
         move, n = max(node.children.items(), key=lambda c: c[1].Q() + c[1].opti + c[1].pess)
         return move
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=configuration.columns,
-            rows=configuration.rows,
-            inarow=configuration.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
 
     def perform_search(self, root):

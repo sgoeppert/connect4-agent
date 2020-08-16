@@ -113,14 +113,7 @@ class SarsaPlayer(RavePlayer):
 
         return (game.get_reward(self.mark) + 1) / 2
 
-    def init_root_node(self, observation, configuration):
-        root_game = ConnectFour(
-            columns=configuration.columns,
-            rows=configuration.rows,
-            inarow=configuration.inarow,
-            mark=observation.mark,
-            board=observation.board
-        )
+    def init_root_node(self, root_game):
         return SarsaNode(game_state=root_game, is_max=True)
 
     def perform_search(self, root):
