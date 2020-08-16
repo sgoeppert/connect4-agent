@@ -8,8 +8,8 @@ from bachelorarbeit.mcts import Node, MCTSPlayer
 
 class ScoreboundedNode(Node):
     def __init__(self,
-                 cut_delta:float = 0.0,
-                 cut_gamma:float = 0.0,
+                 cut_delta: float = 0.0,
+                 cut_gamma: float = 0.0,
                  *args, **kwargs):
         super(ScoreboundedNode, self).__init__(*args, **kwargs)
         self.pess = -1
@@ -175,10 +175,9 @@ class ScoreboundedPlayer(MCTSPlayer):
         root = ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
 
         while self.has_resources():
-            leaf = self.find_leaf(root)
-            child = self.expand(leaf)
-            reward = self.evaluate_game_state(child.game_state)
-            self.backup(child, reward)
+            leaf = self.tree_policy(root)
+            reward = self.evaluate_game_state(leaf.game_state)
+            self.backup(leaf, reward)
 
         # print(root)
         # for m, c in root.children.items():
