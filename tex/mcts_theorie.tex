@@ -28,6 +28,7 @@ Spielbäume sind rekursive Datenstrukturen. Wenn ein Zug gewählt wurde, kann de
 
 Ein einfacher Algorithmus, der aber bei großen Spielbäumen aber schnell an seine Grenzen stößt, um den optimalen Spielzug in einem Spielbaum zu wählen ist der \textbf{Minimax-Algorithmus}. 
 
+\label{chap:minimax}
 In einem Zwei-Spieler-Nullsummenspiel sind die Ziele beider Spieler exakt entgegengesetzt. Der eine Spieler versucht seinen (minimalen) Gewinn zu maximieren, während der Gegenspieler versucht, den (maximalen) Gewinn des ersten Spielers zu minimieren - daher der Name Minimax. Dies spiegelt sich auch im Minimax-Spielbaum wieder indem es Max-Knoten und Min-Knoten gibt. Bei Minimax wechseln sich die Knoten strikt ab, also Max-Knoten haben nur Min-Knoten als Kinder und umgekehrt. 
 
 \footnotetext{\cite{en:user:gdrFirstTwoPly2007}}
@@ -62,7 +63,7 @@ Der von Coulom vorgestellt Algorithmus beginnt mit einem Knoten als Wurzel. Ausg
 \end{figure}
 \footnotetext{\cite[\ppno~6]{browneSurveyMonteCarlo2012}}
 
-Eine Iteration der Monte-Carlo-Baumsuche läuft in vier Schritten ab (siehe Abb. \ref{fig:mctssurveyalgorithm}). Zunächst wird der bestehende Spielbaum in einer \textbf{Selektions-Phase} durchlaufen, bis ein Blattknoten gefunden wurde. Dabei folgt der Algorithmus eine bestimmten Strategie (engl. policy) um die Knoten im Baum zu wählen. Ein Knoten ist ein Blatt des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden. Wenn dieser Blattknoten nicht terminal ist, so wird er \textbf{expandiert} indem ein noch nicht besuchtes Kind hinzugefügt und besucht wird. Ausgehend von diesem neuen Kindknoten wird nun eine \textbf{Simulation} gestartet. Es werden so lange zufällige Spielzüge ausgewählt bis das Spiel einen Endzustand erreicht hat. Die Strategie, die während der Simulation befolgt wird, nennt man auch die Default Policy. In der Regel werden die Spielzüge zufällig gewählt, es können aber Heuristiken benutzt werden um die Simulation zu steuern. Das Ergebnis dieser Simulation wird dann in der \textbf{Backup-Phase} benutzt, um die Bewertungen der in der Selektion besuchten Knoten zu aktualisieren.
+Eine Iteration der Monte-Carlo-Baumsuche läuft in vier Schritten ab (siehe Abb. \ref{fig:mctssurveyalgorithm}). Zunächst wird der bestehende Spielbaum in einer \textbf{Selektions-Phase} durchlaufen, bis ein Blattknoten gefunden wurde. Dabei folgt der Algorithmus eine bestimmten Strategie (engl. policy) um die Knoten im Baum zu wählen. Ein Knoten ist ein Blatt des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden. Wenn dieser Blattknoten nicht terminal ist, so wird er \textbf{expandiert} indem ein noch nicht besuchtes Kind hinzugefügt und besucht wird. Ausgehend von diesem neuen Kindknoten wird nun eine \textbf{Simulation} gestartet. Es werden so lange zufällige Spielzüge ausgewählt bis das Spiel einen Endzustand erreicht hat. Die Strategie, die während der Simulation befolgt wird, nennt man auch die Default Policy. In der Regel werden die Spielzüge zufällig gewählt, es können aber Heuristiken benutzt werden um die Simulation zu steuern. Die Bewertung wird durch die Umgebung definiert, mit der der Algorithmus interagiert. Dafür benötigt die MCTS eine sogenannte Forward-Simulation der Umgebung. Die Umgebung muss aus einem Zustand $s$ und einer Aktion $a$ einen Folgezustand $s^\prime$ und eine Belohnung $r$ erzeugen können. Das Ergebnis dieser Simulation wird dann in der \textbf{Backup-Phase} benutzt, um die Bewertungen der in der Selektion besuchten Knoten zu aktualisieren. Die Problemstellung bestimmt, ob es nur terminale Belohnungen gibt, also nur wenn die Simulation einen Endzustand erreicht hat, oder ob jeder einzelne Zustandsübergang eine Belohnung liefert.
 
 Diese vier Schritte werden so lange wiederholt, bis ein Ressourcenlimit, zum Beispiel ein Zeitlimit, erreicht ist. Danach wird der beste Zug im Wurzelknoten ausgewählt. Die Expansion und Selektion lassen sich logisch noch zu einer Einheit als Tree Policy zusammenfassen.
 Der Ablauf ist in Algorithmus \ref{algo:mcts} als Pseudocode erklärt. Das Programm geht von einem Spielzustand $s_0$ im Wurzelknoten $v_0$ aus. $\textsc{TreePolicy}$ folgt einer festen Strategie, um ein Blatt $v_l$ im Baum zu finden, welches dann expandiert wird, wenn es möglich ist. $\textsc{SimuliereSpiel}$ arbeitet mit dem Spielzustand im Blatt $s(v_l) = s_l$ und erzeugt daraus eine Bewertung $r$. Diese Bewertung wird durch $\textsc{Backup}$ vom Blatt bis zur Wurzel propagiert und aktualisiert die Statistiken in den Knoten. Nach Ablauf eines Zeitlimits wird mit $\textsc{BestesKind}$ der am besten bewertete Kindknoten im Wurzelknoten $v_0$ gewählt und die zugehörige Aktion $a(v)$ zurückgegeben.
@@ -208,7 +209,7 @@ Eine andere Zugfolge, die zum selben Spielzustand führt, ist d1,d2;c1,e1. Durch
 
 Normale UCT-Algorithmen, die Transpositionen nicht berücksichtigen, werden im Paper als \textbf{UCT0} bezeichnet. 
 
-In Gleichung \ref{eqn:UCT} verwende ich die Statistiken eines Knotens $Q(v)$ und $N(v)$ direkt, also die Summe der Belohnungen aus Simulationen und die Anzahl an Simulationen durch diesen Knoten. Zusätzlich dazu kann diese Statistik abhängig von der gewählten Aktion $a$ im Knoten $v$, $Q(v,a)$ und $N(v,a)$ gespeichert werden. Wenn keine Transpositionen identifiziert werden, so sind die Werte identisch $v^\prime = \textsc{Transition}(s(v),a) \Rightarrow Q(v') = Q(v,a)$. Werden Transpositionen aber erkannt, kann es mehrere Aktionen aus verschiedenen Knoten geben, die zum selben Kindknoten führen. 
+In Gleichung \ref{eqn:UCT} verwende ich die Statistiken eines Knotens $Q(v)$ und $N(v)$ direkt, also die Summe der Belohnungen aus Simulationen und die Anzahl an Simulationen durch diesen Knoten. Zusätzlich dazu kann diese Statistik abhängig von der gewählten Aktion $a$ im Knoten $v$, $Q(v,a)$ und $N(v,a)$ gespeichert werden. Wenn keine Transpositionen identifiziert werden, so sind die Werte identisch $v^\prime = \textsc{Transition}(s(v),a) \Rightarrow Q(v^\prime) = Q(v,a)$. Werden Transpositionen aber erkannt, kann es mehrere Aktionen in verschiedenen Knoten geben, die zum selben Kindknoten führen.
 
 Wenn Transpositionen erkannt werden, so können sich im einfachsten Fall die Knoten, unabhängig davon wo sie sich im Baum befinden, ihre Statistiken teilen. Dies hat vor allem den Vorteil, dass der gesamte Baum kleiner wird. Die von Childs u.a. vorgeschlagene einfache Auswahlregel UCT1 ist:
 
@@ -217,25 +218,68 @@ UCT1 = \argmax_{a \in A(v)} \frac{Q(v,a)}{N(v,a)} + C_p\sqrt{\frac{\ln N(v)}{N(v
 \label{eqn:UCT1}
 \end{equation}
 
-Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v)$ wie in der originalen UCT Implementierung verwendet wird. Für die Berechnung des Erkundungsfaktors 
+Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung \ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
 
-Sie können ignoriert werden (UCT0), sie können identifiziert werden und ihre Informationen die in der Selektionsphase notwendig sind, werden über alle identischen Knoten kumuliert (UCT1), anstatt der Information Q(s,a) wird die Information Q(g(s,a)) geteilt, wodurch die Informationen aus den Kindern eines Knotens verwendet werden anstatt der Informationen aus dem Elternknoten über diese Kinder. Dies verfeinert die Schätzung, da sowohl die Informationen aus Elternknoten A in diese Bewertung einfließen als auch die aus anderen Elternknoten B .. p (UCT2). Die letzte Variante UCT3 berechnet den Wert der Kinder Q(g(s,a)) rekursiv als gewichteter Durchschnitt aller Kinder des Knotens. Offen bleibt die Frage, wie die Backup-Phase des MCTS Algorithmus aussehen soll. Die vorgeschlagenen Vorgehensweisen sind “Update-All”, welches ausgehend vom Blatt den Baum wieder hinaufsteigt und alle Vorfahren jedes Knotens aktualisiert, und “Update-Descend” welches nur die Knoten aktualisiert, die auf dem Abstiegspfad liegen.\\
-\par
-Durch das Kombinieren der Knoten entsteht ein gerichteter azyklischer Graph. Es kann nützlich sein, zur Bewertung eines Knotens nicht nur die direkten Kinder und Eltern zu betrachten, sondern beliebig tief im Graph auf- und abzusteigen. Cazenave, Mehat und Saffidine schlagen einen parametrisierbaren UCT Algorithmus, den sie Upper confidence bound for rooted directed acyclic graphs (UCD) nennen, vor.
+\begin{equation}
+UCT2 = \argmax_{a \in A(v)} \frac{Q(v^\prime)}{N(v^\prime)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
+\label{eqn:UCT2}
+\end{equation}
+
+Die letzte vorgeschlagene Variante berechnet den Wert der Kinder $Q(v^\prime)$ rekursiv als gewichteter Durschnitt aller Kinder dieses Kindknotens. Dadurch, dass rekursiv alle Kinder eines Knotens betrachtet werden müssen, ist der Rechenaufwand in der Methode \textsc{bestesKind} sehr hoch. Um ihn zu reduzieren, können die Durchschnittswerte in den Knoten zwischengespeichert werden und müssen sich nur ändern, wenn sich ein Kind verändert. Damit kann der Rechenaufwand aus der teuren Selektionsphase in die Backupphase verlagert werden.
+
+%TODO: UCT3 Gleichung
+\begin{equation}
+UCT3 = \argmax_{a \in A(v)}
+\label{eqn:uct3}
+\end{equation}
+
+Durch das Kombinieren der Knoten entsteht ein gerichteter azyklischer Graph. Es kann nützlich sein, zur Bewertung eines Knotens nicht nur die direkten Kinder und Eltern zu betrachten, sondern beliebig tief im Graph auf- und abzusteigen. Cazenave, Mehat und Saffidine schlagen einen parametrisierbaren UCT Algorithmus, den sie Upper confidence bound for rooted directed acyclic graphs (UCD) nennen, vor. Sie zeigen wie mit dieser Parametrisierung die UCT1-3 Algorithmen von Childs u.a. implementiert werden können. Cazenave u.a. argumentieren dafür, die Statistiken nicht in den Knoten sondern in den Kanten zu speichern, dies kann allerdings die Implementierung verkomplizieren und wird deshalb bei der Anwendung von Transpositionen eher selten umgesetzt.
+Der UCD-Algorithmus besteht aus drei Komponenten.
+%TODO: UCD Gleichungen und Quelle
+\begin{equation}
+Gleichung1
+\label{eqn:ucd1}
+\end{equation}
+\begin{equation}
+Gleichung2
+\label{eqn:ucd2}
+\end{equation}
+\begin{equation}
+Gleichung3
+\label{eqn:ucd3}
+\end{equation}
 
 
 \subsubsection{Scorebounded MCTS}
+%TODO: Referenz Alpha-Beta Cuts, Scorebounded Quelle
+Score bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts im Minimax-Suchalgorithmus. Jeder Knoten speichert eine optimistische $opt(v)$ und pessimistische Grenze $pess(v)$ für seine Kindknoten. Die Bewertung hängt davon ab, ob der Knoten ein Min- oder ein Max-Knoten (siehe Seite \ref{chap:minimax}) ist.
+Für einen Max-Knoten werden die optimistischsten, also die maximalen, Werte der Kinder genommen. Das heißt $opti(v) = \max_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \max_{k \in\ \text{Kinder von}\ v}pess(k)$.
+Ein Min-Knoten dagegen nimmt die minimalen Werte der Kinder $opti(v) = \min_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \min_{k \in\ \text{Kinder von}\ v}pess(k)$.
+Wenn ein Knoten terminal ist, so gilt $pess(v) = opti(v) = \textsc{Utility}(s(v),P_{max})$, die Grenzen entsprechen also der tatsächlichen Bewertung des Zustands durch die Umgebung aus Sicht des Max-Spielers. Der Einfachheit halber sind die Grenzen auch in einem Minimax-Baum immer aus Sicht des Max-Spielers definiert, das heißt bei terminalen Bewertungen von $[-1, 0, 1]$ für Niederlage, Unentschieden und Sieg ist ein Knoten mit $pess(v) = opti(v) = 1$ immer gut für den Max-Spieler respektive $pess(v) = opti(v) = -1$ ist immer schlecht für Max. Die Grenzen werden initialisiert mit $pess(v) = \textsc{Niederlage}, $opti(v) = \textsc{Sieg}$ und erst aktualisiert, wenn ein Endzustand \textbf{im Baum} erreicht wurde, also ein terminaler Blatt-Knoten dem Baum hinzugefügt wurde. Erst dann ist die tatsächliche Bewertung eines Knotens bekannt.
 
-Score bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts in Minimax Suchalgorithmen. Jeder Knoten speichert eine optimistische und pessimistische Einschätzung. Ein Knoten gilt als gelöst, wenn er terminal ist, oder alle Kindknoten gelöst sind. Ein terminaler Knoten hat eine optimistische = pessimistische Grenze = tatsächliche Bewertung dieses Knotens.\\
-\par
-Diese Grenzen können benutzt werden, um die Auswahl der Kindknoten zu steuern. Ein Kindknoten dessen optimistische Grenze schlechter ist, als die pessimistische Grenze des Elternknotens kann getrost ignoriert werden, da er zu keiner Verbesserung der Bewertung dieses Knotens beitragen kann.\\
-\par
-Wenn sich die Bewertung eines Knotens ändert, muss die Änderung der pess. und opt. Grenzen den Baum hinauf propagiert werden. Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor.
+Die Grenzen können benutzt werden um Teile des Suchbaumes zu ignorieren, wenn durch die Grenzen bekannt ist, dass dieser Teilbaum die Bewertung nicht weiter verbessern kann, der Baum wird "beschnitten" (engl. pruned).
+%TODO: Pruning genauer beschreiben.
+
+Zusätzlich zum Beschneiden des Baumes können die Grenzen benutzt werden, um die Selektion zu beeinflussen. So können zum Beispiel Knoten mit einer hohen optimistischer Grenze bevorzugt besucht werden, während versucht wird Knoten mit geringer pessimistischer Grenze zu vermeiden. Zum Beispiel
+
+\begin{equation}
+Q_sb(v) = \frac{Q(v)}{N(v)} + \gamma opti(v) + \delta pess(v)
+\label{eqn:scorebound}
+\end{equation}
+
+mit $-1 \le \gamma, \delta \le 1$.
+
+Da die Grenzen eines Knotens von den Grenzen der Kindknoten abhängig ist, ist es notwendig die Grenzen so selten wie möglich zu aktualisieren und nicht bei jeder Iteration der Baumsuche neu zu berechnen. Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor, die die Grenzen aus einem terminalen Knoten effizient den gesamten Baum hinaufpropagieren.
+
+%TODO: aktualisierungs-algorithmen abschreiben, quelle Scorebounded Seite X
 
 \subsubsection{Rapid Action Value Estimation}
 
-All Moves as First (AMAF) gehört zu den sogenannten History Heuristiken. Anhand der besuchten Knoten während der Selektion und Simulation werden andere Knoten im Baum oder die Simulationsphase beeinflusst. AMAF nimmt an, dass das Spielen eines Spielzuges X aus dem Zustand A einen ähnlichen Wert hat, wie wenn der Spielzug X aus dem Zustand A2 gespielt wird. Dies gilt sowohl für Spielzüge innerhalb des Suchbaumes als auch für Spielzüge, die in der Simulation gewählt werden.
-\par
-Verschiedene History heuristic Verfahren unterscheiden sich darin, wie sie diese zusätzlichen Informationen verwenden. Move Average Sampling nutzt die Daten um den Simulationsschritt in der Default Policy zu steuern. Rapid Action Value Estimation (RAVE) nutzt die Daten zum Bootstrapping der Knoten. Die zusätzlichen Informationen geben bereits ein gewisses Vorwissen über die Werte eines Knotens, solange der Knoten noch nicht ausreichend oft besucht wurde.
-\par
-Unterschieden wird hier zwischen Algorithmen, die die Bewertung der Knoten direkt verändern und solchen, die zusätzliche Informationen in den Knoten speichern.
+Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen. In der regulären Monte-Carlo-Baumsuche werden nur die tatsächlich besuchten Knoten in der Backup-Phase aktualisiert. Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.
+
+%TODO: Quelle für RAVE
+Die verschiedenen AMAF-Verfahren unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_RAVE(v)$ und $N_RAVE(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten.
+
+Im RAVE-Algorithmus, entwickelt von xxx , wird in der Selektions- und Simulations-Phase eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
+
+Was in der Literatur nicht erwähnt wird, ist die Notwendigkeit die Spielzüge eindeutig zu identifizieren. Die meisten Untersuchungen des Algorithmus beziehen sich nur auf Schach und Go, in denen ein Spielzug klar definiert ist (schwarzer Bauer von E2 nach E3 oder schwarzer Stein auf Kreuzung 3,3). Für Vier Gewinnt reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
