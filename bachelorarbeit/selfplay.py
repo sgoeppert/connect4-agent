@@ -1,7 +1,12 @@
-from typing import Tuple, Callable, List, Union, Type
+import pickle
+from typing import Tuple, Callable, List, Dict, Union, Type
 import multiprocessing as mp
 import numpy as np
+
 from tqdm import tqdm
+
+import os
+from pathlib import Path
 import json
 
 from bachelorarbeit.games import Configuration, Observation, ConnectFour
@@ -18,7 +23,8 @@ class Arena:
             constructor_args: Tuple[any, any] = (None, None),
             num_games: int = 30,
             flip_halfway: bool = True,
-            num_processes: int = config.NUM_PROCESSES
+            num_processes: int = config.NUM_PROCESSES,
+            memory: "Memory" = None
     ):
         assert len(players) == 2, "Arena requires two players"
         assert num_processes > 0, "Argument num_processes must be positive"
@@ -28,6 +34,7 @@ class Arena:
         self.flip_halfway = flip_halfway
         self.num_processes = num_processes
         self.flip_players = False
+        self.memory = memory
 
     def update_players(self, player_classes: Tuple[Callable, Callable], constructor_args: Tuple[any, any] = (None, None)):
         self.player_classes = player_classes
@@ -45,21 +52,29 @@ class Arena:
             players = players[::-1]
         return players
 
-    def run_game(self, _dummy=0) -> GameResult:
+    def run_game(self, _dummy=0) -> Tuple[GameResult, List]:
         conf = Configuration()
         game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
 
         players = self.instantiate_players()
 
         s = 0
+        game_states = []
         while not game.is_terminal():
             obs = Observation(board=game.board.copy(), mark=game.mark)
+            game_states.append({"board": obs.board.copy(), "mark": obs.mark, "result": 0})
             active_player = s & 1
             m = players[active_player].get_move(obs, conf)
             game.play_move(m)
             s += 1
 
-        return game.get_reward(1), game.get_reward(2)
+        game_states.append({"board": game.board.copy(), "mark": game.mark, "result": 0})
+
+        rewards = (game.get_reward(1), game.get_reward(2))
+        for state in game_states[1:]:
+            state["result"] = rewards[0]
+
+        return rewards, game_states
 
     def run_game_mp(self, show_progress_bar: bool = True) -> List[GameResult]:
         self.flip_players = False
@@ -77,11 +92,14 @@ class Arena:
             with mp.Pool(self.num_processes, maxtasksperchild=10) as pool:
                 pending_results = pool.imap_unordered(self.run_game, range(num_games))
 
-                for res in pending_results:
+                for res, game_states in pending_results:
                     if self.flip_players:
                         game_results.append(res[::-1])
                     else:
                         game_results.append(res)
+
+                    if self.memory is not None:
+                        self.memory.add_full_game(game_states)
 
                     if show_progress_bar:
                         mean_results = np.mean((np.array(game_results) + 1) / 2, axis=0)
@@ -94,6 +112,9 @@ class Arena:
 
         if show_progress_bar:
             pbar.close()
+
+        if self.memory is not None:
+            self.memory.save_data()
 
         return game_results
 
@@ -179,3 +200,58 @@ class MoveEvaluation:
                     pending_results.close()
 
         return good_move_count, perfect_move_count, count
+
+
+class Memory:
+    def __init__(self, file_name: str, save_interval: int = 5000):
+        self.file_name = Path(config.ROOT_DIR) / "memory" / file_name
+        self.save_interval = save_interval
+        self.game_data = []
+        self.init()
+        self.num_states = len(self.game_data)
+        self.added_since_save = 0
+
+    def init(self):
+        try:
+            self.load_data()
+        except FileNotFoundError as e:
+            print(f"{e}\nCreating new memory")
+            self.game_data = []
+
+    def load_data(self):
+        if os.path.isfile(self.file_name):
+            with open(self.file_name, "rb") as f:
+                self.game_data = pickle.load(f)
+                self.num_states = len(self.game_data)
+        else:
+            raise FileNotFoundError(f"Could not open file {self.file_name}.")
+
+    def save_data(self):
+        os.makedirs(os.path.dirname(self.file_name), exist_ok=True)
+
+        with open(self.file_name, "wb") as f:
+            pickle.dump(self.game_data, f)
+
+    def add_full_game(self, game_states: List):
+        for state in game_states:
+            self.add_state(state)
+
+    def add_state(self, state: Dict):
+        self.game_data.append(state)
+        self.num_states += 1
+
+        self.added_since_save += 1
+        if self.save_interval > 0 and self.added_since_save > self.save_interval:
+            self.save_data()
+            self.added_since_save = 0
+
+    def add_other_memory(self, other: "Memory"):
+        self.game_data.extend(other.game_data)
+
+
+if __name__ == "__main__":
+    from bachelorarbeit.base_players import RandomPlayer
+    memory = Memory(file_name="random_data.pkl")
+    arena = Arena(players=(RandomPlayer, RandomPlayer), num_games=1000, num_processes=6)
+
+    arena.run_game_mp()
