@@ -24,6 +24,29 @@ class ScoreboundedNode(Node):
         else:
             self.is_max_node = True
 
+    def best_child(self, exploration_constant: float = 1.0) -> "ScoreboundedNode":
+        n_p = math.log(self.number_visits)
+        parent = self
+        gamma = self.cut_gamma
+        delta = self.cut_delta
+
+        def score_func(c):
+            if parent.is_max_node:
+                return c.Q() + gamma * c.pess + delta * c.opti
+            else:
+                return c.Q() - delta * c.pess - gamma * c.opti
+
+        children = list(self.children.values())
+        # Entferne Kindknoten die das Ergebnis nicht verbessern können
+        for c in children:
+            if len(children) > 1:
+                if self.is_max_node and c.opti <= self.pess:
+                    children.remove(c)
+                elif not self.is_max_node and c.pess >= self.opti:
+                    children.remove(c)
+
+        c = max(children, key=lambda c: score_func(c) + exploration_constant * math.sqrt(n_p / c.number_visits))
+        return c
 
     def min_pess_child(self):
         c_pess = [c.pess for c in self.children.values()]
@@ -38,40 +61,6 @@ class ScoreboundedNode(Node):
             c_opti.append(1)
 
         return max(c_opti)
-
-    def best_child(self, exploration_constant: float = 1.0) -> "ScoreboundedNode":
-        n_p = math.log(self.number_visits)
-        parent = self
-        gamma = self.cut_gamma
-        delta = self.cut_delta
-
-        def score_func(c):
-            if parent.is_max_node:
-                return c.Q() + gamma * c.pess + delta * c.opti
-            else:
-                return c.Q() - delta * c.pess - gamma * c.opti
-
-        children = list(self.children.values())
-        pruned = 0
-        for c in children:
-            if self.is_max_node:
-                if c.opti <= self.pess:
-                    children.remove(c)
-                    pruned += 1
-            else:
-                if c.pess >= self.opti:
-                    children.remove(c)
-                    pruned += 1
-        # if pruned:
-        #     print("Pruned", pruned)
-
-        # if everything has been pruned, act as if nothing was pruned
-        if len(children) == 0:
-            # print("all children pruned")
-            children = self.children.values()
-
-        c = max(children, key=lambda c: score_func(c) + exploration_constant * math.sqrt(n_p / c.number_visits))
-        return c
 
     def __repr__(self):
         maxnode = " Min"
@@ -98,7 +87,6 @@ class ScoreboundedPlayer(MCTSPlayer):
     def prop_pess(self, s: ScoreboundedNode):
         if s.parent:
             n = s.parent
-            # print(s, n, f"parent2 {n.parent}")
             old_pess = n.pess
             if old_pess < s.pess:
                 if n.is_max_node:
@@ -124,23 +112,16 @@ class ScoreboundedPlayer(MCTSPlayer):
 
     def backup(self, node: ScoreboundedNode, reward: float):
         if node.game_state.is_terminal():
-            # print("Terminal node")
-            bound_score = reward
-            flip = -1
-            if not node.is_max_node:
-                flip = 1
-            node.opti = flip * bound_score
-            node.pess = flip * bound_score
-            # print("prop pess")
+            bound_score = -reward if node.is_max_node else reward
+            node.opti = bound_score
+            node.pess = bound_score
+
             self.prop_pess(node)
             self.prop_opti(node)
 
         current = node
         while current is not None:
             current.increment_visit_and_add_reward(reward)
-            # current.number_visits += 1
-            # current.average_value += (reward - current.average_value) / current.number_visits
-            # current.total_value += reward
             reward = -reward
 
             current = current.parent
@@ -165,8 +146,8 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 2000
-    p = ScoreboundedPlayer(max_steps=steps, exploration_constant=1.2)
+    steps = 200
+    p = ScoreboundedPlayer(max_steps=steps, exploration_constant=1.0)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
