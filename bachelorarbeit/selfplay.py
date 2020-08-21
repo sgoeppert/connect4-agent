@@ -19,7 +19,7 @@ GameResult = Tuple[float, float]
 class Arena:
     def __init__(
             self,
-            players: Tuple[Callable, Callable],
+            players: Tuple[Type[Player], Type[Player]],
             constructor_args: Tuple[any, any] = (None, None),
             num_games: int = 30,
             flip_halfway: bool = True,

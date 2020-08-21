@@ -54,7 +54,7 @@ class ConnectFour:
     def num_players(self) -> int:
         return 2
 
-    def play_move(self, col: int):
+    def play_move(self, col: int) -> "ConnectFour":
         try:
             row = max([r for r in range(self.rows) if self.board[col + (r * self.cols)] == 0])
             self.board[col + (row * self.cols)] = self.mark
@@ -69,6 +69,7 @@ class ConnectFour:
             self.winner = None
 
         self.mark = 3 - self.mark
+        return self
 
     def is_win(self, column: int, mark: int, has_played: bool = False) -> bool:
         columns = self.cols
@@ -80,7 +81,7 @@ class ConnectFour:
             else max([r for r in range(rows) if self.board[column + (r * columns)] == 0])
         )
 
-        def count(offset_row, offset_column):
+        def count(offset_row: int, offset_column: int) -> int:
             for i in range(1, inarow + 1):
                 r = row + offset_row * i
                 c = column + offset_column * i
@@ -116,7 +117,7 @@ class ConnectFour:
             return -1
 
     def copy(self) -> "ConnectFour":
-        cp = ConnectFour(board=self.board.copy(),
+        cp = ConnectFour(board=self.board[:],
                          columns=self.cols,
                          rows=self.rows,
                          mark=self.mark,
@@ -125,7 +126,7 @@ class ConnectFour:
         cp.winner = self.winner
         return cp
 
-    def hash(self):
+    def hash(self) -> int:
         return hash(str(self.board))
 
     def __hash__(self):
