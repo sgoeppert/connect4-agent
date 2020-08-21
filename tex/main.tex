@@ -2,32 +2,52 @@
 \documentclass[a4paper, 11pt]{scrartcl}
 
 %\usepackage[utf8]{inputenc}
+
+% graphic drawing
 \usepackage{tikz}
 \usetikzlibrary{positioning}
 \usetikzlibrary{tikzmark}
 
+% german language for captions etc
 \usepackage[german]{babel}
+
+% nice quotation marks
 \usepackage{csquotes}
 \MakeOuterQuote{"}
 \usepackage[T1]{fontenc}
 
+% better math symbols
 \usepackage{amsmath}
+
 \usepackage{graphicx}
 
+% bibliography
 %\usepackage{biblatex}
 \usepackage[notes,backend=biber]{biblatex-chicago}
 \usepackage{ftnxtra}
 \bibliography{ref2}
 
+% matrix multiplication math symbol
 \makeatletter
 \newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
 \newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
 \makeatother
+
+% argmax and argmin
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 
+% Pseudocode listings
 \usepackage[Algorithmus]{algorithm}
 \usepackage[noend]{algpseudocode}
+
+% code listings
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{biblatex}
+
+
 \author{Stefan Göppert}
 
 \title{Entwicklung eines Agenten für Vier Gewinnt mit Monte-Carlo Baumsuche und neuronalen Netzen}
