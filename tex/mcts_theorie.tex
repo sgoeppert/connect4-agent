@@ -1,7 +1,8 @@
 \section{Die Monte-Carlo-Baumsuche}
 \label{chap:mcts-intro}
 
-Die Monte-Carlo-Baumsuche (engl. Monte Carlo Tree Search, MCTS) wurde 2006 von R\'{e}mi Coulom erstmals vorgestellt und im Go-Programm Crazy Stone mit großem Erfolg eingesetzt\autocite{coulomEfficientSelectivityBackup2007}. Sie basiert auf der Kombination von Minimax-Spielbäumen mit Monte-Carlo-Simulationen.
+Die Monte-Carlo-Baumsuche (engl.\ Monte Carlo Tree Search, MCTS) wurde 2006 von R\'{e}mi Coulom erstmals vorgestellt und im Go-Programm Crazy Stone mit großem Erfolg eingesetzt\autocite{coulomEfficientSelectivityBackup2007}.
+Sie basiert auf der Kombination von Minimax-Spielbäumen mit Monte-Carlo-Simulationen.
 
 
 \subsection{Spielbäume}
@@ -12,10 +13,16 @@ Ein Spiel kann formell mit den folgenden Elementen definiert werden\autocite[\pp
 	\item $\textsc{Actions}(s)$: Definiert die Menge der legalen Spielzüge im Zustand $s$
 	\item $\textsc{Transition}(s,a)$: Die \textbf{Übergangsfunktion} definiert den Folgezustand $s^\prime$, wenn Aktion $a$ im Zustand $s$ gewählt wurde
 	\item $\textsc{Terminal-Test}(s)$: Ein Test ob das Spiel im Zustand $s$ vorüber ist oder nicht
-	\item $\textsc{Utility}(s,p)$: Eine Bewertungsfunktion (engl. utility function) die einen numerischen Wert für einen terminalen Zustand $s$ und einen Spieler $p$ liefert. Der Wert ist typischerweise -1, 0 oder +1 für eine Niederlage, Unentschieden oder einen Sieg, kann aber auch 0, $+\frac{1}{2}$ und +1 sein.
+	\item $\textsc{Utility}(s,p)$: Eine Bewertungsfunktion (engl.\ utility function) die einen numerischen Wert für einen terminalen Zustand $s$ und einen Spieler $p$ liefert. Der Wert ist typischerweise -1, 0 oder +1 für eine Niederlage, Unentschieden oder einen Sieg, kann aber auch 0, $+\frac{1}{2}$ und +1 sein.
 \end{itemize}
 
-Mit dem Ausgangszustand, der \textsc{Actions} Funktion und der \textsc{Transition} Funktion kann ein Spielbaum definiert werden. Ein Spielbaum (siehe Abb. \ref{fig:spielbaum}) ist ein Baum in dem jeder Knoten einen \textbf{Zustand} des Spiels repräsentiert. Der Übergang von einem Knoten zu einem der \textbf{Kinder} ist ein \textbf{Zug}. Die Anzahl der Kinder eines Knotens ist auch als \textbf{Verzweigungsfaktor} bekannt. Der \textbf{Wurzelknoten} des Baumes ist der anfängliche Zustand des Spiels. Knoten ohne Kinder, in denen keine weiteren Züge möglich sind, sind \textbf{terminale Knoten}. Der Spielzustand in diesen terminalen Knoten kann bewertet werden um ein Spielergebnis zu erhalten.
+Mit dem Ausgangszustand, der \textsc{Actions} Funktion und der \textsc{Transition} Funktion kann ein Spielbaum definiert werden.
+Ein Spielbaum (siehe Abb.~\ref{fig:spielbaum}) ist ein Baum in dem jeder Knoten einen \textbf{Zustand} des Spiels repräsentiert.
+Der Übergang von einem Knoten zu einem der \textbf{Kinder} ist ein \textbf{Zug}.
+Die Anzahl der Kinder eines Knotens ist auch als \textbf{Verzweigungsfaktor} bekannt.
+Der \textbf{Wurzelknoten} des Baumes ist der anfängliche Zustand des Spiels.
+Knoten ohne Kinder, in denen keine weiteren Züge möglich sind, sind \textbf{terminale Knoten}.
+Der Spielzustand in diesen terminalen Knoten kann bewertet werden um ein Spielergebnis zu erhalten.
 
 \begin{figure}[hbt!]
 	\centering
@@ -24,12 +31,16 @@ Mit dem Ausgangszustand, der \textsc{Actions} Funktion und der \textsc{Transitio
 	\label{fig:spielbaum}
 \end{figure}
 
-Spielbäume sind rekursive Datenstrukturen. Wenn ein Zug gewählt wurde, kann der verbleibende Teilbaum, mit dem gewählten Folgezustand nun in der Wurzel, als neuer Spielbaum wiederverwendet werden.
+Spielbäume sind rekursive Datenstrukturen.
+Wenn ein Zug gewählt wurde, kann der verbleibende Teilbaum, mit dem gewählten Folgezustand nun in der Wurzel, als neuer Spielbaum wiederverwendet werden.
 
 Ein einfacher Algorithmus, der aber bei großen Spielbäumen aber schnell an seine Grenzen stößt, um den optimalen Spielzug in einem Spielbaum zu wählen ist der \textbf{Minimax-Algorithmus}. 
 
 \label{chap:minimax}
-In einem Zwei-Spieler-Nullsummenspiel sind die Ziele beider Spieler exakt entgegengesetzt. Der eine Spieler versucht seinen (minimalen) Gewinn zu maximieren, während der Gegenspieler versucht, den (maximalen) Gewinn des ersten Spielers zu minimieren - daher der Name Minimax. Dies spiegelt sich auch im Minimax-Spielbaum wieder indem es Max-Knoten und Min-Knoten gibt. Bei Minimax wechseln sich die Knoten strikt ab, also Max-Knoten haben nur Min-Knoten als Kinder und umgekehrt. 
+In einem Zwei-Spieler-Nullsummenspiel sind die Ziele beider Spieler exakt entgegengesetzt.
+Der eine Spieler versucht seinen (minimalen) Gewinn zu maximieren, während der Gegenspieler versucht, den (maximalen) Gewinn des ersten Spielers zu minimieren - daher der Name Minimax.
+Dies spiegelt sich auch im Minimax-Spielbaum wieder indem es Max-Knoten und Min-Knoten gibt.
+Bei Minimax wechseln sich die Knoten strikt ab, also Max-Knoten haben nur Min-Knoten als Kinder und umgekehrt.
 
 \footnotetext{\cite{en:user:gdrFirstTwoPly2007}}
 
@@ -42,18 +53,27 @@ In einem Zwei-Spieler-Nullsummenspiel sind die Ziele beider Spieler exakt entgeg
 \end{figure}
 \footnotetext{\cite{nogueiraMinimaxAlgorithm2006}}
 
-Minimax muss den gesamten Spielbaum erforschen, bis im Wurzelknoten ein optimaler Zug gewählt werden kann, da jeder Knoten von der Bewertung seiner Kindknoten abhängig ist. Bei Spielen mit großem Verzweigungsfaktor wie Schach und Go führt dies aber zu gigantischen Spielbäumen, die einfach nicht komplett aufgebaut werden können.
+Minimax muss den gesamten Spielbaum erforschen, bis im Wurzelknoten ein optimaler Zug gewählt werden kann, da jeder Knoten von der Bewertung seiner Kindknoten abhängig ist.
+Bei Spielen mit großem Verzweigungsfaktor wie Schach und Go führt dies aber zu gigantischen Spielbäumen, die einfach nicht komplett aufgebaut werden können.
 
-Eine Lösung für dieses Problem ist es einfach die Suche ab einer gewissen Tiefe zu beenden und den aktuellen Zustand mit einer Bewertungsfunktion zu bewerten. Dies hat sich aber zum Beispiel für Go als sehr schwierig herausgestellt, da es schwer ist eine angemessene Bewertungsfunktion zu definieren.
+Eine Lösung für dieses Problem ist es einfach die Suche ab einer gewissen Tiefe zu beenden und den aktuellen Zustand mit einer Bewertungsfunktion zu bewerten.
+Dies hat sich aber zum Beispiel für Go als sehr schwierig herausgestellt, da es schwer ist eine angemessene Bewertungsfunktion zu definieren.
 
-Die Alpha-Beta-Suche ist eine Modifikation der Minimax-Baumsuche, welche versucht nur so viel vom Spielbaum zu durchsuchen, wie es nötig ist. Sobald festgestellt wird, dass ein weiteres Kind in einem Knoten das Ergebnis nicht verbessern kann, wird der gesamte Teilbaum "abgeschnitten" und nicht weiter berücksichtigt.
+Die Alpha-Beta-Suche ist eine Modifikation der Minimax-Baumsuche, welche versucht nur so viel vom Spielbaum zu durchsuchen, wie es nötig ist.
+Sobald festgestellt wird, dass ein weiteres Kind in einem Knoten das Ergebnis nicht verbessern kann, wird der gesamte Teilbaum "abgeschnitten" und nicht weiter berücksichtigt.
 
 
 \subsection{Der MCTS-Algorithmus}
 \label{chap:mcts-algo}
-Coulom kombinierte erstmals die Erzeugung eines Spielbaumes mit Monte-Carlo Simulationen. Unter Monte-Carlo Simulationen oder Monte-Carlo Experimenten versteht man gleichförmige Zufallsexperimente, die in großer Anzahl durchgeführt werden, um ein Ergebnis zu erhalten welches sich, mit steigender Anzahl der Experimente, dem tatsächlichen Wert immer weiter annähert.
+Coulom kombinierte erstmals die Erzeugung eines Spielbaumes mit Monte-Carlo Simulationen.
+Unter Monte-Carlo Simulationen oder Monte-Carlo Experimenten versteht man gleichförmige Zufallsexperimente, die in großer Anzahl durchgeführt werden, um ein Ergebnis zu erhalten welches sich, mit steigender Anzahl der Experimente, dem tatsächlichen Wert immer weiter annähert.
 
-Der von Coulom vorgestellt Algorithmus beginnt mit einem Knoten als Wurzel. Ausgehend von diesem Wurzelknoten werden nun zufällige Simulationen des Spiels gespielt. Das bedeutet in jedem Zustand wird ein zufälliger Zug gewählt und gespielt, bis das Spiel zu Ende ist. Der erste Zustand in einer solchen Simulation, der sich noch nicht im Spielbaum befindet, wird zum Baum hinzugefügt. Alle anderen Knoten, die sich bereits im Spielbaum befinden, merken sich, wie häufig sie bei solchen Simulationen besucht wurden und auch die Summe der Ergebnisse von Simulationen durch diesen Knoten. Die gesammelten Statistiken werden dann bei nachfolgenden Simulationen benutzt, um vielversprechende Knoten häufiger zu besuchen.
+Der von Coulom vorgestellt Algorithmus beginnt mit einem Knoten als Wurzel.
+Ausgehend von diesem Wurzelknoten werden nun zufällige Simulationen des Spiels gespielt.
+Das bedeutet in jedem Zustand wird ein zufälliger Zug gewählt und gespielt, bis das Spiel zu Ende ist.
+Der erste Zustand in einer solchen Simulation, der sich noch nicht im Spielbaum befindet, wird zum Baum hinzugefügt.
+Alle anderen Knoten, die sich bereits im Spielbaum befinden, merken sich, wie häufig sie bei solchen Simulationen besucht wurden und auch die Summe der Ergebnisse von Simulationen durch diesen Knoten.
+Die gesammelten Statistiken werden dann bei nachfolgenden Simulationen benutzt, um vielversprechende Knoten häufiger zu besuchen.
 
 \begin{figure}[hbt!]
 	\centering
@@ -63,7 +83,17 @@ Der von Coulom vorgestellt Algorithmus beginnt mit einem Knoten als Wurzel. Ausg
 \end{figure}
 \footnotetext{\cite[\ppno~6]{browneSurveyMonteCarlo2012}}
 
-Eine Iteration der Monte-Carlo-Baumsuche läuft in vier Schritten ab (siehe Abb. \ref{fig:mctssurveyalgorithm}). Zunächst wird der bestehende Spielbaum in einer \textbf{Selektions-Phase} durchlaufen, bis ein Blattknoten gefunden wurde. Dabei folgt der Algorithmus eine bestimmten Strategie (engl. policy) um die Knoten im Baum zu wählen. Ein Knoten ist ein Blatt des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden. Wenn dieser Blattknoten nicht terminal ist, so wird er \textbf{expandiert} indem ein noch nicht besuchtes Kind hinzugefügt und besucht wird. Ausgehend von diesem neuen Kindknoten wird nun eine \textbf{Simulation} gestartet. Es werden so lange zufällige Spielzüge ausgewählt bis das Spiel einen Endzustand erreicht hat. Die Strategie, die während der Simulation befolgt wird, nennt man auch die Default Policy. In der Regel werden die Spielzüge zufällig gewählt, es können aber Heuristiken benutzt werden um die Simulation zu steuern. Die Bewertung wird durch die Umgebung definiert, mit der der Algorithmus interagiert. Dafür benötigt die MCTS eine sogenannte Forward-Simulation der Umgebung. Die Umgebung muss aus einem Zustand $s$ und einer Aktion $a$ einen Folgezustand $s^\prime$ und eine Belohnung $r$ erzeugen können. Das Ergebnis dieser Simulation wird dann in der \textbf{Backup-Phase} benutzt, um die Bewertungen der in der Selektion besuchten Knoten zu aktualisieren. Die Problemstellung bestimmt, ob es nur terminale Belohnungen gibt, also nur wenn die Simulation einen Endzustand erreicht hat, oder ob jeder einzelne Zustandsübergang eine Belohnung liefert.
+Eine Iteration der Monte-Carlo-Baumsuche läuft in vier Schritten ab (siehe Abb.~\ref{fig:mctssurveyalgorithm}).
+Zunächst wird der bestehende Spielbaum in einer \textbf{Selektions-Phase} durchlaufen, bis ein Blattknoten gefunden wurde.
+Dabei folgt der Algorithmus eine bestimmten Strategie (engl. policy) um die Knoten im Baum zu wählen.
+Ein Knoten ist ein Blatt des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden.
+Wenn dieser Blattknoten nicht terminal ist, so wird er \textbf{expandiert} indem ein noch nicht besuchtes Kind hinzugefügt und besucht wird.
+Ausgehend von diesem neuen Kindknoten wird nun eine \textbf{Simulation} gestartet.
+Es werden so lange zufällige Spielzüge ausgewählt bis das Spiel einen Endzustand erreicht hat.
+Die Strategie, die während der Simulation befolgt wird, nennt man auch die Default Policy.
+In der Regel werden die Spielzüge zufällig gewählt, es können aber Heuristiken benutzt werden um die Simulation zu steuern.
+Die Bewertung wird durch die Umgebung definiert, mit der der Algorithmus interagiert.
+Dafür benötigt die MCTS eine sogenannte Forward-Simulation der Umgebung. Die Umgebung muss aus einem Zustand $s$ und einer Aktion $a$ einen Folgezustand $s^\prime$ und eine Belohnung $r$ erzeugen können. Das Ergebnis dieser Simulation wird dann in der \textbf{Backup-Phase} benutzt, um die Bewertungen der in der Selektion besuchten Knoten zu aktualisieren. Die Problemstellung bestimmt, ob es nur terminale Belohnungen gibt, also nur wenn die Simulation einen Endzustand erreicht hat, oder ob jeder einzelne Zustandsübergang eine Belohnung liefert.
 
 Diese vier Schritte werden so lange wiederholt, bis ein Ressourcenlimit, zum Beispiel ein Zeitlimit, erreicht ist. Danach wird der beste Zug im Wurzelknoten ausgewählt. Die Expansion und Selektion lassen sich logisch noch zu einer Einheit als Tree Policy zusammenfassen.
 Der Ablauf ist in Algorithmus \ref{algo:mcts} als Pseudocode erklärt. Das Programm geht von einem Spielzustand $s_0$ im Wurzelknoten $v_0$ aus. $\textsc{TreePolicy}$ folgt einer festen Strategie, um ein Blatt $v_l$ im Baum zu finden, welches dann expandiert wird, wenn es möglich ist. $\textsc{SimuliereSpiel}$ arbeitet mit dem Spielzustand im Blatt $s(v_l) = s_l$ und erzeugt daraus eine Bewertung $r$. Diese Bewertung wird durch $\textsc{Backup}$ vom Blatt bis zur Wurzel propagiert und aktualisiert die Statistiken in den Knoten. Nach Ablauf eines Zeitlimits wird mit $\textsc{BestesKind}$ der am besten bewertete Kindknoten im Wurzelknoten $v_0$ gewählt und die zugehörige Aktion $a(v)$ zurückgegeben.
@@ -250,17 +280,24 @@ Gleichung3
 \end{equation}
 
 
-\subsubsection{Scorebounded MCTS}
+\subsubsection{Score Bounded MCTS}
+\label{chap:scorebounded}
 %TODO: Referenz Alpha-Beta Cuts, Scorebounded Quelle
-Score bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts im Minimax-Suchalgorithmus. Jeder Knoten speichert eine optimistische $opt(v)$ und pessimistische Grenze $pess(v)$ für seine Kindknoten. Die Bewertung hängt davon ab, ob der Knoten ein Min- oder ein Max-Knoten (siehe Seite \ref{chap:minimax}) ist.
-Für einen Max-Knoten werden die optimistischsten, also die maximalen, Werte der Kinder genommen. Das heißt $opti(v) = \max_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \max_{k \in\ \text{Kinder von}\ v}pess(k)$.
+Score Bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts im Minimax-Suchalgorithmus.
+Jeder Knoten speichert eine optimistische $opt(v)$ und pessimistische Grenze $pess(v)$ für seine Kindknoten.
+Die Bewertung hängt davon ab, ob der Knoten ein Min- oder ein Max-Knoten (siehe Seite~\ref{chap:minimax}) ist.
+Für einen Max-Knoten werden die optimistischsten, also die maximalen, Werte der Kinder genommen.
+Das heißt $opti(v) = \max_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \max_{k \in\ \text{Kinder von}\ v}pess(k)$.
 Ein Min-Knoten dagegen nimmt die minimalen Werte der Kinder $opti(v) = \min_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \min_{k \in\ \text{Kinder von}\ v}pess(k)$.
-Wenn ein Knoten terminal ist, so gilt $pess(v) = opti(v) = \textsc{Utility}(s(v),P_{max})$, die Grenzen entsprechen also der tatsächlichen Bewertung des Zustands durch die Umgebung aus Sicht des Max-Spielers. Der Einfachheit halber sind die Grenzen auch in einem Minimax-Baum immer aus Sicht des Max-Spielers definiert, das heißt bei terminalen Bewertungen von $[-1, 0, 1]$ für Niederlage, Unentschieden und Sieg ist ein Knoten mit $pess(v) = opti(v) = 1$ immer gut für den Max-Spieler respektive $pess(v) = opti(v) = -1$ ist immer schlecht für Max. Die Grenzen werden initialisiert mit $pess(v) = \textsc{Niederlage}, $opti(v) = \textsc{Sieg}$ und erst aktualisiert, wenn ein Endzustand \textbf{im Baum} erreicht wurde, also ein terminaler Blatt-Knoten dem Baum hinzugefügt wurde. Erst dann ist die tatsächliche Bewertung eines Knotens bekannt.
+Wenn ein Knoten terminal ist, so gilt $pess(v) = opti(v) = \textsc{Utility}(s(v),P_{max})$, die Grenzen entsprechen also der tatsächlichen Bewertung des Zustands durch die Umgebung aus Sicht des Max-Spielers. Der Einfachheit halber sind die Grenzen auch in einem Minimax-Baum immer aus Sicht des Max-Spielers definiert, das heißt bei terminalen Bewertungen von $[-1, 0, 1]$ für Niederlage, Unentschieden und Sieg ist ein Knoten mit $pess(v) = opti(v) = 1$ immer gut für den Max-Spieler respektive $pess(v) = opti(v) = -1$ ist immer schlecht für Max. Die Grenzen werden initialisiert mit $pess(v) = \textsc{Niederlage}$, $opti(v) = \textsc{Sieg}$ und erst aktualisiert, wenn ein Endzustand \textbf{im Baum} erreicht wurde, also ein terminaler Blatt-Knoten dem Baum hinzugefügt wurde.
+Erst dann ist die tatsächliche Bewertung eines Knotens bekannt.
 
-Die Grenzen können benutzt werden um Teile des Suchbaumes zu ignorieren, wenn durch die Grenzen bekannt ist, dass dieser Teilbaum die Bewertung nicht weiter verbessern kann, der Baum wird "beschnitten" (engl. pruned).
-%TODO: Pruning genauer beschreiben.
+Die Grenzen können benutzt werden um Teile des Suchbaumes zu ignorieren, wenn durch die Grenzen bekannt ist, dass dieser Teilbaum die Bewertung nicht weiter verbessern kann, der Baum wird "beschnitten" (engl.\ pruned).
+In einem Max-Knoten (bzw.\ Min-Knoten) $n$ kann der Kindknoten $s$ ignoriert werden, wenn $opti(s) \le pess(n)$ ($pess(s) \ge opti(n)$).\cite[\ppno~5]{cazenaveScoreBoundedMonteCarlo2011}
 
-Zusätzlich zum Beschneiden des Baumes können die Grenzen benutzt werden, um die Selektion zu beeinflussen. So können zum Beispiel Knoten mit einer hohen optimistischer Grenze bevorzugt besucht werden, während versucht wird Knoten mit geringer pessimistischer Grenze zu vermeiden. Zum Beispiel
+Zusätzlich zum Beschneiden des Baumes können die Grenzen benutzt werden, um die Selektion zu beeinflussen.
+So können zum Beispiel Knoten mit einer hohen optimistischer Grenze bevorzugt besucht werden, während versucht wird Knoten mit geringer pessimistischer Grenze zu vermeiden.
+Zum Beispiel
 
 \begin{equation}
 Q_sb(v) = \frac{Q(v)}{N(v)} + \gamma opti(v) + \delta pess(v)
@@ -269,19 +306,65 @@ Q_sb(v) = \frac{Q(v)}{N(v)} + \gamma opti(v) + \delta pess(v)
 
 mit $-1 \le \gamma, \delta \le 1$.
 
-Da die Grenzen eines Knotens von den Grenzen der Kindknoten abhängig ist, ist es notwendig die Grenzen so selten wie möglich zu aktualisieren und nicht bei jeder Iteration der Baumsuche neu zu berechnen. Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor, die die Grenzen aus einem terminalen Knoten effizient den gesamten Baum hinaufpropagieren.
+Da die Grenzen eines Knotens von den Grenzen der Kindknoten abhängig ist, ist es notwendig die Grenzen so selten wie möglich zu aktualisieren und nicht bei jeder Iteration der Baumsuche neu zu berechnen.
+Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor, die die Grenzen aus einem terminalen Knoten effizient den gesamten Baum hinaufpropagieren.
 
-%TODO: aktualisierungs-algorithmen abschreiben, quelle Scorebounded Seite X
+
+\begin{algorithm}[H]
+\begin{algorithmic}
+\Function{prop_pess}{$s$}
+	\If{$s$ ist nicht die Wurzel}
+		\State $n \gets \text{Elternknoten von }s$
+		\State old\_pess \gets $pess(n)$
+		\If{old\_pess < $pess(s)$}
+			\If{$n$ ist ein Max Knoten}
+				\State $pess(n) \gets pess(s)$
+				\Call{prop_press}{$n$}
+			\Else
+				\State $pess(n) \ gets \min_{s' \in children(n)}pess(s')$
+				\If{old\_pess > $pess(n)$}
+					\Call{prop_press}{$n$}
+				\EndIf
+			\EndIf
+		\EndIf
+	\EndIf
+\EndFunction
+
+
+\Function{prop_opti}{$s$}
+	\If{$s$ ist nicht die Wurzel}
+		\State $n \gets \text{Elternknoten von }s$
+		\State old\_opti \gets $opti(n)$
+		\If{old\_opti > $opti(s)$}
+			\If{$n$ ist ein Max Knoten}
+				\State $opti(n) \gets \max_{s' \in children(n)}opti(s')$
+				\If{old_opti > $opti(n)$}
+					\Call{prop_opti}{$n$}
+				\EndIf
+			\Else
+				\State $opti(n) \gets opti(s)$
+				\Call{prop_opti}{$n$}
+			\EndIf
+		\EndIf
+	\EndIf
+\EndFunction
+\end{algorithmic}
+\caption{Algorithmus zur Aktualisierung der pessimistischen und optimistischen Grenzen.\footnotemark}
+\label{algo:prop-scorebound}
+\end{algorithm}
+\footnotetext{\cite[\ppno~4]{cazenaveScoreBoundedMonteCarlo2011}}
 
 \subsubsection{Rapid Action Value Estimation}
 
-Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen. In der regulären Monte-Carlo-Baumsuche werden nur die tatsächlich besuchten Knoten in der Backup-Phase aktualisiert. Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.
+Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen.
+In der regulären Monte-Carlo-Baumsuche werden nur die tatsächlich besuchten Knoten in der Backup-Phase aktualisiert.
+Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.
 
 %TODO: Quelle für RAVE
 Die verschiedenen AMAF-Verfahren unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_RAVE(v)$ und $N_RAVE(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten. Die Kombination der RAVE-Statistik mit der regulären MCTS-Statistik wird durch einen Parameter $\beta$ gesteuert.
 
 \begin{equation}
-UCT_{RAVE}=\beta * \frac{Q_RAVE(v^\prime)}{N_RAVE(v^\prime)} + (1-\beta) * \frac{Q(v^\prime)}{N(v^\prime)} + C_p * \sqrt{\frac{\ln(N(v))}{N(v^\prime)}
+UCT_{RAVE}=\beta * \frac{Q_RAVE(v^\prime)}{N_RAVE(v^\prime)} + (1-\beta) * \frac{Q(v^\prime)}{N(v^\prime)} + C_p * \sqrt{\frac{\ln(N(v))}{N(v^\prime)}}
 \label{eqn:uct-rave}
 \end{equation}
 
@@ -295,5 +378,6 @@ Wenn dieser Parameter während der gesamten Baumsuche konstant bleibt, so nennt 
 
 In der Selektions- und Simulations-Phase wird eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
 
-Was in der Literatur nicht erwähnt wird, ist die Notwendigkeit die Spielzüge eindeutig zu identifizieren. Die meisten Untersuchungen des Algorithmus beziehen sich nur auf Schach und Go, in denen ein Spielzug klar definiert ist (schwarzer Bauer von E2 nach E3 oder schwarzer Stein auf Kreuzung 3,3). Für Vier Gewinnt reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
+Was in der Literatur nicht erwähnt wird, ist die Notwendigkeit die Spielzüge eindeutig zu identifizieren. Die meisten Untersuchungen des Algorithmus beziehen sich nur auf Schach und Go, in denen ein Spielzug klar definiert ist (schwarzer Bauer von E2 nach E3 oder schwarzer Stein auf Kreuzung 3,3).
+Für Vier Gewinnt reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
 
