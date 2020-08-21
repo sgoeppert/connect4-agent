@@ -1,0 +1,11 @@
+{
+  "title": "Eval against flat MC",
+  "num_games": 100,
+  "player": "MCTSPlayer",
+  "opponent_steps": 1000,
+  "configuration": null,
+  "mean": [
+    0.755,
+    0.245
+  ]
+}

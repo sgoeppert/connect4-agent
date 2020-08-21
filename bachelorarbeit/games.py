@@ -33,6 +33,7 @@ class ConnectFour:
         self.rows = rows
         self.mark = mark
         self.inarow = inarow
+        self.stones_per_column = [0] * columns
         self.finished = False
         self.winner = None
 
@@ -58,6 +59,7 @@ class ConnectFour:
         try:
             row = max([r for r in range(self.rows) if self.board[col + (r * self.cols)] == 0])
             self.board[col + (row * self.cols)] = self.mark
+            self.stones_per_column[col] += 1
         except ValueError:
             raise RuntimeError("Invalid play")
 
@@ -105,6 +107,14 @@ class ConnectFour:
     def is_tie(self) -> bool:
         return all(mark != 0 for mark in self.board)
 
+    def get_move_name(self, column: int, played: bool = False) -> int:
+        stones_in_col = self.stones_per_column[column]
+        player = self.get_current_player()
+        if played:
+            stones_in_col -= 1
+            player = self.get_other_player(player)
+        return 10 * (stones_in_col * self.cols + column) + player
+
     def get_reward(self, mark: int) -> int:
         if not self.finished:
             raise RuntimeError("get_reward called on non terminal game")
@@ -124,6 +134,7 @@ class ConnectFour:
                          inarow=self.inarow)
         cp.finished = self.finished
         cp.winner = self.winner
+        cp.stones_per_column = self.stones_per_column
         return cp
 
     def hash(self) -> int:

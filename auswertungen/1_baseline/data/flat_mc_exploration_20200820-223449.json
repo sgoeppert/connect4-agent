@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Eval against flat MC",
+    "num_games": 300,
+    "player": "FlatMonteCarloPlayer",
+    "opponent_steps": 500,
+    "configuration": {
+      "max_steps": 500,
+      "exploration_constant": 0.7071067811865475,
+      "ucb_selection": true
+    },
+    "mean": [
+      0.6383333333333333,
+      0.3616666666666667
+    ]
+  },
+  {
+    "title": "Eval against flat MC",
+    "num_games": 300,
+    "player": "FlatMonteCarloPlayer",
+    "opponent_steps": 500,
+    "configuration": {
+      "max_steps": 500,
+      "exploration_constant": 1.0,
+      "ucb_selection": true
+    },
+    "mean": [
+      0.6,
+      0.4
+    ]
+  },
+  {
+    "title": "Eval against flat MC",
+    "num_games": 300,
+    "player": "FlatMonteCarloPlayer",
+    "opponent_steps": 500,
+    "configuration": {
+      "max_steps": 500,
+      "exploration_constant": 1.2,
+      "ucb_selection": true
+    },
+    "mean": [
+      0.53,
+      0.47
+    ]
+  },
+  {
+    "title": "Eval against flat MC",
+    "num_games": 300,
+    "player": "FlatMonteCarloPlayer",
+    "opponent_steps": 500,
+    "configuration": {
+      "max_steps": 500,
+      "exploration_constant": 1.4142135623730951,
+      "ucb_selection": true
+    },
+    "mean": [
+      0.605,
+      0.395
+    ]
+  }
+]
