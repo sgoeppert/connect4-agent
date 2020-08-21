@@ -81,7 +81,7 @@ class ScoreboundedNode(Node):
         solved = ""
         if self.pess == self.opti:
             solved = " Solved"
-        return f"SBNode(n: {self.number_visits}, v: {self.total_value}, pess: {self.pess}, opti: {self.opti}{maxnode}{solved})"
+        return f"SBNode(Q: {self.Q()}, N: {self.number_visits}, pess: {self.pess}, opti: {self.opti}{maxnode}{solved})"
 
 
 class ScoreboundedPlayer(MCTSPlayer):
@@ -90,12 +90,10 @@ class ScoreboundedPlayer(MCTSPlayer):
     def __init__(self,
                  cut_delta: float = 0.0,
                  cut_gamma: float = 0.0,
-                 use_heavy_score: bool = False,
                  *args, **kwargs):
         super(ScoreboundedPlayer, self).__init__(*args, **kwargs)
         self.cut_delta = cut_delta
         self.cut_gamma = cut_gamma
-        self.use_heavy_score = use_heavy_score
 
     def prop_pess(self, s: ScoreboundedNode):
         if s.parent:
@@ -128,14 +126,6 @@ class ScoreboundedPlayer(MCTSPlayer):
         if node.game_state.is_terminal():
             # print("Terminal node")
             bound_score = reward
-            if self.use_heavy_score:
-                moves = np.count_nonzero(node.game_state.board)
-                min_win = 7
-                total_moves = 42
-
-                bound_score = reward * (1 + total_moves - moves) / (total_moves - min_win)
-                bound_score = min(1, max(-1, bound_score))  # limit value between -1 and 1
-
             flip = -1
             if not node.is_max_node:
                 flip = 1
@@ -147,8 +137,10 @@ class ScoreboundedPlayer(MCTSPlayer):
 
         current = node
         while current is not None:
-            current.number_visits += 1
-            current.total_value += reward
+            current.increment_visit_and_add_reward(reward)
+            # current.number_visits += 1
+            # current.average_value += (reward - current.average_value) / current.number_visits
+            # current.total_value += reward
             reward = -reward
 
             current = current.parent
@@ -180,4 +172,5 @@ if __name__ == "__main__":
     obs = Observation(board=game.board.copy(), mark=game.mark)
 
     with timer(f"{steps} steps"):
-        p.get_move(obs, conf)
+        m = p.get_move(obs, conf)
+    print(m)

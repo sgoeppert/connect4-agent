@@ -10,7 +10,7 @@ from bachelorarbeit.rave import RaveNode, RavePlayer
 class SarsaNode(RaveNode):
     def __init__(self, *args, **kwargs):
         super(SarsaNode, self).__init__(*args, **kwargs)
-        self.v = 0
+        # self.v = 0
         self.max_v = 0.01
         self.min_v = -0.01
 
@@ -18,20 +18,20 @@ class SarsaNode(RaveNode):
         max_v = self.parent.max_v
         min_v = self.parent.min_v
 
-        return (self.v - min_v) / (max_v - min_v)
+        return (self.average_value - min_v) / (max_v - min_v)
 
     def Q(self):
         return self.normalizeQ()
 
     def __repr__(self):
-        return f"SarsaNode(n: {self.number_visits}, v: {self.v}, rave_n: {self.rave_count}, rave_v: {self.rave_score})"
+        return f"SarsaNode(n: {self.number_visits}, Q: {self.Q()}, rave_n: {self.rave_count}, rave_v: {self.rave_score})"
 
 
 class SarsaPlayer(RavePlayer):
     name = "SarsaPlayer"
 
-    def __init__(self, gamma: float = 1.0, lamda: float = 1.0, beta: float = 0.5, *args, **kwargs):
-        super(SarsaPlayer, self).__init__(beta=beta, *args, **kwargs)
+    def __init__(self, gamma: float = 1.0, lamda: float = 1.0, *args, **kwargs):
+        super(SarsaPlayer, self).__init__(*args, **kwargs)
         self.gamma = gamma
         self.lamda = lamda
 
@@ -46,7 +46,7 @@ class SarsaPlayer(RavePlayer):
         v_next = 0
         last_v = 0
         while current is not None:
-            v_current = current.v
+            v_current = current.average_value
             # print("v_next", v_next, "v_current", v_current)
             delta = self.gamma * v_next - v_current
             delta_sum = self.lamda * self.gamma * delta_sum + delta
@@ -55,7 +55,7 @@ class SarsaPlayer(RavePlayer):
             # print("delta_sum", delta_sum)
 
             current.number_visits += 1
-            current.v += delta_sum / current.number_visits
+            current.average_value += delta_sum / current.number_visits
 
             if last_v > current.max_v:
                 current.max_v = last_v
@@ -63,15 +63,16 @@ class SarsaPlayer(RavePlayer):
             if last_v < current.min_v:
                 current.min_v = last_v
 
-            last_v = current.v
+            last_v = current.average_value
             # print(current)
 
             delta_sum = -delta_sum
             v_next = -v_current
             for mov, child in current.rave_children.items():
                 if mov in move_set:
-                    child.rave_count += 1
-                    child.rave_score += -reward
+                    child.increment_rave_visit_and_add_reward(-reward)
+                    # child.rave_count += 1
+                    # child.rave_score += (-reward - child.rave_score) / child.rave_count
             reward = -reward
             current = current.parent
 
@@ -98,7 +99,7 @@ if __name__ == "__main__":
     from bachelorarbeit.tools import timer
 
     steps = 2000
-    pl = SarsaPlayer(max_steps=steps, exploration_constant=0.9, beta=0.5, gamma=1.0, lamda=0.98)
+    pl = SarsaPlayer(max_steps=steps, exploration_constant=0.9, b=0.01, gamma=1.0, lamda=0.98)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)

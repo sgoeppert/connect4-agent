@@ -17,21 +17,25 @@ class RaveNode(Node):
     def __repr__(self):
         return f"RaveNode(n: {self.number_visits}, v: {self.total_value}, rave_n: {self.rave_count}, rave_v: {self.rave_score})"
 
-    def QRave(self) -> float:
-        return self.rave_score / max(1, self.rave_count)
+    def beta(self, b: float = 0.0) -> float:
+        return self.rave_count / (self.rave_count + self.number_visits + self.rave_count * self.number_visits * b * b)
 
-    def Q(self) -> float:
-        return self.total_value / max(1, self.number_visits)
+    def QRave(self) -> float:
+        return self.rave_score
+
+    def increment_rave_visit_and_add_reward(self, reward):
+        self.rave_count += 1
+        self.rave_score += (reward - self.rave_score) / self.rave_count
 
     def exploration(self, parent_visits):
         if self.number_visits == 0:
             return 10
         return math.sqrt(parent_visits / self.number_visits)
 
-    def best_child(self, exploration_constant: float = 1.0, beta: float = 0.9) -> "RaveNode":
+    def best_child(self, exploration_constant: float = 1.0, b: float = 0.0) -> "RaveNode":
         n_p = math.log(self.number_visits)
         _, c = max(self.children.items(),
-                   key=lambda c: (1 - beta) * c[1].Q() + beta * c[1].QRave()
+                   key=lambda c: (1 - c[1].beta(b)) * c[1].Q() + c[1].beta(b) * c[1].QRave()
                                  + exploration_constant * c[1].exploration(n_p))
         return c
 
@@ -67,9 +71,9 @@ class RaveNode(Node):
 class RavePlayer(MCTSPlayer):
     name = "RavePlayer"
 
-    def __init__(self, beta: float = 0.9, expand_all=False, *args, **kwargs):
+    def __init__(self, b: float = 0.0, expand_all=False, *args, **kwargs):
         super(RavePlayer, self).__init__(*args, **kwargs)
-        self.beta = beta
+        self.b = b
         self.expand_all = expand_all
 
     @staticmethod
@@ -90,7 +94,7 @@ class RavePlayer(MCTSPlayer):
         while not current.game_state.is_terminal():
             if current.is_expanded():
                 p = current.game_state.get_current_player()
-                current = current.best_child(self.exploration_constant, beta=self.beta)
+                current = current.best_child(self.exploration_constant, b=self.b)
                 m = current.move
                 move_name = 10 * (move_counts[m] * action_space + m) + p
                 move_counts[m] += 1
@@ -120,19 +124,22 @@ class RavePlayer(MCTSPlayer):
         move_set = set(moves)
         current = node
         while current is not None:
-            current.number_visits += 1
-            current.total_value += reward
+            current.increment_visit_and_add_reward(reward)
+            # current.number_visits += 1
+            # current.average_value += (reward - current.average_value) / current.number_visits
+            # current.total_value += reward
 
             for mov, child in current.rave_children.items():
                 if mov in move_set:
-                    child.rave_count += 1
-                    child.rave_score += -reward
+                    child.increment_rave_visit_and_add_reward(-reward)
+                    # child.rave_count += 1
+                    # child.rave_score += (-reward - child.rave_score) / child.rave_count
 
             reward = -reward
             current = current.parent
 
     def best_move(self, node: RaveNode) -> int:
-        move, n = max(node.children.items(), key=lambda c: (1 - self.beta) * c[1].Q() + self.beta * c[1].QRave())
+        move, n = max(node.children.items(), key=lambda c: (1 - c[1].beta(0)) * c[1].Q() + c[1].beta(0) * c[1].QRave())
         return move
 
     def init_root_node(self, root_game):
@@ -155,7 +162,7 @@ if __name__ == "__main__":
     from bachelorarbeit.tools import timer
 
     steps = 2000
-    pl = RavePlayer(max_steps=steps, exploration_constant=0.9,expand_all=False,beta=0.9)
+    pl = RavePlayer(max_steps=steps, exploration_constant=0.9, expand_all=False, beta=0.9)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)

@@ -9,36 +9,47 @@ from bachelorarbeit.base_players import Player
 
 
 class Node:
-    def __init__(self, game_state: ConnectFour, parent: "Node" = None, move: int = None):
-        self.total_value = 0
-        self.number_visits = 0
-        self.children = {}
+    def __init__(self, game_state: ConnectFour, parent: "Node" = None):
+        self.average_value = 0  # Q(v)
+        self.total_value = 0  # V(v)
+        self.number_visits = 0  # N(v)
+        self.children = {}  # C(v), Kinder des Knotens
 
-        self.parent = parent
-        self.move = move
+        self.parent = parent  # der direkte Elternknoten
 
-        self.game_state = game_state
-        self.possible_moves = game_state.list_moves()
-        self.expanded = False
+        self.game_state = game_state  # der Spielzustand in diesem Knoten
+        self.possible_moves = game_state.list_moves()  # Aktionen der noch nicht erforschten Kindknoten
+        self.expanded = False  # ob der Knoten vollständig expandiert ist
 
     def Q(self) -> float:
-        return self.total_value / self.number_visits
+        return self.average_value
 
     def best_child(self, exploration_constant: float = 1.0) -> "Node":
         n_p = math.log(self.number_visits)
-        _, c = max(self.children.items(),
-                   key=lambda c: c[1].Q() + exploration_constant * math.sqrt(n_p / c[1].number_visits))
+
+        def UCT(child: Node):
+            """
+            Berechnet den UCT Wert UCT = Q(v') + C_p * sqrt(ln(N(v))/N(v'))
+            :param child: Knoten v'
+            :return:
+            """
+            return child.Q() + exploration_constant * math.sqrt(n_p / child.number_visits)
+
+        _, c = max(self.children.items(), key=lambda entry: UCT(entry[1]))
         return c
+
+    def increment_visit_and_add_reward(self, reward: float):
+        self.number_visits += 1
+        self.average_value += (reward - self.average_value) / self.number_visits
 
     def is_expanded(self) -> bool:
         return self.expanded
 
     def expand_one_child(self) -> "Node":
+        node_class = type(self)
+
         move = random.choice(self.possible_moves)
-        child_state = self.game_state.copy()
-        child_state.play_move(move)
-        myclass = type(self)
-        self.children[move] = myclass(game_state=child_state, parent=self, move=move)
+        self.children[move] = node_class(game_state=self.game_state.copy().play_move(move), parent=self)
         self.possible_moves.remove(move)
         if len(self.possible_moves) == 0:
             self.expanded = True
@@ -47,6 +58,9 @@ class Node:
 
     def add_child(self, node: "Node", move: int):
         self.children[move] = node
+
+    def __repr__(self):
+        return f"Node(Q:{self.Q()}, N:{self.number_visits})"
 
 
 class MCTSPlayer(Player):
@@ -61,17 +75,20 @@ class MCTSPlayer(Player):
             **kwargs
     ):
         super(MCTSPlayer, self).__init__(**kwargs)
-        self.max_steps = max_steps
-        self.steps_taken = 0
 
-        self.num_nodes = 0
+        # UCT Exploration Konstante Cp
         self.exploration_constant = exploration_constant
-        self.keep_tree = keep_tree
-        self.root = None
+        self.keep_tree = keep_tree  # ob der Baum zwischen Zügen erhalten bleibt
+        self.root = None  # die Wurzel des Baumes
 
+        # Limitiert die Ausführungszeit
         self.start_time = 0
         self.time_limit = 0
         self.time_buffer = time_buffer
+
+        # Verbrauchte und maximale Schritte pro Zug
+        self.max_steps = max_steps
+        self.steps_taken = 0
 
     def __repr__(self) -> str:
         return self.name
@@ -96,6 +113,8 @@ class MCTSPlayer(Player):
 
     def evaluate_game_state(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
+        # Die Bewertung Geschieht aus Sicht des Spielers, der uns in diesen Zustand geführt hat, darum muss der Spieler
+        # geholt werden, der zuletzt gezogen hat, nicht der der gerade an der Reihe ist.
         scoring = game.get_other_player(game.get_current_player())
         while not game.is_terminal():
             game.play_move(random.choice(game.list_moves()))
@@ -111,24 +130,10 @@ class MCTSPlayer(Player):
                 return current.expand_one_child()
         return current
 
-    def find_leaf(self, root: Node) -> Node:
-        current = root
-        while current.is_expanded():
-            current = current.best_child(self.exploration_constant)
-        return current
-
-    def expand(self, node: Node) -> Node:
-        # Only expand the node if it isn't a terminal state. Terminal states don't have children
-        if not node.game_state.is_terminal():
-            return node.expand_one_child()
-        else:
-            return node
-
     def backup(self, node: Node, reward: float):
         current = node
         while current is not None:
-            current.number_visits += 1
-            current.total_value += reward
+            current.increment_visit_and_add_reward(reward)
             reward = -reward
             current = current.parent
 
@@ -167,6 +172,20 @@ class MCTSPlayer(Player):
         return Node(root_game)
 
     def perform_search(self, root):
+        """
+        Führe die Monte-Carlo-Baumsuche ausgehend von einem Wurzelknoten durch.
+
+        So lange noch Ressourcen verfügbar sind, dies können eine begrenzte Anzahl an Iterationen oder ein Zeitlimit
+        sein, wird der MCTS Algorithmus ausgeführt. Die tree_policy durchläuft den bereits existierenden Baum bis ein
+        Blatt gefunden wurde, welches wenn möglich in der tree_policy expandiert wird. Danach wird der Spielzustand
+        in diesem Blatt mit evaluate_game_state zu Ende simuliert. Das Ergebnis dieser Simulation - -1, 0  oder 1 - wird
+        mit in backup benutzt, um die Statistiken der Knoten zu aktualisieren.
+        Nach Ablauf der Ressourcen wird der beste Zug durch best_move ausgewählt. Dies ist der Zug mit der höchsten
+        durchschnittlichen Belohnung.
+
+        :param root: Der Wurzelknoten v0
+        :return:
+        """
         while self.has_resources():
             leaf = self.tree_policy(root)
             reward = self.evaluate_game_state(leaf.game_state)
@@ -181,17 +200,13 @@ class MCTSPlayer(Player):
 
         # if no root could be determined, create a new tree from scratch
         if root is None:
-            root_game = ConnectFour(
-                columns=conf.columns,
-                rows=conf.rows,
-                inarow=conf.inarow,
-                mark=observation.mark,
-                board=observation.board
-            )
+            root_game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow,
+                                    mark=observation.mark, board=observation.board)
             root = self.init_root_node(root_game)
 
         # run the search
         best = self.perform_search(root)
+
         # persist the root if we're keeping the tree
         self._store_root(root.children[best])
 
@@ -209,4 +224,5 @@ if __name__ == "__main__":
     obs = Observation(board=game.board.copy(), mark=game.mark)
 
     with timer(f"{steps} steps"):
-        p.get_move(obs, conf)
+        m = p.get_move(obs, conf)
+    print(m)
