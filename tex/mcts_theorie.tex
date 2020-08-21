@@ -1,5 +1,5 @@
 \section{Die Monte-Carlo-Baumsuche}
-\label{chap:mcts}
+\label{chap:mcts-intro}
 
 Die Monte-Carlo-Baumsuche (engl. Monte Carlo Tree Search, MCTS) wurde 2006 von R\'{e}mi Coulom erstmals vorgestellt und im Go-Programm Crazy Stone mit großem Erfolg eingesetzt\autocite{coulomEfficientSelectivityBackup2007}. Sie basiert auf der Kombination von Minimax-Spielbäumen mit Monte-Carlo-Simulationen.
 
@@ -50,7 +50,7 @@ Die Alpha-Beta-Suche ist eine Modifikation der Minimax-Baumsuche, welche versuch
 
 
 \subsection{Der MCTS-Algorithmus}
-
+\label{chap:mcts-algo}
 Coulom kombinierte erstmals die Erzeugung eines Spielbaumes mit Monte-Carlo Simulationen. Unter Monte-Carlo Simulationen oder Monte-Carlo Experimenten versteht man gleichförmige Zufallsexperimente, die in großer Anzahl durchgeführt werden, um ein Ergebnis zu erhalten welches sich, mit steigender Anzahl der Experimente, dem tatsächlichen Wert immer weiter annähert.
 
 Der von Coulom vorgestellt Algorithmus beginnt mit einem Knoten als Wurzel. Ausgehend von diesem Wurzelknoten werden nun zufällige Simulationen des Spiels gespielt. Das bedeutet in jedem Zustand wird ein zufälliger Zug gewählt und gespielt, bis das Spiel zu Ende ist. Der erste Zustand in einer solchen Simulation, der sich noch nicht im Spielbaum befindet, wird zum Baum hinzugefügt. Alle anderen Knoten, die sich bereits im Spielbaum befinden, merken sich, wie häufig sie bei solchen Simulationen besucht wurden und auch die Summe der Ergebnisse von Simulationen durch diesen Knoten. Die gesammelten Statistiken werden dann bei nachfolgenden Simulationen benutzt, um vielversprechende Knoten häufiger zu besuchen.
@@ -218,7 +218,7 @@ UCT1 = \argmax_{a \in A(v)} \frac{Q(v,a)}{N(v,a)} + C_p\sqrt{\frac{\ln N(v)}{N(v
 \label{eqn:UCT1}
 \end{equation}
 
-Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung \ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
+Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung\~\ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
 
 \begin{equation}
 UCT2 = \argmax_{a \in A(v)} \frac{Q(v^\prime)}{N(v^\prime)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
@@ -278,8 +278,22 @@ Da die Grenzen eines Knotens von den Grenzen der Kindknoten abhängig ist, ist e
 Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen. In der regulären Monte-Carlo-Baumsuche werden nur die tatsächlich besuchten Knoten in der Backup-Phase aktualisiert. Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.
 
 %TODO: Quelle für RAVE
-Die verschiedenen AMAF-Verfahren unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_RAVE(v)$ und $N_RAVE(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten.
+Die verschiedenen AMAF-Verfahren unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_RAVE(v)$ und $N_RAVE(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten. Die Kombination der RAVE-Statistik mit der regulären MCTS-Statistik wird durch einen Parameter $\beta$ gesteuert.
 
-Im RAVE-Algorithmus, entwickelt von xxx , wird in der Selektions- und Simulations-Phase eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
+\begin{equation}
+UCT_{RAVE}=\beta * \frac{Q_RAVE(v^\prime)}{N_RAVE(v^\prime)} + (1-\beta) * \frac{Q(v^\prime)}{N(v^\prime)} + C_p * \sqrt{\frac{\ln(N(v))}{N(v^\prime)}
+\label{eqn:uct-rave}
+\end{equation}
+
+\begin{equation}
+\beta = \frac{N_{RAVE}(v^\prime)}{N(v^\prime)+N_{RAVE}(v^\prime)+N(v^\prime)*N_{RAVE}(v^\prime)*b^2}
+\label{eqn:beta}
+\end{equation}
+
+
+Wenn dieser Parameter während der gesamten Baumsuche konstant bleibt, so nennt man diesen Algorithmus auch $\alpha$-AMAF, mit einem konstanten $\alpha \in [0,1]$. Das besondere an RAVE ist, dass sich dieser Parameter im Laufe der Baumsuche verändert. Wenn ein Knoten noch wenig besucht wurde, so ist $\beta$ nahe $1$, wodurch fast ausschließlich die RAVE-Statistik benutzt wird. Mit mehr Besuchen der Kindknoten, wird die gesammelte Statistik $Q(v)$ genauer und somit kann ein niedrigerer Wert für $\beta$ verwendet werden. Der Hyperparameter $b$ in Gleichung \ref{eqn:beta} kann angepasst werden, um RAVE gezielter anzupassn.
+
+In der Selektions- und Simulations-Phase wird eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
 
 Was in der Literatur nicht erwähnt wird, ist die Notwendigkeit die Spielzüge eindeutig zu identifizieren. Die meisten Untersuchungen des Algorithmus beziehen sich nur auf Schach und Go, in denen ein Spielzug klar definiert ist (schwarzer Bauer von E2 nach E3 oder schwarzer Stein auf Kreuzung 3,3). Für Vier Gewinnt reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
+
