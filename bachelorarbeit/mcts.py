@@ -207,6 +207,7 @@ class MCTSPlayer(Player):
         # run the search
         best = self.perform_search(root)
 
+        # print(root.children)
         # persist the root if we're keeping the tree
         self._store_root(root.children[best])
 

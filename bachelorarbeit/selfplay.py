@@ -1,7 +1,8 @@
 import pickle
-from typing import Tuple, Callable, List, Dict, Union, Type
+from typing import Optional, Tuple, Callable, List, Dict, Union, Type
 import multiprocessing as mp
 import numpy as np
+import math
 
 from tqdm import tqdm
 
@@ -14,7 +15,6 @@ from bachelorarbeit.base_players import Player
 import config
 
 GameResult = Tuple[float, float]
-
 
 class Arena:
     def __init__(
@@ -36,9 +36,11 @@ class Arena:
         self.flip_players = False
         self.memory = memory
 
-    def update_players(self, player_classes: Tuple[Callable, Callable], constructor_args: Tuple[any, any] = (None, None)):
-        self.player_classes = player_classes
-        self.constructor_args = constructor_args
+    def update_players(self, player_classes: Optional[Tuple[Callable, Callable]], constructor_args: Optional[Tuple[any, any]] = None):
+        if player_classes is not None:
+            self.player_classes = player_classes
+        if constructor_args is not None:
+            self.constructor_args = constructor_args
 
     def instantiate_players(self) -> List[Player]:
         players = []
@@ -65,20 +67,23 @@ class Arena:
             game_states.append({"board": obs.board.copy(), "mark": obs.mark, "result": 0})
             active_player = s & 1
             m = players[active_player].get_move(obs, conf)
+            # print(m)
             game.play_move(m)
             s += 1
 
         game_states.append({"board": game.board.copy(), "mark": game.mark, "result": 0})
 
         rewards = (game.get_reward(1), game.get_reward(2))
+        step = 0
         for state in game_states[1:]:
-            state["result"] = rewards[0]
-
+            state["result"] = rewards[step % 2]
+            step += 1
+        # print(game_states, rewards)
         return rewards, game_states
 
     def run_game_mp(self, show_progress_bar: bool = True) -> List[GameResult]:
         self.flip_players = False
-
+        mp.set_start_method("spawn", force=True)
         pbar = None
         if show_progress_bar:
             pbar = tqdm(total=self.num_games)
@@ -117,6 +122,12 @@ class Arena:
             self.memory.save_data()
 
         return game_results
+
+
+# class TensorFlowArena(Arena):
+#     def run_game(self, _dummy=0) -> Tuple[GameResult, List]:
+#         from tensorflow import keras
+#         return super(TensorFlowArena, self).run_game(_dummy)
 
 
 class MoveEvaluation:
@@ -209,7 +220,11 @@ class Memory:
         self.game_data = []
         self.init()
         self.num_states = len(self.game_data)
+        self.num_games = 0
         self.added_since_save = 0
+
+    def set_file_name(self, file_name):
+        self.file_name = Path(config.ROOT_DIR) / "memory" / file_name
 
     def init(self):
         try:
@@ -235,6 +250,7 @@ class Memory:
     def add_full_game(self, game_states: List):
         for state in game_states:
             self.add_state(state)
+        self.num_games += 1
 
     def add_state(self, state: Dict):
         self.game_data.append(state)
@@ -248,10 +264,15 @@ class Memory:
     def add_other_memory(self, other: "Memory"):
         self.game_data.extend(other.game_data)
 
+    def forget(self, amount: float = 0.2):
+        num_to_forget = math.floor(self.num_states * amount)
+        self.game_data = self.game_data[num_to_forget:]
+        self.num_states -= num_to_forget
 
 if __name__ == "__main__":
     from bachelorarbeit.base_players import RandomPlayer
-    memory = Memory(file_name="random_data.pkl")
-    arena = Arena(players=(RandomPlayer, RandomPlayer), num_games=1000, num_processes=6)
+    from bachelorarbeit.mcts import MCTSPlayer
+    # memory = Memory(file_name="random_data.pkl")
+    arena = Arena(players=(MCTSPlayer, MCTSPlayer), num_games=1, num_processes=6)
 
     arena.run_game_mp()

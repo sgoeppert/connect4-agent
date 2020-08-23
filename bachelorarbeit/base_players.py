@@ -34,45 +34,65 @@ class RandomPlayer(Player):
 class FlatMonteCarlo(Player):
     name = "FlatMonteCarloPlayer"
 
-    def __init__(self, max_steps: int = 1000, exploration_constant: float = 1.0, ucb_selection: bool = True, **kwargs):
+    def __init__(self,
+                 max_steps: int = 1000,
+                 exploration_constant: float = 0.8,
+                 ucb_selection: bool = True,
+                 **kwargs):
+
         super(FlatMonteCarlo, self).__init__(**kwargs)
         self.max_steps = max_steps
         self.ucb_selection = ucb_selection
-        self.exploration_constant = exploration_constant
+        self.c_p = exploration_constant
 
-    def evaluate_game_state(self, game: ConnectFour, scoring_player: int) -> int:
+    def evaluate_game_state(self,
+                            game: ConnectFour,
+                            scoring_player: int) -> int:
+
         while not game.is_terminal():
             move = random.choice(game.list_moves())
             game.play_move(move)
 
         return game.get_reward(scoring_player)
 
-    def get_move(self, observation: Observation, configuration: Configuration) -> int:
-        game = ConnectFour(board=observation.board, rows=configuration.rows,
-                           columns=configuration.columns, inarow=configuration.inarow,
+    def get_move(self,
+                 observation: Observation,
+                 configuration: Configuration) -> int:
+
+        game = ConnectFour(board=observation.board,
+                           rows=configuration.rows,
+                           columns=configuration.columns,
+                           inarow=configuration.inarow,
                            mark=observation.mark)
 
         visits = defaultdict(int)
         rewards = defaultdict(int)
         scoring_player = game.get_current_player()
 
-        def move_score(move: int, steps_elapsed: int, exploration: float) -> float:
-            if visits[move] == 0:
+        def move_score(move: int,
+                       N: int = 1,
+                       C: float = 0.0) -> float:
+
+            n = visits[move]
+            if n == 0:
                 return 10
             else:
-                return rewards[move] / visits[move] \
-                       + exploration * math.sqrt(2 * math.log(steps_elapsed) / visits[move])
+                q = rewards[move] / visits[move]
+                return q + C * math.sqrt(2 * math.log(N) / n)
 
         for i in range(self.max_steps):
             if self.ucb_selection:
-                move = max(game.list_moves(), key=lambda m: move_score(m, i + 1, self.exploration_constant))
+                move = max(game.list_moves(),
+                           key=lambda m: move_score(m, i + 1, self.c_p))
             else:
                 move = random.choice(game.list_moves())
-            result = self.evaluate_game_state(game.copy().play_move(move), scoring_player)
+
+            next_state = game.copy().play_move(move)
+            result = self.evaluate_game_state(next_state, scoring_player)
             visits[move] += 1
             rewards[move] += result
 
-        chosen_move = max(visits.keys(), key=lambda m: move_score(m, 1, 0))
+        chosen_move = max(visits.keys(), key=lambda m: move_score(m))
 
         return chosen_move
 
