@@ -30,8 +30,8 @@ if DEBUG:
     INITIAL_CP_VALUES = [0.1, 1 / math.sqrt(2)]
     LOG_FILE = "debug_" + LOG_FILE
 else:
-    MAX_STEPS = 750
-    NUM_GAMES = 300
+    MAX_STEPS = 1000
+    NUM_GAMES = 500
     NUM_GAMES_DETAIL = 500
     MOVE_EVAL_REPEATS = 10
     INITIAL_CP_VALUES = [0.25, 0.5, 1 / math.sqrt(2), 1.0, 1.2, math.sqrt(2)]
@@ -72,7 +72,7 @@ def test_flat_mc_vs_random():
 
 
 def test_flat_mc_ucb_parameters_against_flat_mc(cp_values):
-    print("test_flat_mc_ucb_parameters_against_flat_mc")
+    print("test_flat_mc_ucb_parameters_against_flat_mc - cp: ", cp_values)
     base_setting = {"max_steps": MAX_STEPS, "ucb_selection": True}
     comparison = {"max_steps": MAX_STEPS, "ucb_selection": False}
 
@@ -668,10 +668,10 @@ if __name__ == "__main__":
     tab, best_conf_move = flat_ucb_move_evaluation(flat_ucb_detail_cp)
     tab.insert_column(0, random_scores, head="RandomPlayer")
     tab.label = "move-eval-base"
-    tab.caption = "Prozentsatz der guten und perfekten Züge im Datensatz mit 750 Spielpositionen für den zufälligen " \
+    tab.caption = f"Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für den zufälligen " \
                   "und den Flat Monte Carlo Spieler. Jede Evaluation wurde 10 mal wiederholt und der Durchschnitt der " \
                   "Ergebnisse gebildet. Der Flat Monte Carlo Spieler benutzt die UCB-Formel zur Kindauswahl mit der " \
-                  "Verschiedenen $C_p$ und hat 750 Iterationen Bedenkzeit pro Zug."
+                  f"Verschiedenen $C_p$ und hat {MAX_STEPS} Iterationen Bedenkzeit pro Zug."
     tab.write_to_file("3_move_eval_baseline")
 
     write_log("First move evaluation done")
@@ -711,7 +711,7 @@ if __name__ == "__main__":
     """
     tab, best_mcts_conf_move = mcts_move_evaluation(mcts_detail_cp)
     tab.label = "mcts-move-eval"
-    tab.caption = "Prozentsatz der guten und perfekten Züge im Datensatz mit 750 Spielpositionen für die " \
+    tab.caption = "Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für die " \
                   "normale Monte-Carlo-Baumsuche. Jede Evaluation wurde 10 mal wiederholt und der " \
                   "Durchschnitt der Ergebnisse gebildet."
     tab.write_to_file("5_mcts_move_eval")
