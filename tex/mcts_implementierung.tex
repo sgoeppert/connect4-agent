@@ -14,7 +14,7 @@ Der Kaggle-Wettbewerb liefert bereits mit dem Python Package \verb|kaggle-enviro
 Diese Umgebung wird vom Wettbewerb selbst für die Evaluierung der eingereichten Agenten verwendet, ist aber für meine Zwecke unnötig Umfangreich und unbequem zu verwenden.
 
 Deshalb war es zuerst notwendig, eine eigene Implementierung von Vier Gewinnt zu erstellen.
-Die Klasse \verb|bachelorarbeit.games.ConnectFour| ist eine Erweiterung der Logik aus dem \verb|connectx.py| Modul von kaggle-environments\footnote{Quelle: https://github.com/Kaggle/kaggle-environments/tree/master/kaggle_environments/envs/connectx}.
+Die Klasse \verb|bachelorarbeit.games.ConnectFour| ist eine Erweiterung der Logik aus dem \verb|connectx.py| Modul von kaggle-environments\footnote{Quelle: \texttt{https://github.com/Kaggle/kaggle-environments/tree/master/kaggle\_environments/envs/connectx}}.
 
 Das Spielfeld wird in einer Liste der Länge \verb|anzahl_spalten * anzahl_zeilen| gespeichert.
 Ein leeres Feld wird durch eine 0, Steine von Spieler 1 und 2 durch die Zahlen 1 und respektive 2 repräsentiert.
@@ -51,7 +51,7 @@ Im Wettbewerb hat jeder Agent eine Vorbereitungszeit beim ersten Zug von 10 Seku
 Da allerdings die Leistung der Maschinen, auf denen der Wettbewerb ausgeführt wird, nur schwer eingeschätzt werden kann, benutze ich lokal kein Zeitlimit für meine Agenten.
 Stattdessen wird die Baumsuche auf eine bestimmte Anzahl an Iterationen limitiert.
 
-Der Rückgabewert der Methode ist der Zug, den der Agent macht, also eine Zahl zwischen 0 und \verb|anzahl_spalten-1|.
+Der Rückgabewert der Methode ist der Zug, den der Agent macht, also eine Zahl zwischen 0 und \verb|Configuration.columns-1|.
 
 \begin{lstlisting}[language=Python,caption=Die Basisklasse aller Agenten.,label={lst:baseplayer}]
 class Player(ABC):
@@ -66,7 +66,7 @@ class Player(ABC):
 \label{chap:vergleiche-impl}
 
 Die Agenten werden mit einer Reihe verschiedener Algorithmen verglichen.
-Der einfachste Vergleich ist gegen einen rein zufälligen Spieler \verb|bachelorarbeit.base_players.RandomPlayer|.
+Der einfachste Vergleich ist gegen einen rein zufälligen Spieler \verb|RandomPlayer|.
 Dieser Spieler wählt immer einen zufälligen legalen Zug.
 Wenn es einem Agenten nicht gelingt nahezu einhundert Prozent der Spiele gegen den zufälligen Spieler zu gewinnen, so muss etwas an ihrer Implementierung fehlerhaft sein.
 
@@ -85,62 +85,81 @@ In jedem Schritt wird eine Aktion gleichmäßig zufällig ausgewählt und das Sp
 Das Ergebnis dieser Simulation wird für diese Aktion gespeichert.
 Der Agent führt zufällige Iterationen durch, bis ein Zeit oder Schrittlimit erreicht ist.
 Am Ende wird die Aktion gewählt, die die höchste durchschnittliche Bewertung hat.
-Eine stärkere Variante dieses Spielers wählt die Kindknoten nicht zufällig sondern mit der UCB-Formel (Gleichung~\ref{eqn:ucb}) aus.
+Eine stärkere Variante dieses Spielers wählt die Kindknoten nicht zufällig sondern mit der UCB-Formel (Gleichung~\ref{eqn:UCB1}) aus.
 
 \begin{lstlisting}[language=Python,caption=Flache Monte Carlo Suche.,label={lst:flat-mc}]
 class FlatMonteCarlo(Player):
     name = "FlatMonteCarloPlayer"
 
-    def __init__(self, max_steps: int = 1000, exploration_constant: float = 1.0, ucb_selection: bool = True, **kwargs):
+    def __init__(self,
+                 max_steps: int = 1000,
+                 exploration_constant: float = 1.0,
+                 ucb_selection: bool = True,
+                 **kwargs):
+
         super(FlatMonteCarlo, self).__init__(**kwargs)
         self.max_steps = max_steps
         self.ucb_selection = ucb_selection
-        self.exploration_constant = exploration_constant
+        self.c_p = exploration_constant
 
-    def evaluate_game_state(self, game: ConnectFour, scoring_player: int) -> int:
+    def evaluate_game_state(self,
+                            game: ConnectFour,
+                            scoring_player: int) -> int:
+
         while not game.is_terminal():
             move = random.choice(game.list_moves())
             game.play_move(move)
 
         return game.get_reward(scoring_player)
 
-    def get_move(self, observation: Observation, configuration: Configuration) -> int:
-        game = ConnectFour(board=observation.board, rows=configuration.rows,
-                           columns=configuration.columns, inarow=configuration.inarow,
+    def get_move(self,
+                 observation: Observation,
+                 configuration: Configuration) -> int:
+
+        game = ConnectFour(board=observation.board,
+                           rows=configuration.rows,
+                           columns=configuration.columns,
+                           inarow=configuration.inarow,
                            mark=observation.mark)
 
-        visits = defaultdict(int)  # Anzahl der Simulationen pro Aktion
-        rewards = defaultdict(int)  # Summe der Bewertungen pro Aktion
+        visits = defaultdict(int)
+        rewards = defaultdict(int)
         scoring_player = game.get_current_player()
 
-        def move_score(move: int, steps_elapsed: int, exploration: float) -> float:
-            if visits[move] == 0:
-                return 10  # Erzwinge Selektion von unerforschten Zügen
+        def move_score(move: int,
+                       N: int = 1,
+                       C: float = 0.0) -> float:
+
+            n = visits[move]
+            if n == 0:
+                return 10
             else:
-                # UCB Auswahl-Regel
-                return rewards[move] / visits[move] \
-                       + exploration * math.sqrt(2 * math.log(steps_elapsed) / visits[move])
+                q = rewards[move] / visits[move]
+                return q + C * math.sqrt(2 * math.log(N) / n)
 
         for i in range(self.max_steps):
             if self.ucb_selection:
-                move = max(game.list_moves(), key=lambda m: move_score(m, i + 1, self.exploration_constant))
+                move = max(game.list_moves(),
+                           key=lambda m: move_score(m, i + 1, self.c_p))
             else:
                 move = random.choice(game.list_moves())
-            result = self.evaluate_game_state(game.copy().play_move(move), scoring_player)
+
+            next_state = game.copy().play_move(move)
+            result = self.evaluate_game_state(next_state, scoring_player)
             visits[move] += 1
             rewards[move] += result
 
-        chosen_move = max(visits.keys(), key=lambda m: move_score(m, 1, 0))
+        chosen_move = max(visits.keys(), key=lambda m: move_score(m))
 
         return chosen_move
 \end{lstlisting}
 
 Der Flat Monte Carlo Spieler kann durch den Parameter \verb|max_steps| und die Variante mit UCB-Kindauswahl zusätzlich mit dem Parameter \verb|exploration_constant| konfiguriert werden.
-In den Vergleichen mit anderen Agenten sind die Parameter allerdings auf \verb|max_steps=1000, exploration_constant=1.0| fixiert.
+In den Vergleichen mit anderen Agenten sind die Parameter allerdings auf \verb|max_steps=1000, exploration_constant=0.8| fixiert.
 
 Der Wert des \verb|exploration_constant| Parameters wurde experimentell bestimmt, indem der Agent gegen sich selbst gespielt hat.
 Dafür wurde der Parameter für einen Spieler auf 1.0 fixiert, und mit verschiedenen Werten des anderen Spielers verglichen.
-Die Ergebnisse sind in Tabelle~\ref{tab:flat-mc}.
+Zuerst habe ich eine große Spanne von Werten zwischen 0.1 und 2.0 probiert, siehe Tabelle~\ref{tab:flat-mc}.
 
 \begin{table}[h!]
 \centering
@@ -148,19 +167,49 @@ Die Ergebnisse sind in Tabelle~\ref{tab:flat-mc}.
  \hline
  $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
  \hline
- Gewinnchance & 0.05 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
+ Gewinnchance & 0.046 & 0.156 & 0.463 & 0.526 & 0.533 & 0.49 & 0.492 & 0.475 \\
  \hline
 \end{tabular}
-\caption{Gewinnchance für unterschiedliche Werte des \verb|exploration_constant| Parameters über 300 Spiele. Die Hälfte der Spiele hat der Spieler angefangen, die andere hälfte hat er als zweites gezogen.}
+\caption{Gewinnchance für unterschiedliche Werte des \texttt{exploration\_constant} Parameters über 300 Spiele. Die Hälfte der Spiele hat der Spieler angefangen, die andere hälfte hat er als zweites gezogen.}
 \label{tab:flat-mc}
 \end{table}
+
+Ein guter Wert scheint also zwischen 0.707 ($\frac{1}{\sqrt{2}}$) und 1.0 zu liegen.
+Genauere Tests in diesem Interval haben die folgenden Werte ergeben:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
+ \hline
+ $C_p$ & $\frac{1}{\sqrt{2}}$ & 0.8 & 0.9 & 1.1 \\
+ \hline
+ Gewinnchance & 0.471 & 0.513 & 0.507 & 0.486 \\
+ \hline
+\end{tabular}
+\caption{Verfeinerung des Parameters $C_p$ über 500 Spiele pro Parameter. }
+\label{tab:flat-mc-2}
+\end{table}
+
+Aufgrund dieser Daten wähle ich den Wert $C_p = 0.8$ als optimalen Parameter.
+
 
 Die dritte Art der Evaluation geschieht mit einem Datensatz aus 1000 Spielpositionen und Bewertungen jedes Zuges in dieser Position durch einen perfekten Spieler.
 Der Datensatz wurde vom Nutzer Peter Cnudde mit einem Vier Gewinnt Solver, einem in C++ geschriebenen Programm, das für jeden Zustand die optimalen Spielzüge berechnen kann, erstellt und auf Kaggle hochgeladen\footnote{Quelle: https://www.kaggle.com/petercnudde/scoring-connect-x-agents}.
 Jede Spielposition in diesem Datensatz hat das folgende Format:
 
 \begin{verbatim}
-{"board": [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 1, 0, 2, 0, 0, 0, 1, 1, 1, 2, 1, 0, 1, 2], "score": -2, "move score": [-3, -4, -4, -2, -6, -5, -4]}
+{
+    "board": [
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 2, 0, 0, 0, 2,
+        0, 0, 2, 0, 0, 0, 1,
+        0, 0, 1, 0, 0, 0, 2,
+        1, 0, 2, 0, 0, 0, 1,
+        1, 1, 2, 1, 0, 1, 2
+        ],
+    "score": -2,
+    "move score": [-3, -4, -4, -2, -6, -5, -4]
+}
 \end{verbatim}
 
 \verb|board| ist der Zustand des Spielfeldes, \verb|score| ist die maximal erzielbare Bewertung und \verb|move score| enthält die Bewertungen aller Spielzüge aus diesem Zustand.
@@ -168,7 +217,7 @@ Eine Bewertung = 0 bedeutet das Spiel endet unentschieden, eine Bewertung > 0 be
 Ist eine Bewertung = -99 so ist dieser Zug nicht legal.
 Die Bewertung des Agenten basiert auf zwei Metriken:
 \begin{itemize}
-    \item Gute Züge: Zustände in denen eine Aktion gewählt wurde, die das selbe Spielergebnis zur Folge hat, wie der optimale Zug.\\Also beispielsweise ein Zug mit positiver Bewertung, falls der Spieler gewinnen könnte.
+    \item Gute Züge: Zustände in denen eine Aktion gewählt wurde, die das selbe Spielergebnis zur Folge hat, wie der optimale Zug. Also beispielsweise ein Zug mit positiver Bewertung, falls der Spieler gewinnen könnte.
     \item Perfekte Züge: Zustände in denen die Aktion gewählt wurde, die den selben Wert hat, wie die optimale Bewertung durch den perfekten Spieler.
 \end{itemize}
 
@@ -180,11 +229,12 @@ Die MCTS-Agenten müssen diese Werte übertreffen.
 \centering
 \begin{tabular}{ |c||c|c| }
  \hline
- Spieler & Gut & Perfekt //
+ Spieler & Gut & Perfekt \\
  \hline
- Zufällig & 0.67 & 0.25 //
+ Zufällig & 0.67 & 0.25 \\
  \hline
- Flat MC & 0.75 & 0.55 //
+ Flat MC & 0.75 & 0.55 \\
+ \hline
 \end{tabular}
 \caption{Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für den zufälligen und den Flat Monte Carlo Spieler. Jede Evaluation wurde 10 mal wiederholt und der Durchschnitt der Ergebnisse gebildet. Der Flat Monte Carlo Spieler benutzt die UCB-Formel zur Kindauswahl mit der Konstanten $C_p=1.0$ und hat 1000 Iterationen Bedenkzeit pro Zug.}
 \label{tab:move-evaluation-baseline}
@@ -208,11 +258,11 @@ class Node:
         self.parent = parent  # der direkte Elternknoten
 
         self.game_state = game_state  # der Spielzustand in diesem Knoten
-        self.possible_moves = game_state.list_moves()  # Aktionen für die noch nicht erforschten Kindknoten
-        self.expanded = False  # ob der Knoten vollständig expandiert ist
+        self.possible_moves = game_state.list_moves()  # Aktionen fuer die noch nicht erforschten Kindknoten
+        self.expanded = False  # ob der Knoten vollstaendig expandiert ist
 
     def best_child(self, exploration_constant: float = 1.0) -> "Node":
-        """Gibt das Kind mit dem höchsten UCT-Wert zurück"""
+        """Gibt das Kind mit dem hoechsten UCT-Wert zurueck"""
         n_p = math.log(self.number_visits)
 
         def UCT(child: Node):
@@ -232,11 +282,11 @@ class Node:
         self.average_value += (reward - self.average_value) / self.number_visits
 
     def expand_one_child(self) -> "Node":
-        """ Wählt einen zufälligen Spielzug aus und erzeugt den dazugehörigen Kindknoten"""
+        """ Waehlt einen zufaelligen Spielzug aus und erzeugt den dazugehoerigen Kindknoten"""
 
 \end{lstlisting}
 
-Der Spieler \verb|MCTSPlayer| implementiert den "Upper Confidence Bound for Trees"-Algorithmus aus Kapitel~\ref{algo:uct} direkt.
+Der Spieler \verb|MCTSPlayer| implementiert den "Upper Confidence Bound for Trees"-Algorithmus aus Kapitel~\ref{chap:UCT} direkt.
 Die Methode \verb|get_move| enthält zusätzliche Logik um den Spielbaum von einem Spielzug zum nächsten beizubehalten.
 Der eigentliche Algorithmus ist in der Methode \verb|perform_search(root: Node)| implementiert.
 
@@ -250,13 +300,13 @@ class MCTSPlayer(Player):
         super(MCTSPlayer, self).__init__(**kwargs)
 
         self.exploration_constant = exploration_constant  # UCT Exploration Konstante Cp
-        self.keep_tree = keep_tree  # behalte den Baum zwischen Zügen
+        self.keep_tree = keep_tree  # behalte den Baum zwischen Zuegen
         self.root = None  # die Wurzel des Baumes
 
     def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset(conf)  # Da der Spieler zwischen Zügen persistent ist, können hier Variablen pro Zug zurückgesetzt werden
+        self.reset(conf)  # Da der Spieler zwischen Zuegen persistent ist, koennen hier Variablen pro Zug zurueckgesetzt werden
 
-        # An dieser Stelle wird der aktuelle Zustand im Baum gesucht, falls der Baum zwischen Zügen erhalten bleibt
+        # An dieser Stelle wird der aktuelle Zustand im Baum gesucht, falls der Baum zwischen Zuegen erhalten bleibt
         root = self._restore_root(observation, conf)
 
         # Wenn keine Wurzel gefunden wurde, wird ein neuer Baum erstellt
@@ -265,10 +315,10 @@ class MCTSPlayer(Player):
                                     mark=observation.mark, board=observation.board)
             root = self.init_root_node(root_game)
 
-        # Führt die eigentliche Suche aus
+        # Fuehrt die eigentliche Suche aus
         best = self.perform_search(root)
 
-        # Speichert den Wurzelknoten für den nächsten Zug
+        # Speichert den Wurzelknoten fuer den naechsten Zug
         self._store_root(root.children[best])
 
         return best
@@ -291,7 +341,7 @@ class MCTSPlayer(Player):
 
     def evaluate_game_state(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
-        # Die Bewertung Geschieht aus Sicht des Spielers, der uns in diesen Zustand geführt hat, darum muss der Spieler
+        # Die Bewertung Geschieht aus Sicht des Spielers, der uns in diesen Zustand gefuehrt hat, darum muss der Spieler
         # geholt werden, der zuletzt gezogen hat, nicht der der gerade an der Reihe ist.
         scoring = game.get_other_player(game.get_current_player())
         while not game.is_terminal():
@@ -308,7 +358,7 @@ class MCTSPlayer(Player):
 
 \end{lstlisting}
 
-Die anpassbaren Parameter der verb|MCTSPlayer|-Klasse sind, die Anzahl der Iterationen pro Spielzug \verb|max_steps|, die Konstante \verb|exploration_constant| $C_p$ und das Beibehalten des Baumes zwischen Zügen.
+Die anpassbaren Parameter der \verb|MCTSPlayer|-Klasse sind die Anzahl der Iterationen pro Spielzug \verb|max_steps|, die Konstante \verb|exploration_constant| $C_p$ und das Beibehalten des Baumes zwischen Zügen.
 Um eine vergleichbare Grundlage zu haben, werden alle MCTS-Varianten mit 1000 Iterationen pro Zug getestet und verglichen.
 Manche Verbesserungen benötigen mehr Rechenzeit für 1000 Iterationen, weshalb ich in Kapitel~\ref{chap:results} auch noch Vergleiche bei gleicher Ausführungszeit durchführen werde.
 
@@ -345,19 +395,19 @@ Deshalb wird nur der Parameter $C_p$ mit Werten nahe 1.0 verglichen.
 \centering
 \begin{tabular}{ |c||c|c| }
  \hline
- $C_p$ & Gut & Perfekt //
+ $C_p$ & Gut & Perfekt \\
  \hline
- 0.7 & 0.67 & 0.25 //
+ 0.7 & 0.67 & 0.25 \\
  \hline
- 0.8 & 0.67 & 0.25 //
+ 0.8 & 0.67 & 0.25 \\
  \hline
- 0.9 & 0.67 & 0.25 //
+ 0.9 & 0.67 & 0.25 \\
  \hline
- 1.0 & 0.67 & 0.25 //
+ 1.0 & 0.67 & 0.25 \\
  \hline
- 1.1 & 0.67 & 0.25 //
+ 1.1 & 0.67 & 0.25 \\
  \hline
- 1.2 & 0.67 & 0.25 //
+ 1.2 & 0.67 & 0.25 \\
  \hline
 \end{tabular}
 \caption{Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für die normale Monte-Carlo-Baumsuche. Jede Evaluation wurde 10 mal wiederholt und der Durchschnitt der Ergebnisse gebildet.}
@@ -371,16 +421,11 @@ Im direkten Vergleich muss eine Verbesserung mehr als 50\% der Spiele gegen den 
 \subsection{MCTS mit Transpositionen}
 \label{subsec:mcts-mit-transpositionen}
 
-Bei der Implementierung der Transpositionen habe ich mich dafür entschieden, die UCT1 und UCT2 Algorithmen \refpage{eqn:uct1} von Childs u.a.\ zu implementieren.
+Bei der Implementierung der Transpositionen habe ich mich dafür entschieden, die UCT1 und UCT2 Algorithmen (Seite~\pageref{eqn:UCT1}) von Childs u.a.\ zu implementieren.
 Dafür war es notwendig, dass die Knoten zusätzlich zu ihren eigenen Statistiken $Q(v)$ und $N(v)$ auch die Informationen über die, von ihnen erreichten, Kindknoten $Q(v,a)$ und $N(v,a)$ speichern.
 Diese zusätzlichen Statistiken werden in der Methode \verb|best_child| verwendet, um UCT1 bzw.\ UCT2 zu implementieren.
 
 \begin{lstlisting}[language=Python,label={lst:transpos-node}]
-from bachelorarbeit.mcts import Node
-from collections import defaultdict
-import math
-import random
-
 class TranspositionNode(Node):
     def __init__(self, *args, **kwargs):
         super(TranspositionNode, self).__init__( *args, **kwargs)
@@ -450,18 +495,18 @@ class TranspositionPlayer(MCTSPlayer):
 
     def tree_policy(self, root: TranspositionNode) -> List[TranspositionNode]:
         current = root
-        path = [root]  # Der Pfad, der während der Selektion durchlaufen wird
+        path = [root]  # Der Pfad, der waehrend der Selektion durchlaufen wird
         while not current.game_state.is_terminal():
             if current.is_expanded():
                 current = current.best_child(self.exploration_constant, uct_method=self.uct_method)
                 path.append(current)
             else:
-                # Wähle einen zufälligen nächsten Zustand
+                # Waehle einen zufaelligen naechsten Zustand
                 move, next_state = current.get_random_action_and_state()
-                # Und prüfe ob er bereits in der Transpositionstabelle enthalten ist
+                # Und pruefe ob er bereits in der Transpositionstabelle enthalten ist
                 hash_state = hash(next_state)
                 if hash_state not in self.transpositions:
-                    # Wenn nicht wird ein neuer Knoten hinzugefügt
+                    # Wenn nicht wird ein neuer Knoten hinzugefuegt
                     self.transpositions[hash_state] = TranspositionNode(game_state=next_state, parent=current)
                 next_node = self.transpositions[hash_state]
                 current.add_child(next_node, move)
@@ -508,10 +553,10 @@ Die Zug-Evaluation bestätigt diese Vermutung.
  \hline
  \multicolumn{2}{|c|}{$C_p$} & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
  \hline
- \multirow{2}{\verb|UCT1|} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- & perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
+ \multirow{2}{*}{\texttt{UCT1}} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
+  & perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
  \hline
- \multirow{2}{\verb|UCT2|} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
+ \multirow{2}{*}{\texttt{UCT2}} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
  & perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
  \hline
 \end{tabular}
@@ -569,7 +614,7 @@ class ScoreboundedNode(Node):
                 return c.Q() - delta * c.pess - gamma * c.opti
 
         children = list(self.children.values())
-        # Entferne Kindknoten die das Ergebnis nicht verbessern können
+        # Entferne Kindknoten die das Ergebnis nicht verbessern koennen
         for c in children:
             if len(children) > 1:
                 if self.is_max_node and c.opti <= self.pess:
@@ -595,7 +640,7 @@ class ScoreboundedNode(Node):
         return max(c_opti)
 \end{lstlisting}
 
-Der \verb|ScoreBoundedPlayer| implementiert die Algorithmen zur Aktualisierung der Grenzen (siehe Seite~\pageref{algo:prop-scorebound}).
+Der \verb|ScoreBoundedPlayer| implementiert die Algorithmen zur Aktualisierung der Grenzen (siehe Algorithmus~\ref{algo:prop-scorebound} auf Seite~\pageref{algo:prop-scorebound}).
 
 \begin{lstlisting}[language=Python,label={lst:scorebounded-player}]
 class ScoreboundedPlayer(MCTSPlayer):
@@ -728,7 +773,7 @@ class RaveNode(Node):
 
     def expand_one_child_rave(self, moves: List[int]) -> "RaveNode":
         nodeclass = type(self)
-        move = random.choice(self.possible_moves)  # wähle zufälligen Zug
+        move = random.choice(self.possible_moves)  # waehle zufaelligen Zug
         child_state = self.game_state.copy().play_move(move)
         move_name = child_state.get_move_name(move, played=True)
         moves.append(move_name)
@@ -802,7 +847,7 @@ class RavePlayer(MCTSPlayer):
         while not game.is_terminal():
             m = random.choice(game.list_moves())
             move_name = game.get_move_name(m)
-            moves.append(move_name)  # merke welche Züge gespielt wurden
+            moves.append(move_name)  # merke welche Zuege gespielt wurden
             game.play_move(m)
 
         return game.get_reward(scoring)
@@ -813,8 +858,8 @@ class RavePlayer(MCTSPlayer):
         while current is not None:
             current.increment_visit_and_add_reward(reward)
 
-            # Wenn eines der Kinder dieses Knotens über einen in der Simulation gemachten Spielzug
-            # erreich werden könnte, aktualisiere seine Rave Statistik
+            # Wenn eines der Kinder dieses Knotens ueber einen in der Simulation gemachten Spielzug
+            # erreich werden koennte, aktualisiere seine Rave Statistik
             for mov, child in current.rave_children.items():
                 if mov in move_set:
                     child.increment_rave_visit_and_add_reward(-reward)

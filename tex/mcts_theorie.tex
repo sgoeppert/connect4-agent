@@ -117,7 +117,7 @@ Der Ablauf ist in Algorithmus \ref{algo:mcts} als Pseudocode erklärt. Das Progr
 \footnotetext{\cite[\ppno~5]{browneSurveyMonteCarlo2012}}
 
 \subsection{Upper Confidence Bounds applied to Trees (UCT)}
-
+\label{chap:UCT}
 Parallel zur Arbeit von Coulom haben Kocsis und Szepesv\'{a}ri 2006 den \textbf{Upper Confidence Bounds applied to trees} (UCT)-Algorithmus \autocite{kocsisBanditBasedMonteCarlo2006} entwickelt. UCT gilt heute als beliebtester MCTS-Algorithmus. Die Besonderheit von UCT liegt in seiner Tree Policy und damit in der Art, wie die Knoten im Baum ausgewählt werden. Kocsis und Szepesv\'{a}ri betrachten dabei die Auswahl eines Kindknotens als ein sogenanntes Banditenproblem. \autocite[\ppno~25\psqq]{suttonReinforcementLearningIntroduction2018}
 
 \bigskip
@@ -222,7 +222,7 @@ Dieser normale UCT (engl. plain UCT) Algorithmus, wie er von Kocsis und Szepesv\
 
 \subsection{Verbesserungen}
 
-Die verschiedenen Schritte der Baumsuche können verändert und verbessert werden und werden dadurch besser für die jeweiligen Anwendungsfälle geeignet. Im Paper "A survey of monte carlo methods" von Browne u.a.\autocite{browneSurveyMonteCarlo2012} wird eine große Menge von Verbesserungen vorgestellt und eine Übersicht darüber gegeben, für welche klassischen Spiele sie nützlich sein könnten. Im folgenden werde ich eine Handvoll ausgewählter Verbesserungen vorstellen.
+Die verschiedenen Schritte der Baumsuche können verändert und verbessert werden und werden dadurch besser für die jeweiligen Anwendungsfälle geeignet. Im Paper "A Survey of Monte Carlo Methods" von Browne u.a.\autocite{browneSurveyMonteCarlo2012} wird eine große Menge von Verbesserungen vorgestellt und eine Übersicht darüber gegeben, für welche klassischen Spiele sie nützlich sein könnten. Im folgenden werde ich eine Handvoll ausgewählter Verbesserungen vorstellen.
 
 \subsubsection{Transpositionen}
 \label{transpos}
@@ -241,14 +241,14 @@ Normale UCT-Algorithmen, die Transpositionen nicht berücksichtigen, werden im P
 
 In Gleichung \ref{eqn:UCT} verwende ich die Statistiken eines Knotens $Q(v)$ und $N(v)$ direkt, also die Summe der Belohnungen aus Simulationen und die Anzahl an Simulationen durch diesen Knoten. Zusätzlich dazu kann diese Statistik abhängig von der gewählten Aktion $a$ im Knoten $v$, $Q(v,a)$ und $N(v,a)$ gespeichert werden. Wenn keine Transpositionen identifiziert werden, so sind die Werte identisch $v^\prime = \textsc{Transition}(s(v),a) \Rightarrow Q(v^\prime) = Q(v,a)$. Werden Transpositionen aber erkannt, kann es mehrere Aktionen in verschiedenen Knoten geben, die zum selben Kindknoten führen.
 
-Wenn Transpositionen erkannt werden, so können sich im einfachsten Fall die Knoten, unabhängig davon wo sie sich im Baum befinden, ihre Statistiken teilen. Dies hat vor allem den Vorteil, dass der gesamte Baum kleiner wird. Die von Childs u.a. vorgeschlagene einfache Auswahlregel UCT1 ist:
+Wenn Transpositionen erkannt werden, so können sich im einfachsten Fall die Knoten, unabhängig davon wo sie sich im Baum befinden, ihre Statistiken teilen. Dies hat vor allem den Vorteil, dass der gesamte Baum kleiner wird. Die von Childs u.a. vorgeschlagene einfache Auswahlregel \textbf{UCT1} ist:
 
 \begin{equation}
 UCT1 = \argmax_{a \in A(v)} \frac{Q(v,a)}{N(v,a)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
 \label{eqn:UCT1}
 \end{equation}
 
-Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung\~\ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
+Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung~\ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
 
 \begin{equation}
 UCT2 = \argmax_{a \in A(v)} \frac{Q(v^\prime)}{N(v^\prime)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
@@ -283,24 +283,39 @@ Gleichung3
 \subsubsection{Score Bounded MCTS}
 \label{chap:scorebounded}
 %TODO: Referenz Alpha-Beta Cuts, Scorebounded Quelle
-Score Bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts im Minimax-Suchalgorithmus.
-Jeder Knoten speichert eine optimistische $opt(v)$ und pessimistische Grenze $pess(v)$ für seine Kindknoten.
-Die Bewertung hängt davon ab, ob der Knoten ein Min- oder ein Max-Knoten (siehe Seite~\ref{chap:minimax}) ist.
-Für einen Max-Knoten werden die optimistischsten, also die maximalen, Werte der Kinder genommen.
-Das heißt $opti(v) = \max_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \max_{k \in\ \text{Kinder von}\ v}pess(k)$.
-Ein Min-Knoten dagegen nimmt die minimalen Werte der Kinder $opti(v) = \min_{k \in\ \text{Kinder von}\ v}opti(k)$ und $pess(v) = \min_{k \in\ \text{Kinder von}\ v}pess(k)$.
+Score Bounded MCTS ist konzeptionell ähnlich zu Alpha-Beta Cuts im Minimax-Such\-al\-gorithmus.
+Jeder Knoten speichert eine optimistische $opti(v)$ und pessimistische Grenze $pess(v)$ für seine Kindknoten.
+Die Bewertung hängt davon ab, ob der Knoten ein Min- oder ein Max-Knoten (siehe Kapitel~\ref{chap:minimax}) ist.
+Für einen Max-Knoten $v_{max}$ werden die optimistischsten, also die maximalen, Werte der Kinder genommen, also
+\begin{equation}
+\begin{split}
+opti(v_{max}) = \max_{k \in\ \text{Kinder}(v_{max})}opti(k)\\
+pess(v_{max}) = \max_{k \in\ \text{Kinder}(v_{max})}pess(k).
+\end{split}
+\end{equation}
+
+Ein Min-Knoten dagegen nimmt die minimalen Werte der Kinder 
+
+\begin{equation}
+\begin{split}
+opti(v_{min}) = \min_{k \in\ \text{Kinder}(v_{min})}opti(k)\\
+pess(v_{min}) = \min_{k \in\ \text{Kinder}(v_{min})}pess(k).
+\end{split}
+\end{equation}
+
+
 Wenn ein Knoten terminal ist, so gilt $pess(v) = opti(v) = \textsc{Utility}(s(v),P_{max})$, die Grenzen entsprechen also der tatsächlichen Bewertung des Zustands durch die Umgebung aus Sicht des Max-Spielers. Der Einfachheit halber sind die Grenzen auch in einem Minimax-Baum immer aus Sicht des Max-Spielers definiert, das heißt bei terminalen Bewertungen von $[-1, 0, 1]$ für Niederlage, Unentschieden und Sieg ist ein Knoten mit $pess(v) = opti(v) = 1$ immer gut für den Max-Spieler respektive $pess(v) = opti(v) = -1$ ist immer schlecht für Max. Die Grenzen werden initialisiert mit $pess(v) = \textsc{Niederlage}$, $opti(v) = \textsc{Sieg}$ und erst aktualisiert, wenn ein Endzustand \textbf{im Baum} erreicht wurde, also ein terminaler Blatt-Knoten dem Baum hinzugefügt wurde.
 Erst dann ist die tatsächliche Bewertung eines Knotens bekannt.
 
 Die Grenzen können benutzt werden um Teile des Suchbaumes zu ignorieren, wenn durch die Grenzen bekannt ist, dass dieser Teilbaum die Bewertung nicht weiter verbessern kann, der Baum wird "beschnitten" (engl.\ pruned).
-In einem Max-Knoten (bzw.\ Min-Knoten) $n$ kann der Kindknoten $s$ ignoriert werden, wenn $opti(s) \le pess(n)$ ($pess(s) \ge opti(n)$).\cite[\ppno~5]{cazenaveScoreBoundedMonteCarlo2011}
+In einem Max-Knoten (bzw.\ Min-Knoten) $n$ kann der Kindknoten $s$ ignoriert werden, wenn $opti(s) \le pess(n)$ ($pess(s) \ge opti(n)$).\autocite[\ppno~5]{cazenaveScoreBoundedMonteCarlo2011}
 
 Zusätzlich zum Beschneiden des Baumes können die Grenzen benutzt werden, um die Selektion zu beeinflussen.
 So können zum Beispiel Knoten mit einer hohen optimistischer Grenze bevorzugt besucht werden, während versucht wird Knoten mit geringer pessimistischer Grenze zu vermeiden.
 Zum Beispiel
 
 \begin{equation}
-Q_sb(v) = \frac{Q(v)}{N(v)} + \gamma opti(v) + \delta pess(v)
+Q_sb(v) = \frac{Q(v)}{N(v)} + \gamma \cdot opti(v) + \delta \cdot pess(v)
 \label{eqn:scorebound}
 \end{equation}
 
@@ -312,38 +327,38 @@ Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor, die die Gr
 
 \begin{algorithm}[H]
 \begin{algorithmic}
-\Function{prop_pess}{$s$}
+\Function{prop\_pess}{$s$}
 	\If{$s$ ist nicht die Wurzel}
 		\State $n \gets \text{Elternknoten von }s$
-		\State old\_pess \gets $pess(n)$
+		\State old\_pess $\gets pess(n)$
 		\If{old\_pess < $pess(s)$}
 			\If{$n$ ist ein Max Knoten}
 				\State $pess(n) \gets pess(s)$
-				\Call{prop_press}{$n$}
+				\State \textsc{prop\_press}($n$)
 			\Else
 				\State $pess(n) \ gets \min_{s' \in children(n)}pess(s')$
 				\If{old\_pess > $pess(n)$}
-					\Call{prop_press}{$n$}
+					\State \textsc{prop\_press}($n$)
 				\EndIf
 			\EndIf
 		\EndIf
 	\EndIf
 \EndFunction
 
-
-\Function{prop_opti}{$s$}
+\\
+\Function{prop\_opti}{$s$}
 	\If{$s$ ist nicht die Wurzel}
 		\State $n \gets \text{Elternknoten von }s$
-		\State old\_opti \gets $opti(n)$
+		\State old\_opti $\gets opti(n)$
 		\If{old\_opti > $opti(s)$}
 			\If{$n$ ist ein Max Knoten}
 				\State $opti(n) \gets \max_{s' \in children(n)}opti(s')$
-				\If{old_opti > $opti(n)$}
-					\Call{prop_opti}{$n$}
+				\If{old\_opti > $opti(n)$}
+					\State \textsc{prop\_opti}($n$)
 				\EndIf
 			\Else
 				\State $opti(n) \gets opti(s)$
-				\Call{prop_opti}{$n$}
+				\State \textsc{prop\_opti}($n$)
 			\EndIf
 		\EndIf
 	\EndIf
