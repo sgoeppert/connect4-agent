@@ -17,12 +17,13 @@ def run_selfplay_experiment(
         players: Tuple[Type[Player], Type[Player]],
         constructor_args: Tuple[any, any] = (None, None),
         num_games: int = 100,
-        num_processes: int = config.NUM_PROCESSES
+        num_processes: int = config.NUM_PROCESSES,
+        show_progress_bar: bool = False
 ):
     # print("Running Experiment: ", title)
     arena = Arena(players, constructor_args=constructor_args, num_processes=num_processes, num_games=num_games)
 
-    results = arena.run_game_mp(show_progress_bar=False)
+    results = arena.run_game_mp(show_progress_bar=show_progress_bar)
     mean_scores = (np.mean(results, axis=0) + 1) / 2  # calculate the mean score per player as value between 0 and 1
 
     return {
@@ -299,7 +300,7 @@ class Table:
             lines.append("\\label{tab:"+self.label+"}")
         lines.append("\\end{table}")
 
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
 
     def print(self):
         lines = []
@@ -330,7 +331,7 @@ class Table:
         if self.label is not None:
             lines.append("Label: "+self.label)
 
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
 
     def write_to_file(self, file, ending=".txt", out_format="latex"):
         fname = Path(config.ROOT_DIR) / "tables" / (file + ending)
