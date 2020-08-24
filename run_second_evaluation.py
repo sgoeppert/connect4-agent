@@ -65,9 +65,10 @@ def explore_parameter_against_fixed_opponent(player, opponent, player_conf, oppo
                                              values, parameter="exploration_constant",
                                              variable_opponent=False):
     base_setting = player_conf
+    write_log("Running explore_parameter for {} Iterations".format(len(values)))
 
     result_row = []
-    for v in values:
+    for v in tqdm(values):
         settings = base_setting.copy()
         settings[parameter] = v
 
@@ -88,7 +89,7 @@ def explore_parameter_against_fixed_opponent(player, opponent, player_conf, oppo
 def run_move_eval(player, base_setting):
     good_scores = []
     perfect_scores = []
-
+    write_log("Running move_eval for {} Iterations".format(len(MOVE_EVAL_STEPS) * MOVE_EVAL_REPEATS))
     for step in tqdm(MOVE_EVAL_STEPS):
         settings = base_setting.copy()
         settings["max_steps"] = step
@@ -709,6 +710,7 @@ def run_rave_experiments(flat_mc_settings, mcts_config):
 
 
 if __name__ == "__main__":
+    write_log("Starting...")
     flat_mc_config = run_flat_mc_experiments()
     mcts_config = run_mcts_experiments(flat_mc_config)
 
