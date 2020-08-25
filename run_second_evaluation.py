@@ -711,21 +711,22 @@ def run_rave_experiments(flat_mc_settings, mcts_config):
 
 if __name__ == "__main__":
     write_log("Starting...")
-    flat_mc_config = run_flat_mc_experiments()
-    mcts_config = run_mcts_experiments(flat_mc_config)
-
-    transpos_config = run_transpos_experiments(flat_mc_config, mcts_config)
-
-    score_bounded_config = run_score_bounded_experiments(flat_mc_config, mcts_config)
-
+    # flat_mc_config = run_flat_mc_experiments()
+    # mcts_config = run_mcts_experiments(flat_mc_config)
+    #
+    # transpos_config = run_transpos_experiments(flat_mc_config, mcts_config)
+    #
+    # score_bounded_config = run_score_bounded_experiments(flat_mc_config, mcts_config)
+    flat_mc_config = {"max_steps": 1000, "ucb_selection": True, "exploration_constant": 1.2}
+    mcts_config = {"max_steps": 1000, "exploration_constant": 0.85}
     rave_config = run_rave_experiments(flat_mc_config, mcts_config)
 
-    configurations = {
-        "flat": flat_mc_config,
-        "mcts": mcts_config,
-        "tranpos": transpos_config,
-        "scorebound": score_bounded_config,
-        "rave": rave_config
-    }
+    # configurations = {
+    #     "flat": flat_mc_config,
+    #     "mcts": mcts_config,
+    #     "tranpos": transpos_config,
+    #     "scorebound": score_bounded_config,
+    #     "rave": rave_config
+    # }
 
-    dump_json("eval_results/configurations_{}.json", configurations)
+    # dump_json("eval_results/configurations_{}.json", configurations)
