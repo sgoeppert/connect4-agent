@@ -22,7 +22,7 @@ if __name__ == "__main__":
             num_games=500,
             show_progress_bar=True
         )
-        results[method] = res.mean
+        results[method] = res["mean"]
 
     dump_json("long_runs/transposition_{}.json", results)
 
