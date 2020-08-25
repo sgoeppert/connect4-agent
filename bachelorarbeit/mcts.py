@@ -59,6 +59,9 @@ class Node:
     def add_child(self, node: "Node", move: int):
         self.children[move] = node
 
+    def remove_parent(self, player):
+        self.parent = None
+
     def __repr__(self):
         return f"Node(Q:{self.Q()}, N:{self.number_visits})"
 
@@ -158,7 +161,7 @@ class MCTSPlayer(Player):
             opp_move = self.determine_opponent_move(observation.board, self.root.game_state.board, configuration.columns)
             if opp_move in root.children:
                 root = root.children[opp_move]
-                root.parent = None
+                root.remove_parent(self)
             else:
                 root = None
         return root
@@ -166,7 +169,7 @@ class MCTSPlayer(Player):
     def _store_root(self, new_root):
         if self.keep_tree:
             self.root = new_root
-            self.root.parent = None
+            self.root.remove_parent(self)
 
     def init_root_node(self, root_game):
         return Node(root_game)
@@ -206,8 +209,8 @@ class MCTSPlayer(Player):
 
         # run the search
         best = self.perform_search(root)
-
-        # print(root.children)
+        # print(root)
+        # print("Children:", *list(root.children.items()), sep="\n\t")
         # persist the root if we're keeping the tree
         self._store_root(root.children[best])
 

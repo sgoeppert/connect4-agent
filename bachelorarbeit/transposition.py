@@ -97,11 +97,40 @@ class TranspositionNode(Node):
                 summed += c_n * c_v
             self.UCT3_val = (self.sim_reward + summed) / self.number_visits
 
+    def remove_children(self, player: "TranspositionPlayer", keep_node: "TranspositionNode"):
+        children = list(self.children.items())
+        for m, child in children:
+            if child != keep_node:
+                try:
+                    del(self.children[m])
+                except KeyError:
+                    pass
+                    # print("Could not find child in parent: ", child)
+                try:
+                    del(player.transpositions[hash(child.game_state)])
+                except KeyError:
+                    pass
+                    # print("Could not find child in transpositions: ", child)
+
+
+    def remove_parent(self, player: "TranspositionPlayer"):
+        # print("Remove parent")
+        # print(self.parents)
+        self.parent = None
+        for parent in self.parents:
+            parent.remove_parent(player)
+            parent.remove_children(player, keep_node=self)
+            hsh = hash(parent.game_state)
+            try:
+                del(player.transpositions[hsh])
+            except KeyError:
+                pass
+
+        self.parents = []
 
     def __repr__(self):
         me = f"TransposNode(n: {self.number_visits}, v: {normalize(self.average_value)}, uct3: {normalize(self.UCT3_val)})"
         return me
-
 
 
 class TranspositionPlayer(MCTSPlayer):
@@ -118,7 +147,8 @@ class TranspositionPlayer(MCTSPlayer):
 
     def reset(self, *args, **kwargs):
         super(TranspositionPlayer, self).reset(*args, **kwargs)
-        self.transpositions = {}
+        if not self.keep_tree:
+            self.transpositions = {}
 
     def tree_policy(self, root: TranspositionNode) -> List[TranspositionNode]:
         current = root
@@ -179,6 +209,7 @@ class TranspositionPlayer(MCTSPlayer):
             reward = -reward
 
     def perform_search(self, root):
+        # print("Before:", len(self.transpositions))
         while self.has_resources():
             path = self.tree_policy(root)
             reward = self.evaluate_game_state(path[-1].game_state)
@@ -186,6 +217,7 @@ class TranspositionPlayer(MCTSPlayer):
                 self.backup_uct3(path, reward)
             else:
                 self.backup(path, reward)
+        # print("After:", len(self.transpositions))
         return self.best_move(root)
 
     def init_root_node(self, root_game):
@@ -195,6 +227,7 @@ class TranspositionPlayer(MCTSPlayer):
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
+
 
     # def backup(path, reward):
     #
@@ -247,14 +280,40 @@ if __name__ == "__main__":
     # print(root)
     # print("Children:", *list(root.children.items()), sep="\n\t")
 
+
+    def memory_usage_psutil():
+        # return the memory usage in MB
+        import os
+        import psutil
+        process = psutil.Process(os.getpid())
+        mem = process.memory_info().rss / float(2 ** 20)
+        return mem
+
     #
-    steps = 300
+    steps = 10000
     conf = Configuration()
-    p = TranspositionPlayer(max_steps=steps, uct_method="UCT3", exploration_constant=0.707)
+    p = TranspositionPlayer(max_steps=steps, uct_method="UCT3", keep_tree=True, exploration_constant=0.707)
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
 
     with timer(f"{steps} steps"):
         m = p.get_move(obs, conf)
 
+    print(memory_usage_psutil(), "MiB")
+    # print(len(p.transpositions))
+    print(m)
+    g = game.play_move(m).play_move(4)
+    obs.board = g.board.copy()
+    obs.mark = g.mark
+    # print(len(p.transpositions))
+    m = p.get_move(obs, conf)
+    print(memory_usage_psutil(), "MiB")
+
+    g = game.play_move(m).play_move(4)
+    obs.board = g.board.copy()
+    obs.mark = g.mark
+    m = p.get_move(obs, conf)
+    print(memory_usage_psutil(), "MiB")
+
+    # print(len(p.transpositions))
     print(m)

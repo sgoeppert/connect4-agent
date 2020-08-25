@@ -18,12 +18,13 @@ def run_selfplay_experiment(
         constructor_args: Tuple[any, any] = (None, None),
         num_games: int = 100,
         num_processes: int = config.NUM_PROCESSES,
-        show_progress_bar: bool = False
+        show_progress_bar: bool = False,
+        max_tasks_per_child: int = 10
 ):
     # print("Running Experiment: ", title)
     arena = Arena(players, constructor_args=constructor_args, num_processes=num_processes, num_games=num_games)
 
-    results = arena.run_game_mp(show_progress_bar=show_progress_bar)
+    results = arena.run_game_mp(show_progress_bar=show_progress_bar, max_tasks=max_tasks_per_child)
     mean_scores = (np.mean(results, axis=0) + 1) / 2  # calculate the mean score per player as value between 0 and 1
 
     return {
@@ -139,6 +140,12 @@ def transform_board_large(board):
 
 def transform_board(board):
     return (np.array(board) / 2).tolist()
+
+
+def transform_board_nega(board):
+    b = np.array(board)
+    b[b == 2] = -1
+    return b.tolist()
 
 
 def transform_board_cnn(board):

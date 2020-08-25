@@ -81,7 +81,7 @@ class Arena:
         # print(game_states, rewards)
         return rewards, game_states
 
-    def run_game_mp(self, show_progress_bar: bool = True) -> List[GameResult]:
+    def run_game_mp(self, show_progress_bar: bool = True, max_tasks: int = 10) -> List[GameResult]:
         self.flip_players = False
         mp.set_start_method("spawn", force=True)
         pbar = None
@@ -94,7 +94,7 @@ class Arena:
 
         game_results = []
         for num_games in n_games:
-            with mp.Pool(self.num_processes, maxtasksperchild=10) as pool:
+            with mp.Pool(self.num_processes, maxtasksperchild=max_tasks) as pool:
                 pending_results = pool.imap_unordered(self.run_game, range(num_games))
 
                 for res, game_states in pending_results:
