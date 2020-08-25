@@ -27,7 +27,7 @@ class SarsaNode(RaveNode):
     def Q(self):
         return self.normalizeQ()
 
-    def best_child(self, exploration_constant: float = 1.0, beta: float = 0.9) -> "RaveNode":
+    def best_child(self, C_p: float = 1.0, beta: float = 0.9) -> "RaveNode":
         n_p = math.log(self.number_visits)
 
         if self.is_max:
@@ -37,7 +37,7 @@ class SarsaNode(RaveNode):
 
         _, c = max(self.children.items(),
                    key=lambda c: flip * ((1 - beta) * c[1].Q() + beta * c[1].QRave())
-                                 + exploration_constant * c[1].exploration(n_p))
+                                 + C_p * c[1].exploration(n_p))
         return c
 
     def __repr__(self):

@@ -24,7 +24,7 @@ class Node:
     def Q(self) -> float:
         return self.average_value
 
-    def best_child(self, exploration_constant: float = 1.0) -> "Node":
+    def best_child(self, C_p: float = 1.0) -> "Node":
         n_p = math.log(self.number_visits)
 
         def UCT(child: Node):
@@ -33,7 +33,7 @@ class Node:
             :param child: Knoten v'
             :return:
             """
-            return child.Q() + exploration_constant * math.sqrt(n_p / child.number_visits)
+            return child.Q() + C_p * math.sqrt(n_p / child.number_visits)
 
         _, c = max(self.children.items(), key=lambda entry: UCT(entry[1]))
         return c
@@ -55,9 +55,6 @@ class Node:
             self.expanded = True
 
         return self.children[move]
-
-    def add_child(self, node: "Node", move: int):
-        self.children[move] = node
 
     def remove_parent(self, player):
         self.parent = None
@@ -92,9 +89,6 @@ class MCTSPlayer(Player):
         # Verbrauchte und maximale Schritte pro Zug
         self.max_steps = max_steps
         self.steps_taken = 0
-
-    def __repr__(self) -> str:
-        return self.name
 
     def reset(self, conf: Configuration = None):
         self.steps_taken = 0

@@ -30,13 +30,6 @@ class TranspositionNode(Node):
         self.child_visits[move] += 1
         self.child_values[move] += (reward - self.child_values[move]) / self.child_visits[move]
 
-    # def Qsa(self, parent, mymove):
-    #     return parent.child_values[mymove]
-    #
-    # def Nsa(self, parent, mymove):
-    #     v = parent.child_visits[mymove]
-    #     return v
-
     def Qsa(self, move):
         return self.child_values[move]
 
@@ -44,22 +37,22 @@ class TranspositionNode(Node):
         return self.child_visits[move]
 
 
-    def best_child(self, exploration_constant: float = 1.0, uct_method: str = "UCT") -> "Node":
+    def best_child(self, C_p: float = 1.0, uct_method: str = "UCT") -> "Node":
         n_p = math.log(self.number_visits)
 
         parent = self
 
         def UCT1(action, _):
-            return normalize(parent.Qsa(action)) + exploration_constant * math.sqrt(n_p / parent.Nsa(action))
+            return normalize(parent.Qsa(action)) + C_p * math.sqrt(n_p / parent.Nsa(action))
 
         def UCT2(action, child):
-            return normalize(child.Q()) + exploration_constant * math.sqrt(n_p / parent.Nsa(action))
+            return normalize(child.Q()) + C_p * math.sqrt(n_p / parent.Nsa(action))
 
         def UCT3(action, child):
-            return normalize(child.UCT3_val) + exploration_constant * math.sqrt(n_p / parent.Nsa(action))
+            return normalize(child.UCT3_val) + C_p * math.sqrt(n_p / parent.Nsa(action))
 
         def default(_, child):
-            return normalize(child.Q()) + exploration_constant * math.sqrt(n_p / child.number_visits)
+            return normalize(child.Q()) + C_p * math.sqrt(n_p / child.number_visits)
 
         selection_method = default
         if uct_method == "UCT1":
@@ -105,17 +98,12 @@ class TranspositionNode(Node):
                     del(self.children[m])
                 except KeyError:
                     pass
-                    # print("Could not find child in parent: ", child)
                 try:
                     del(player.transpositions[hash(child.game_state)])
                 except KeyError:
                     pass
-                    # print("Could not find child in transpositions: ", child)
-
 
     def remove_parent(self, player: "TranspositionPlayer"):
-        # print("Remove parent")
-        # print(self.parents)
         self.parent = None
         for parent in self.parents:
             parent.remove_parent(player)
@@ -136,11 +124,10 @@ class TranspositionNode(Node):
 class TranspositionPlayer(MCTSPlayer):
     name = "Transpositionplayer"
 
-    def __init__(self, uct_method: str = "UCT", uct3=False, **kwargs):
+    def __init__(self, uct_method: str = "UCT", **kwargs):
         super(TranspositionPlayer, self).__init__(**kwargs)
         self.transpositions = {}
         self.uct_method = uct_method
-        self.uct3=uct3
 
     def __repr__(self) -> str:
         return self.name
@@ -171,8 +158,7 @@ class TranspositionPlayer(MCTSPlayer):
                 return path
         return path
 
-    def backup_uct3(self, path: List[TranspositionNode], reward: float):
-
+    def backup(self, path: List[TranspositionNode], reward: float):
         nodes_to_update = set()
 
         leaf = path[-1]
@@ -181,43 +167,28 @@ class TranspositionPlayer(MCTSPlayer):
         prev = None
         for _node in reversed(path):
             _node.increment_visit_and_add_reward(reward)
-            nodes_to_update.add(_node)
-            if prev is not None:
-                m = _node.find_child_action(prev)
-                _node.increment_child_visit_and_add_reward(m, -reward)
-
-            new_updates = set()
-            for node in nodes_to_update:
-                node.update_QUCT3()
-                if node.parents:
-                    new_updates.update(node.parents)
-            nodes_to_update = new_updates
-
-            prev = _node
-            reward = -reward
-
-    def backup(self, path: List[TranspositionNode], reward: float):
-        prev = None
-        for _node in reversed(path):
-            _node.increment_visit_and_add_reward(reward)
 
             if prev is not None:
                 m = _node.find_child_action(prev)
                 _node.increment_child_visit_and_add_reward(m, -reward)
+
+            if self.uct_method == "UCT3":
+                nodes_to_update.add(_node)
+                new_updates = set()
+                for node in nodes_to_update:
+                    node.update_QUCT3()
+                    if node.parents:
+                        new_updates.update(node.parents)
+                nodes_to_update = new_updates
 
             prev = _node
             reward = -reward
 
     def perform_search(self, root):
-        # print("Before:", len(self.transpositions))
         while self.has_resources():
             path = self.tree_policy(root)
             reward = self.evaluate_game_state(path[-1].game_state)
-            if self.uct_method == "UCT3":
-                self.backup_uct3(path, reward)
-            else:
-                self.backup(path, reward)
-        # print("After:", len(self.transpositions))
+            self.backup(path, reward)
         return self.best_move(root)
 
     def init_root_node(self, root_game):

@@ -8,6 +8,8 @@ class Configuration:
     columns: int = 7
     inarow: int = 4
     timeout: int = 0
+    actTimeout: int = 0
+    agentTimeout: int = 0
 
 
 @dataclass

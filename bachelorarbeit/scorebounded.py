@@ -24,7 +24,7 @@ class ScoreboundedNode(Node):
         else:
             self.is_max_node = True
 
-    def best_child(self, exploration_constant: float = 1.0) -> "ScoreboundedNode":
+    def best_child(self, C_p: float = 1.0) -> "ScoreboundedNode":
         n_p = math.log(self.number_visits)
         parent = self
         gamma = self.cut_gamma
@@ -45,7 +45,7 @@ class ScoreboundedNode(Node):
                 elif not self.is_max_node and c.pess >= self.opti:
                     children.remove(c)
 
-        c = max(children, key=lambda c: score_func(c) + exploration_constant * math.sqrt(n_p / c.number_visits))
+        c = max(children, key=lambda c: score_func(c) + C_p * math.sqrt(n_p / c.number_visits))
         return c
 
     def min_pess_child(self):

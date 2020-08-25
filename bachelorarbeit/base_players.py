@@ -17,6 +17,9 @@ class Player(ABC):
     def get_move(self, observation: Observation, configuration: Configuration) -> int:
         pass
 
+    def __repr__(self) -> str:
+        return self.name
+
 
 class RandomPlayer(Player):
     name = "RandomPlayer"
@@ -26,9 +29,6 @@ class RandomPlayer(Player):
 
     def get_move(self, observation: Observation, configuration: Configuration) -> int:
         return random.choice([c for c in range(configuration.columns) if observation.board[c] == 0])
-
-    def __repr__(self) -> str:
-        return self.name
 
 
 class FlatMonteCarlo(Player):

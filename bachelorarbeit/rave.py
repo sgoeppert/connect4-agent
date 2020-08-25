@@ -23,11 +23,14 @@ class RaveNode(Node):
     def exploration(self, parent_visits):
         return math.sqrt(parent_visits / self.number_visits)
 
-    def best_child(self, C_p: float = 1.0, b: float = 0.0) -> Tuple["RaveNode", int]:
+    def best_child(self, C_p: float = 1.0, b: float = 0.0, alpha: float = None) -> Tuple["RaveNode", int]:
         n_p = math.log(self.number_visits)
 
         def UCT_Rave(child: RaveNode):
-            beta = child.beta(b)
+            if alpha is not None:
+                beta = alpha
+            else:
+                beta = child.beta(b)
             return (1 - beta) * child.Q() + beta * child.QRave() \
                    + C_p * math.sqrt(n_p / child.number_visits)
 
@@ -59,16 +62,17 @@ class RaveNode(Node):
 class RavePlayer(MCTSPlayer):
     name = "RavePlayer"
 
-    def __init__(self, b: float = 0.0, *args, **kwargs):
+    def __init__(self, b: float = 0.0, alpha: float = None, *args, **kwargs):
         super(RavePlayer, self).__init__(*args, **kwargs)
         self.b = b
+        self.alpha = alpha
 
     def tree_policy_rave(self, root: "RaveNode", moves) -> "RaveNode":
         current = root
 
         while not current.game_state.is_terminal():
             if current.is_expanded():
-                current, m = current.best_child(self.exploration_constant, b=self.b)
+                current, m = current.best_child(self.exploration_constant, b=self.b, alpha=self.alpha)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
                 move_name = current.game_state.get_move_name(m, played=True)
                 moves.append(move_name)
@@ -116,7 +120,8 @@ class RavePlayer(MCTSPlayer):
         return RaveNode(game_state=root_game)
 
     def best_move(self, node: RaveNode) -> int:
-        move, n = max(node.children.items(), key=lambda c: (1 - c[1].beta(0)) * c[1].Q() + c[1].beta(0) * c[1].QRave())
+        n, move = node.best_child(C_p=0, b=self.b, alpha=self.alpha)
+        # move, n = max(node.children.items(), key=lambda c: (1 - c[1].beta(0)) * c[1].Q() + c[1].beta(0) * c[1].QRave())
         return move
 
 
