@@ -53,7 +53,7 @@ class RaveNode(Node):
         self.rave_score += (reward - self.rave_score) / self.rave_count
 
     def __repr__(self):
-        return f"RaveNode(n: {self.number_visits}, v: {self.total_value}, rave_n: {self.rave_count}, rave_v: {self.rave_score})"
+        return f"RaveNode(n: {self.number_visits}, v: {self.average_value}, rave_n: {self.rave_count}, rave_v: {self.rave_score})"
 
 
 class RavePlayer(MCTSPlayer):
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     from bachelorarbeit.tools import timer
 
     steps = 200
-    pl = RavePlayer(max_steps=steps, exploration_constant=0.9, b=0.0)
+    pl = RavePlayer(max_steps=steps, exploration_constant=0.5, b=0.0)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)

@@ -134,7 +134,7 @@ class ConnectFour:
                          inarow=self.inarow)
         cp.finished = self.finished
         cp.winner = self.winner
-        cp.stones_per_column = self.stones_per_column
+        cp.stones_per_column = self.stones_per_column[:]
         return cp
 
     def hash(self) -> int:
