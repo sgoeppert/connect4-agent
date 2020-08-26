@@ -31,6 +31,12 @@ class RandomPlayer(Player):
         return random.choice([c for c in range(configuration.columns) if observation.board[c] == 0])
 
 
+def simulate_game(game):
+    while not game.is_terminal():
+        move = random.choice(game.list_moves())
+        game.play_move(move)
+    return game
+
 class FlatMonteCarlo(Player):
     name = "FlatMonteCarloPlayer"
 
@@ -45,16 +51,6 @@ class FlatMonteCarlo(Player):
         self.ucb_selection = ucb_selection
         self.c_p = exploration_constant
 
-    def evaluate_game_state(self,
-                            game: ConnectFour,
-                            scoring_player: int) -> int:
-
-        while not game.is_terminal():
-            move = random.choice(game.list_moves())
-            game.play_move(move)
-
-        return game.get_reward(scoring_player)
-
     def get_move(self,
                  observation: Observation,
                  configuration: Configuration) -> int:
@@ -65,43 +61,32 @@ class FlatMonteCarlo(Player):
                            inarow=configuration.inarow,
                            mark=observation.mark)
 
-        visits = defaultdict(int)
-        rewards = defaultdict(int)
+        n = defaultdict(int)
+        q = defaultdict(float)
         scoring_player = game.get_current_player()
 
-        def move_score(move: int,
-                       N: int = 1,
-                       C: float = 0.0) -> float:
+        def ucb(m, N=1):
+            return q[m] + self.c_p * math.sqrt(math.log(N) / max(1,n[m]))
 
-            n = visits[move]
-            if n == 0:
-                return 10
-            else:
-                q = rewards[move] / visits[move]
-                return q + C * math.sqrt(2 * math.log(N) / n)
-
-        for i in range(self.max_steps):
+        for i in range(1, self.max_steps+1):
             if self.ucb_selection:
-                move = max(game.list_moves(),
-                           key=lambda m: move_score(m, i + 1, self.c_p))
+                a = max(game.list_moves(), key=lambda m: ucb(m, i))
             else:
-                move = random.choice(game.list_moves())
+                a = random.choice(game.list_moves())
 
-            next_state = game.copy().play_move(move)
-            result = self.evaluate_game_state(next_state, scoring_player)
-            visits[move] += 1
-            rewards[move] += result
+            end_state = simulate_game(game.copy().play_move(a))
+            r = end_state.get_reward(scoring_player)
+            n[a] += 1
+            q[a] += (r - q[a])/n[a]
 
-        chosen_move = max(visits.keys(), key=lambda m: move_score(m))
-
-        return chosen_move
+        return max(n.keys(), key=lambda m: ucb(m))
 
 
 if __name__ == "__main__":
     from bachelorarbeit.selfplay import Arena
     from bachelorarbeit.tools import timer
 
-    steps = 1000
+    steps = 20
     arena = Arena(
         players=(FlatMonteCarlo, RandomPlayer),
         constructor_args=({"max_steps": steps, "exploration_constant": 1 / math.sqrt(2)},
