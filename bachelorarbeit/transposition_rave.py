@@ -54,7 +54,7 @@ class TpRaveNode(Node):
                 beta = alpha
             else:
                 beta = child.beta(b)
-            return (1 - beta) * value + beta * child.QRave()
+            return (1 - beta) * value + beta * normalize(child.QRave())
 
         parent = self
         def UCT1(action, child):
