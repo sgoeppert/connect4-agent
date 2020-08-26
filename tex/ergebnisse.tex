@@ -1,7 +1,422 @@
 \section{Vergleiche und Ergebnisse}
 \label{chap:results}
 
+Die zuvor in den Kapiteln~\ref{chap:mcts-impl} und \ref{chap:mcts-mit-nn} entwickelten Agenten werden in diesem Kapitel ausführlich miteinander verglichen.
+Nachdem ich meine Methodik für die Evaluation der Agenten vorgestellt habe, werden die Agenten nacheinander ausgewertet und am Ende noch einmal einander gegenüber gestellt.
+
+\subsection{Methodik}
+\label{subsec:methodik}
+
+Bevor die Spielstärke eines Agenten bestimmt werden kann, müssen vorher die konfigurierbaren Parameter des Agenten optimiert werden.
+Diese unterscheiden sich von Agent zu Agent, alle haben aber den gemeinsamen Parameter $C_p$, der beeinflusst, wie häufig der Agent erforschen soll anstatt die optimale Aktion zu wählen.
+Dieser Parameter muss für jede Verbesserung und eventuell sogar für jede Parametrisierung der Verbesserung individuell bestimmt werden, liegt aber in der Regel zwischen $0.1$ und $2.0$.
+
+Die besten Parameter werden experimentell durch Spiele gegen den normalen MCTS-Spieler bestimmt.
+
+\bigskip
+Der Optimierte Spieler wird danach dadurch bewertet, wie genau er gute und perfekte Spielzüge in einem Datensatz mit Spielpositionen findet.
+Der Datensatz dieser Zug-Evaluation besteht aus 1000 Spielpositionen und Bewertungen jedes Zuges in dieser Position durch einen perfekten Spieler.
+Der Datensatz wurde vom Nutzer Peter Cnudde mit einem Vier Gewinnt Solver, einem in C++ geschriebenen Programm, das für jeden Zustand die optimalen Spielzüge berechnen kann, erstellt und auf Kaggle hochgeladen\footnote{Quelle: https://www.kaggle.com/petercnudde/scoring-connect-x-agents}.
+Jede Spielposition in diesem Datensatz hat das folgende Format:
+
+\begin{verbatim}
+{
+    "board": [
+        0, 0, 0, 0, 0, 0, 0,
+        0, 0, 2, 0, 0, 0, 2,
+        0, 0, 2, 0, 0, 0, 1,
+        0, 0, 1, 0, 0, 0, 2,
+        1, 0, 2, 0, 0, 0, 1,
+        1, 1, 2, 1, 0, 1, 2
+        ],
+    "score": -2,
+    "move score": [-3, -4, -4, -2, -6, -5, -4]
+}
+\end{verbatim}
+
+\verb|board| ist der Zustand des Spielfeldes, \verb|score| ist die maximal erzielbare Bewertung und \verb|move score| enthält die Bewertungen aller Spielzüge aus diesem Zustand.
+Eine Bewertung = 0 bedeutet das Spiel endet unentschieden, eine Bewertung > 0 bedeutet dass der Spieler gewinnt (je größer der Wert, desto schneller gewinnt der Spieler) und < 0 bedeutet der Spieler verliert.
+Ist eine Bewertung = -99 so ist dieser Zug nicht legal.
+Die Bewertung des Agenten basiert auf zwei Metriken:
+\begin{itemize}
+    \item \textbf{Gute Züge:} Zustände in denen eine Aktion gewählt wurde, die das selbe Spielergebnis zur Folge hat, wie der optimale Zug. Also beispielsweise ein Zug mit positiver Bewertung, falls der Spieler gewinnen könnte.
+    \item \textbf{Perfekte Züge:} Zustände in denen eine Aktion gewählt wurde, die den selben Wert hat, wie die optimale Bewertung durch den perfekten Spieler.
+\end{itemize}
+
+Die Zug-Evaluation wird mit 25, 50, 100, 200, 400 und 800 Iterationen pro Zug durchgeführt, um die Stärke des Agenten in Abhängigkeit von der Anzahl der Iterationen zu messen.
+Da die, durch die Baumsuche gewählten, Spielzüge auch durch Zufall beeinflusst sind, wird die Evaluation für jeden Spieler und jede Konfiguration mehrfach durchgeführt.
+
+\bigskip
+Die Ergebnisse der Zug-Evaluation mit einem zufälligen Spieler und mit der flachen Monte-Carlo Suche bilden die Vergleichsgrundlage (siehe Tabelle~\ref{tab:flat-mc-move-eval}).
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c||c|c|c|c|c|c|c|}
+\cline{3-8}
+\multicolumn{2}{c}{} & \multicolumn{6}{|c|}{Iterationen} \\
+\hline
+ & RandomPlayer & 25 & 50 & 100 & 200 & 400 & 800 \\
+\hline
+Gut \% & 0.673 & 0.748 & 0.797 & 0.83 & 0.869 & 0.893 & 0.909 \\
+\hline
+Perfekt \% & 0.262 & 0.395 & 0.468 & 0.537 & 0.61 & 0.662 & 0.692 \\
+\hline
+\end{tabular}
+\caption{Gute und Perfekte Zugauswahl des zufälligen Spielers und des Flat Monte Carlo Spielers.
+Der Flat Monte Carlo Spieler benutzt die UCB-Formel zur Kindauswahl mit $C_p=1.2$ und hat 1000 Iterationen Bedenkzeit pro Zug.
+Es wurden 10 Wiederholungen durchgeführt.}
+\label{tab:flat-mc-move-eval}
+\end{table}
+
 \subsection{Normale Monte-Carlo-Baumsuche}
 \label{chap:results-mcts}
 
+Der Parameter $C_p$ des MCTS-Spielers selbst wurde ebenfalls durch Spielen gegen sich selbst (Selfplay) bestimmt.
+Dafür spielt der MCTS-Spieler $A$ mit verschiedenen Werten von $C_{INITIAL}\in \left[0.25, 0.5, \frac{1}{\sqrt{2}}, 0.85, 1.0, 1.1, 1.2, \sqrt{2}\right]$ gegen einen Spieler $B$ mit festem $C_p=1.0$.
+In jedem Vergleich werden \textbf{500 Spiele} gespielt, die Hälfte davon zieht Spieler $A$ als Erstes, die andere Hälfte zieht er als Zweites.
+
+Die Ergebnisse fangen erst bei mehr als 300 Spielen an sich zu stabilisieren, bei 500 erachte ich sie als recht zuverlässig, aber trotzdem kann es in den Auswertungen zu größeren Abweichungen kommen.
+
+Alle Agenten werden mit einer \textbf{festen Anzahl Iterationen (1000)} pro Spielzug verglichen. 
+Ich habe 1000 gewählt, weil es mir dadurch möglich ist, angemessen viele Spiele mit jedem Agenten zu simulieren. 
+Mit 1000 Iterationen dauert jeder Spielzug in etwa 0.5 Sekunden unabhängig davon welcher Agent seinen Zug macht.
+Somit kann, durch parallele Ausführung in 10 Prozessor-Threads, ein Spiel pro Sekunde simuliert werden.
+
+Die Spielbäume bleiben nicht zwischen den Zügen erhalten, jeder Agent beginnt also mit jedem Zug von neuem.
+Darauf wie sich die Leistung der Agenten verändert, wenn die Bäume erhalten bleiben und die Bedenkzeit pro Zug größer ist, gehe ich am Ende dieses Kapitels ein.
+
+\medskip
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c||c|c|c|c|c|c|c|c|}
+\hline
+$C_p$ & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 0.85 & 1.0 & 1.1 & 1.2 & $\sqrt{2}$ \\
+\hline
+Sieg \% & 0.177 & 0.351 & 0.448 & 0.51 & 0.467 & 0.507 & 0.445 & 0.457 \\
+\hline
+\end{tabular}
+\caption{Gewinnchance der Monte-Carlo-Baumsuche mit verschiedenen Parametern $C_p$ gegen MCTS mit $C_p=1.0$ über 500 Spiele.}
+\label{tab:mcts-cp-1}
+\end{table}
+
+\medskip
+Nachdem ein bester Wert $C_{BESTER}=0.85$ aus $C_{INITIAL}$ gefunden wurde, spielt der Agent noch einmal gegen sich selbst.
+Dieses Mal benutzt der Gegner den zuvor bestimmten Wert $C_{BESTER}$ und der Agent spielt mit verschiedenen Werten $C_p = C_{BESTER} \pm k \times 0.05, k \in \left[1,2\right] $.
+
+\medskip
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c||c|c|c|c|c|}
+\hline
+$C_p$ & 0.75 & 0.8 & 0.85 & 0.9 & 0.95 \\
+\hline
+Sieg \% & 0.461 & 0.487 & 0.526 & 0.48 & 0.473 \\
+\hline
+\end{tabular}
+\caption{Verfeinerung des Parameters $C_p$ für MCTS um den zuvor gefundenen Wert $C_p=0.85$. Test über 500 Spiele mit 1000 Schritten pro Zug.}
+\label{tab:mcts-cp-2}
+\end{table}
+
+\medskip
+Der Parameter mit der größte Gewinnchance $C_p=0.85$ wird als optimaler Parameter für den normalen MCTS-Spieler in nachfolgenden Vergleichen verwendet. 
+Die Ergebnisse der Zug-Evaluation sind in Tabelle~\ref{tab:mcts-move-eval} zu finden.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|}
+		\hline
+		Iterationen & 25 & 50 & 100 & 200 & 400 & 800 \\
+		\hline
+		Gut \% & 0.763 & 0.807 & 0.851 & 0.879 & 0.895 & 0.909 \\
+		\hline
+		Perfekt \% & 0.406 & 0.491 & 0.578 & 0.639 & 0.679 & 0.706 \\
+		\hline
+	\end{tabular}
+	\caption{Gute und Perfekte Zugauswahl des MCTS Spielers im Datensatz mit 1000 Spielpositionen mit einem Parameter $C_p=0.85$. Es wurden 10 Wiederholungen durchgeführt.}
+	\label{tab:mcts-move-eval}
+\end{table}
+
+Die Auswahl der korrekten Züge ist nur minimal besser, als die der flachen Monte-Carlo-Suche, in einem direkten Vergleich konnte der MCTS Spieler aber 76\% der Spiele (von 500 Spielen) gewinnen. 
+Generell zeigt sich, dass die Präzision der Zugauswahl nicht linear mit der Anzahl der Iterationen steigt.
+
+\bigskip
+Die optimale Parametrisierung des normalen MCTS-Spielers ist $\mathbf{C_p=0.85}$.
+
+\pagebreak[2]
 \subsection{Transpositionen}
+
+Der MCTS-Spieler mit Transpositionen hat zusätzlich zur Erkundungskonstante $C_p$ noch die Wahl zwischen vier verschiedenen Methoden zur Auswahl der Kindknoten in der Selektionsphase (im Folgenden UCT-Methoden genannt).
+Um einen Parameter $C_p$ zu bestimmen, wird als UCT-Methode der \textit{simple way}, wie er im Paper von Cazenave u.a.\autocite{cazenaveUCDUpperConfidence2012} genannt wird, gewählt.
+Transpositionen werden zwar erkannt und die Knoten teilen sich ihre Statistik, die Selektion arbeitet aber einfach nur mit den aggregierten Statistiken im Knoten und nutzt die Transpositionen nicht weiter aus.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.25 & 0.5 & 0.707 & 0.85 & 1.0 & 1.1 & 1.2 & 1.414 \\
+		\hline
+		Sieg \% & 0.368 & 0.518 & 0.452 & 0.449 & 0.39 & 0.402 & 0.397 & 0.308 \\
+		\hline
+	\end{tabular}
+	\caption{Gewinnchance der MCTS mit Transpositionen mit verschiedenen Parametern $C_p$ gegen MCTS mit $C_p=0.85$ über 500 Spiele.}
+	\label{tab:transpos-cp-1}
+\end{table}
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.4 & 0.45 & 0.5 & 0.55 & 0.6 \\
+		\hline
+		Sieg \% & 0.504 & 0.521 & 0.535 & 0.484 & 0.512 \\
+		\hline
+	\end{tabular}
+	\caption{Verfeinerung des Parameters $C_p$ für MCTS mit Transpositionen um den zuvor gefundenen Wert $C_p=0.5$. Test über 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:transpos-cp-2}
+\end{table}
+
+Der gefundene Wert aus den \cref{tab:transpos-cp-1,tab:transpos-cp-2}, $C_p=0.5$, wird als Mittelwert benutzt, um die UCT-Methoden gegen den normalen MCTS-Spieler zu vergleichen.
+Da der Parameter nicht garantiert die besten Ergebnisse für jede Methode liefert, wurden $C_p$-Werte im Bereich $\left[0.2,0.3, .., 0.8\right]$ verglichen (Tabelle~\ref{tab:transpos-methods}).
+
+\medskip
+
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.2 & 0.3 & 0.4 & 0.5 & 0.6 & 0.7 & 0.8 \\
+		\hline
+		UCT1 & 0.236 & 0.406 & 0.486 & 0.508 & 0.5 & 0.516 & 0.482 \\
+		\hline
+		UCT2 & 0.272 & 0.426 & 0.496 & \textbf{0.535} & 0.508 & 0.498 & 0.454 \\
+		\hline
+		UCT3 & 0.265 & 0.444 & 0.498 & 0.466 & 0.461 & 0.457 & 0.426 \\
+		\hline
+		Standard & 0.285 & 0.401 & 0.516 & 0.52 & 0.455 & 0.454 & 0.428 \\
+		\hline
+	\end{tabular}
+	\caption{Veränderung der Spielstärke mit unterschiedlichen Auswahlmethoden der Kindauswahl für verschiedene Parameter $C_p$ gegen den optimierten MCTS Spieler. 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:transpos-methods}
+\end{table}
+
+Die besten Ergebnisse werden mit der UCT2-Auswahlmethode und $C_p=0.5$ erreicht. 
+
+\pagebreak[4]
+Die Zug-Evaluation wurde für alle UCT-Methoden mit dem selben $C_p=0.5$ durchgeführt.
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|c|}
+		\cline{3-8}
+		\multicolumn{2}{c}{} & \multicolumn{6}{|c|}{Iterationen} \\
+		\hline
+		UCT-Methode & gut/perfekt & 25 & 50 & 100 & 200 & 400 & 800 \\
+		\hline
+		\multirow{2}{*}{UCT1} & gut & 0.766 & 0.806 & 0.854 & 0.882 & 0.902 & 0.911 \\
+		\cline{2-8}
+		 & perfekt & 0.413 & 0.491 & 0.588 & 0.642 & 0.688 & 0.707 \\
+		\hline
+		\multirow{2}{*}{UCT2} & gut & 0.77 & 0.805 & 0.855 & 0.882 & 0.896 & 0.915 \\
+		\cline{2-8}
+		 & perfekt & 0.414 & 0.486 & 0.584 & 0.653 & 0.682 & 0.717 \\
+		\hline
+		\multirow{2}{*}{UCT3} & gut & 0.766 & 0.804 & 0.855 & 0.881 & 0.898 & 0.912 \\
+		\cline{2-8}
+		 & perfekt & 0.408 & 0.482 & 0.579 & 0.648 & 0.685 & 0.715 \\
+		\hline
+		\multirow{2}{*}{Standard} & gut & 0.765 & 0.813 & 0.851 & 0.881 & 0.9 & 0.91 \\
+		\cline{2-8}
+		 & perfekt & 0.414 & 0.492 & 0.584 & 0.643 & 0.686 & 0.706 \\
+		\hline
+	\end{tabular}
+	\caption{Gute und Perfekte Zugauswahl des MCTS Spielers mit Transpositionen im Datensatz mit 1000 Spielpositionen mit einem Parameter $C_p=0.5$. Es wurden 10 Wiederholungen durchgeführt.}
+	\label{tab:transpos-move-eval}
+\end{table}
+
+
+Auch wenn Transpositionen von der Idee her sehr nützlich erscheinen, hält sich ihr Erfolg in meinen Experimenten in Grenzen.
+Die Ergebnisse der Zug-Evaluation sind nur geringfügig besser als MCTS ohne Transpositionen, die Gewinnrate von 53.5\% im direkten Spiel ist dafür eine deutlich größere Verbesserung.
+
+\bigskip
+Der Optimale MCTS-Spieler mit Transpositionen benutzt den Selektionsalgorithmus \textbf{UCT2} (siehe Seite~\pageref{eqn:UCT2}) und hat ein $\mathbf{C_p=0.5}$. 
+Mit dieser Parametrisierung hat er 53.5\% der Spiele gegen den MCTS-Spieler gewonnen.
+
+\pagebreak[1]
+\subsection{Score Bounded Monte-Carlo-Baumsuche}
+
+Die beiden Parameter $\gamma$ und $\delta$ des Score Bounded MCTS-Algorithmus beeinflussen wie die optimistischen $opti(v)$ und pessimistischen $pess(v)$ Grenzen eines Knotens die Kindauswahl beeinflussen.
+
+Genauso wie zuvor wird der Parameter $C_p$ im Vergleich gegen den normalen MCTS-Spieler bestimmt. Die beiden Parameter $\gamma$ und $\delta$ werden dafür auf $0.0$ fixiert. 
+
+\medskip
+\pagebreak[3]
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.25 & 0.5 & 0.707 & 0.85 & 1.0 & 1.1 & 1.2 & 1.414 \\
+		\hline
+		Sieg \% & 0.118 & 0.332 & 0.452 & 0.445 & 0.515 & 0.487 & 0.482 & 0.418 \\
+		\hline
+	\end{tabular}
+	\caption{Gewinnchance des Score Bounded MCTS mit verschiedenen Parametern $C_p$ gegen MCTS mit $C_p=0.85$ über 500 Spiele.}
+	\label{tab:score-bounded-cp-1}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.9 & 0.95 & 1.0 & 1.05 & 1.1 \\
+		\hline
+		Sieg \% & 0.468 & 0.524 & 0.522 & 0.491 & 0.458 \\
+		\hline
+	\end{tabular}
+	\caption{Verfeinerung des Parameters $C_p$ für Score Bounded MCTS um den zuvor gefundenen Wert $C_p=1.0$. Test über 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:score-bounded-cp-2}
+\end{table}
+
+Der beste gefundene Parameter $C_p$ ist $0.95$. Damit werden nun die Parameter $\gamma$ und $\delta$ bestimmt. Die Spanne der getesteten Werte liegt im Bereich $\left[-0.2,\dots,0.2\right]$. Cazenave und Saffidine haben in ihren Experimenten\autocite[\ppno~11]{cazenaveScoreBoundedMonteCarlo2011} die Werte $\gamma=0$ und $\delta=-0.1$ für Vier Gewinnt gefunden, weshalb ich mich auf diesen Bereich begrenzt habe. 
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|}
+		\hline
+		$\downarrow\gamma$/$\delta \rightarrow$ & -0.2 & -0.1 & 0 & 0.1 & 0.2 \\
+		\hline
+		\hline
+		-0.2 & 0.439 & 0.498 & 0.497 & 0.522 & 0.484 \\
+		\hline
+		-0.1 & 0.423 & 0.454 & 0.5 & 0.493 & 0.535 \\
+		\hline
+		0 & 0.451 & 0.469 & 0.487 & 0.521 & \textbf{0.561} \\
+		\hline
+		0.1 & 0.447 & 0.459 & 0.503 & 0.472 & 0.505 \\
+		\hline
+		0.2 & 0.438 & 0.48 & 0.478 & 0.477 & 0.532 \\
+		\hline
+	\end{tabular}
+	\caption{Vergleich der Auswirkung der Parameter $\gamma$ und $\delta$ in Score Bounded MCTS auf die Spielstärke gegen optimierten MCTS Spieler. 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:score-bounded-best-params}
+\end{table}
+
+Der Parameter $\gamma$ scheint keinen nennenswerten Einfluss auf die Spielstärke zu haben. 
+Meine Experimente zeigen aber, dass ein kleiner positiver Wert für $\delta$ die größten Vorteile bringt (\cref{tab:score-bounded-best-params}).
+Entgegen der Ergebnisse von Cazenave und Saffidine verschlechtert sich der Spieler für $\delta < 0$ nur.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|}
+		\hline
+		Iterationen & 25 & 50 & 100 & 200 & 400 & 800 \\
+		\hline
+		Gut \% & 0.796 & 0.833 & 0.858 & 0.876 & 0.892 & 0.902 \\
+		\hline
+		Perfekt \% & 0.479 & 0.57 & 0.61 & 0.64 & 0.661 & 0.682 \\
+		\hline
+	\end{tabular}
+	\caption{Gute und Perfekte Zugauswahl des Score Bounded MCTS Spielers im Datensatz mit 1000 Spielpositionen mit einem Parameter $C_p=0.95$ und den Parametern $\delta=0.2$ und $\gamma=0$. Es wurden 10 Wiederholungen durchgeführt.}
+\label{tab:score-bounded-move-eval}
+\end{table}
+
+In der Zug-Evaluation hat der Score Bounded MCTS-Spieler Vorteile, wenn wenige Iterationen pro Zug durchgeführt werden können. 
+Bei 25 und 50 Iterationen ist der Agent signifikant stärker als die normale Monte-Carlo-Baumsuche und auch als die Verbesserung durch Transpositionen.
+Dafür wird er aber mit mehr Iterationen nicht so gut wie normale MCTS oder MCTS mit Transpositionen.
+
+\bigskip
+Die optimalen Parameter für den Score Bounded MCTS-Spieler sind $C_p=0.95$, $\gamma=0$ und $\delta=0.2$. 
+Damit konnte der Spieler $56.1\%$ der Spiele gegen den MCTS-Spieler gewinnen.
+
+
+\pagebreak[1]
+\subsection{RAVE}
+
+Der RAVE-Agent hat nur einen zusätzlichen Parameter $b$. Dieser dient der Feinabstimmung des RAVE-Parameters $\beta$ (siehe Gleichung~\ref{eqn:beta} auf Seite~\pageref{eqn:beta}).
+Der optimale Wert für $C_p$ fällt mit der RAVE-Verbesserung deutlich geringer aus, als bei der normalen Baumsuche (\cref{tab:rave-cp-1,tab:rave-cp-2}).
+Die zusätzlichen Informationen, die die RAVE-Statistik in den Baum bringt, scheinen sehr viel nützlicher zu sein, als die normale Erkundung durch die UCT-Formel.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.25 & 0.5 & 0.707 & 0.85 & 1.0 & 1.1 & 1.2 & 1.414 \\
+		\hline
+		Sieg \% & 0.559 & 0.51 & 0.496 & 0.455 & 0.462 & 0.468 & 0.418 & 0.366 \\
+		\hline
+	\end{tabular}
+	\caption{Gewinnchance des RAVE MCTS Spielers mit verschiedenen Parametern $C_p$ gegen MCTS mit $C_p=0.85$ über 500 Spiele.}
+	\label{tab:rave-cp-1}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|}
+		\hline
+		$C_p$ & 0.15 & 0.2 & 0.25 & 0.3 & 0.35 \\
+		\hline
+		Sieg \% & 0.604 & \textbf{0.617} & 0.572 & 0.553 & 0.542 \\
+		\hline
+	\end{tabular}
+	\caption{Verfeinerung des Parameters $C_p$ für RAVE MCTS um den zuvor gefundenen Wert $C_p=0.25$. Test über 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:rave-cp-2}
+\end{table}
+
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|}
+		\hline
+		$b$ & 0 & 0.001 & 0.01 & 0.1 \\
+		\hline
+		Sieg \% & \textbf{0.571} & 0.567 & 0.556 & 0.304 \\
+		\hline
+	\end{tabular}
+	\caption{Vergleich der Auswirkung des Parameters $b$ in RAVE MCTS auf die Spielstärke gegen optimierten MCTS Spieler. 500 Spiele mit 1000 Schritten pro Zug.}
+	\label{tab:rave-best-param}
+\end{table}
+
+Die RAVE-Verbesserung hat mit $C_p=0.2$ die besten Ergebnisse bis jetzt erzielt. Der Parameter $b=0$ stellt sich auch als optimaler Wert heraus(\cref{tab:rave-best-param}).
+
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c||c|c|c|c|c|c|}
+		\hline
+		Iterationen & 25 & 50 & 100 & 200 & 400 & 800 \\
+		\hline
+		Gut \% & 0.801 & 0.852 & 0.886 & 0.907 & 0.922 & 0.929 \\
+		\hline
+		Perfekt \% & 0.479 & 0.578 & 0.659 & 0.704 & 0.731 & 0.754 \\
+		\hline
+	\end{tabular}
+	\caption{Gute und Perfekte Zugauswahl des RAVE MCTS Spielers mit einem Parameter $C_p=0.2$ und dem Parameter $b=0$. Es wurden 10 Wiederholungen durchgeführt.}
+	\label{tab:rave-move-eval}
+\end{table}
+
+RAVE zeigt seine Stärke auch in der Zug-Evaluation.
+Der Anteil der perfekten Züge ist, bei geringer Anzahl von Iterationen, sogar besser als der Score Bounded MCTS-Spieler, RAVE ist aber auch bei mehr Iterationen pro Zug deutlich besser als die normale MCTS und MCTS mit Transpositionen.
+Auch generell macht der RAVE-Spieler weniger Fehler und wählt einen mindestens guten Zug mit 92.9\%-iger Wahrscheinlichkeit.
+
+
+\bigskip
+Die optimalen Parameter des RAVE-Spielers sind $C_p=0.2$ und $b=0$. Der Spieler hat damit bis zu $61.7\%$ der Spiele gegen den normalen MCTS-Spieler gewonnen.
+
+
+\pagebreak[3]
+\subsection{Kombinationen?}
+
+\pagebreak[1]
+\subsection{Neuronale Netze?}
+
+
+\subsection{Direkter Vergleich}
+Die Spielergebnisse gegen MCTS aus der Optimierung der Verbesserungen waren:
+
+\begin{itemize}
+	\item \textbf{Transpositionen:} 53.5\% Gewinnchance
+	\item \textbf{Score Bounded:} 56.1\% Gewinnchance
+	\item \textbf{RAVE:} 61.7\% Gewinnchance
+\end{itemize}
+
+\unsure[inline]{Ich möchte auch gerne noch die Verbesserungen mit vielen Iterationen pro Zug ($\ge$ 10000) vergleichen, dies dauert aber sehr lange.}
+\improvement[inline]{Hier muss noch einiges geschrieben werden}
+\improvement[inline]{Ein richtiger Graph der die Agenten direkt nebeneinander zeigt wäre schön. Aber was kommt auf die X-Achse?}

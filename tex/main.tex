@@ -1,11 +1,11 @@
 % !TeX spellcheck = de_DE_frami
-\documentclass[a4paper, 11pt]{scrartcl}
+\documentclass[a4paper, 11pt,dvipsnames]{scrartcl}
 
 %\usepackage[utf8]{inputenc}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
+\usepackage{xargs}
 % graphic drawing
 \usepackage{tikz}
 \usetikzlibrary{positioning}
@@ -48,7 +48,9 @@
 \usepackage{listings}
 \usepackage{biblatex}
 
+
 \usepackage{xcolor}
+%\PassOptionsToPackage{pdftex,}{xcolor}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -80,6 +82,19 @@
 % Tabellen
 \usepackage{multirow}
 
+\usepackage[german]{cleveref}
+
+
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\thiswillnotshow}[2][1=]{\todo[disable,#1]{#2}}
+
+
+\flushbottom
+
 
 \author{Stefan Göppert}
 
@@ -87,6 +102,16 @@
 
 \begin{document}
 \maketitle
+\newpage
+
+\newpage
+\tableofcontents
+\newpage
+
+\listoffigures
+
+\listoftables
+\change{Die Tabellen brauchen kurze Labels für das Tabellenverzeichnis.}
 \newpage
 
 \input{1_einleitung}
@@ -98,10 +123,6 @@
 \input{mcts_implementierung}
 \newpage
 
-\input{nn_theorie}
-\newpage
-\input{nn_implementierung}
-\newpage
 \input{ergebnisse}
 \newpage
 \input{fazit}
@@ -126,6 +147,14 @@
 %\input{knns}
 %\newpage
 
+
+\input{nn_theorie}
+\newpage
+\input{nn_implementierung}
+\newpage
+
 \printbibliography
+\newpage
+\listoftodos[Todos]
 
 \end{document}

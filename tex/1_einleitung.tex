@@ -1,4 +1,6 @@
 \section{Einleitung}
+
+\change[inline]{Die Einleitung muss noch komplett überarbeitet werden.}
 Im Oktober 2015 wurde zum ersten Mal ein Profi-Spieler im Brettspiel Go unter Turnierbedingungen von einem Computerprogramm geschlagen. Fan Hui, 2015 Europameister in Go, unterlag dem von Google Deepmind entwickelten Programm AlphaGo fünf zu null. Ein halbes Jahr später wurde auch der 18-fache Weltmeister Lee Sedol von AlphaGo vier zu eins geschlagen.\autocite{AlphaGoStoryFar} AlphaGo ist ein Meilenstein in der Entwicklung von Go-Computerprogrammen. Vor 2015 konnten sich Go-Programme nur auf kleineren Spielfeldern und mit zusätzlichen Steinen zu Beginn des Spiels mit guten Spielern messen.
 
 Aufgrund des hohen Verzweigungsgrads und der Schwierigkeit Spielpositionen gut zu bewerten, stoßen traditionelle Suchverfahren wie die Alpha-Beta-Suche mit Go schnell an ihre Grenzen. Seit 2006 wurde daher für viele Go-Programme die Monte-Carlo-Baumsuche eingesetzt. Anstatt alle möglichen Spielpositionen auszuprobieren, wie es in der Alpha-Beta-Suche der Fall ist, werden in der Monte-Carlo-Baumsuche zufällige Spiele simuliert und das vielversprechendste Ergebnis weiterverfolgt.
@@ -14,7 +16,7 @@ Auf der Online-Plattform Kaggle gibt es seit Januar 2020 einen neuen Wettbewerb,
 Wie gut kann die Monte-Carlo-Baumsuche ein Spiel wie Vier Gewinnt spielen und kann sie auch in diesem einfacheren Anwendungsfall von Deep Learning profitieren? 
 
 \subsection{Aufbau der Arbeit}
-Nach einer Erklärung der Regeln von Vier Gewinnt und dem allgemeineren Spiel "Connect X", wird der Begriff des Agenten definiert und die Online-Plattform Kaggle vorgestellt, sowie die Regeln des Wettbewerbs erklärt. In Kapitel 2 wird dann die Monte-Carlo-Baumsuche erklärt und einige Verbesserungen beschrieben, welche in Kapitel 3 implementiert werden. Kapitel \ref{chap:networks} gibt einen Überblick über den Aufbau und die Funktionsweise von neuronalen Netzen und betrachtet eine besondere Form neuronaler Netze, die ConvNets. Im darauffolgenden Kapitel \ref{chap:nn-impl} werden dann zwei verschiedene Netzwerke implementiert und mit der Monte-Carlo-Baumsuche kombiniert.
+Nach einer Erklärung der Regeln von Vier Gewinnt und dem allgemeineren Spiel "Connect X", wird der Begriff des Agenten definiert und die Online-Plattform Kaggle vorgestellt, sowie die Regeln des Wettbewerbs erklärt. In Kapitel~\ref{chap:mcts-intro} wird dann die Monte-Carlo-Baumsuche erklärt und einige Verbesserungen beschrieben, welche in Kapitel~\ref{chap:mcts-impl} implementiert werden. Kapitel~\ref{chap:networks} gibt einen Überblick über den Aufbau und die Funktionsweise von neuronalen Netzen und betrachtet eine besondere Form neuronaler Netze, die ConvNets. Im darauffolgenden Kapitel \ref{chap:nn-impl} werden dann zwei verschiedene Netzwerke implementiert und mit der Monte-Carlo-Baumsuche kombiniert.
 
 Die Ergebnisse aus den Kapiteln \ref{chap:mcts-impl} und \ref{chap:nn-impl} werden in Kapitel \ref{chap:results} gegenüber gestellt und verglichen, bevor in Kapitel \ref{chap:fazit} ein Fazit gezogen wird.
 
@@ -44,3 +46,4 @@ Es ist also ein Computerprogramm, das abhängig von verschiedenen Zuständen ohn
 \subsection{Kaggle}
 Kaggle ist eine Online-Plattform für Data-Science Experimente und Wettbewerbe. 
 Inhalt dieser Arbeit ist der Kaggle Wettbewerb “Connect X”, welcher am 03. Januar 2020 gestartet ist. Die Herausforderung im Wettbewerb ist es, einen Spieler (Agent) hochzuladen, der “Connect X” spielen kann.
+\improvement[inline]{Auch wenn der Kaggle-Wettbewerb die Inspiration für die Bachelorarbeit war, gehe ich im Rest der Arbeit nur ein kleines Bisschen darauf ein. Vielleicht kann die Referenz zu Kaggle auch ganz raus?}

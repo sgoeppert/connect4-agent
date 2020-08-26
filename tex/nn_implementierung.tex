@@ -1,2 +1,110 @@
 \section{Implementierung der Neuronalen Netze}
 \label{chap:nn-impl}
+\info[inline]{Dieses Kapitel habe ich geschrieben, während ich meine ursprünglichen Experimente mit neuronalen Netzen noch einmal wiederholt habe. Deshalb ist es sehr konversationell geschrieben. Leider habe ich seit meinen ursprünglichen Experimenten nochmal einiges weiter mit MCTS experimentiert, wodurch ich den alten Code hier nicht richtig einbringen kann. }
+
+So wunderbar die Technologie und die allgemein erzielten Ergebnisse mit neuronalen Netzen sind, so schwer sind sie auch korrekt zu konfigurieren.
+Es ist mehr eine Kunst als eine Wissenschaft, die korrekten Parameter eines neuronalen Netzes zu finden.
+Es gibt unzählige Stellschrauben, die die Leistung des Netzwerks beeinflussen, und einige davon haben noch nicht einmal etwas mit dem Netzwerk selbst zu tun.
+
+Die erste Frage die ich mich gestellt habe, ist wie ich die Daten repräsentiere damit das neuronale Netz gut davon lernen kann.
+Das Spielfeld liegt bereits als ein ein-dimensionales Array vom Integerwerten vor
+\begin{verbatim}
+board = [
+    0, 0, 0, 0, 0, 0, 0,
+    0, 0, 2, 0, 0, 0, 2,
+    0, 0, 2, 0, 0, 0, 1,
+    0, 0, 1, 0, 0, 0, 2,
+    1, 0, 2, 0, 0, 0, 1,
+    1, 1, 2, 1, 0, 1, 2
+    ]
+\end{verbatim}
+.
+In einem ersten Versuch habe ich die Werte auf einen Bereich zwischen 0 und 1 normalisiert, indem ich die Werte durch zwei geteilt habe.
+Der Zielwert, den das Netzwerk vorhersagen soll, ist das Ergebnis des Spiels für einen bestimmten Spieler.
+Dieser Zielwert könnte immer aus Sicht des ersten Spielers sein, oder er wechselt sich mit jedem Zug ab.
+
+Ich habe mich zuerst dafür entschieden, den Zielwert immer aus Sicht des ersten Spielers zu benutzen.
+Wenn also der erste Spieler das Spiel gewonnen hat, so haben alle Spielzustände, die in diesem Spiel durchlaufen wurden, den Zielwert 1.
+Hat der erste Spieler dagegen verloren, so ist der Zielwert -1 und Unentschieden sind 0.
+
+Die Daten, mit denen das Netzwerk trainiert, wurden durch Selfplay erzeugt.
+Zwei MCTS-Spieler, mit jeweils 1000 Schritten Bedenkzeit pro Zug, spielen tausende Spiele gegeneinander.
+Die so gesammelte Menge an Spielzuständen wird dann für das initiale Training des Netzwerks benutzt.
+Um die Generierung dieser Spieldaten zu beschleunigen, wurden viele Spiele parallel ausgeführt.
+Die durchschnittliche Zeit pro Spiel lag bei etwa 1 Sekunde.
+Der so erzeugte Datensatz besteht aus ca.\ 400.000 Spielzuständen (in etwa 20.000 Spiele).
+Durch die große Menge an Spieldaten erhoffe ich mir, dass das durchschnittliche Ergebnis eines jeden Spielzustands relativ genau ist.
+Mit mehr Daten sollte das Ergebnis nur noch genauer werden.
+
+
+Das Problem kann sowohl als Regressionsaufgabe als auch als Klassifikationsaufgabe gesehen werden (siehe Seite~\pageref{chap:regression-classification}).
+Die Regression versucht den genauen "Wert" des Spielzustandes vorherzusagen und damit eine Gewinnwahrscheinlichkeit für den jeweiligen Spieler.
+Die Klassifikation kann versuchen die Spielzustände in \textbf{gut} und \textbf{schlecht} einzuteilen.
+Für terminale Zustände würde die Klassifikation sicher gut funktionieren, da sie eindeutig gut oder schlecht sind.
+Die nicht-terminalen Zustände haben aber keinen klaren "1 oder 0" Zielwert, dies wäre nur durch einen Solver absolut definierbar.
+
+Meine Entscheidung das Problem als Regressionsaufgabe zu betrachten, hat direkten Einfluss auf die Entwicklung des neuronalen Netzes.
+Das erste Netzwerk, das ich trainiert habe, war ein einfaches vollständig verbundenes neuronales Netz mit 42 Inputs und einem Output.
+Die Zielwerte liegen im Bereich $[-1,1]$ wodurch die Wahl der Aktivierungsfunktion der Ausgabeschicht auf die $tanh$ Funktion fällt.
+Für ein Regressions-Problem ist die typische Kostenfunktion der durchschnittliche Fehler im Quadrat (siehe Seite~\pageref{chap:cost-function}).
+
+Das erste Netzwerk hat drei versteckte Schichten mit jeweils 100 Einheiten.
+Dies ist absichtlich etwas größer gewählt, um zu sehen ob das Netzwerk überhaupt in der Lage ist etwas zu lernen und um dadurch Parameter wie zum Beispiel die Lernrate festzulegen.
+Die gewählte Aktivierungsfunktion der versteckten Schichten ist die ReLU-Funktion (siehe Seite~\pageref{chap:activations}), da sie allgemein als bessere Alternative zur Sigmoid-Funktion gesehen wird.
+Um zu testen, ob ein solches Netzwerk überhaupt etwas lernen kann, habe ich es zunächst nur mit einem Teil der gesamten Trainingsdaten trainiert.
+
+Eine weitere Frage, die es vorher noch zu klären gibt, ist wie mit Duplikaten in den Trainingsdaten umgegangen werden soll.
+Gerade die Anfangszustände des Spiels tauchen verhältnismäßig häufig im gesamten Datensatz auf.
+Bei 20.000 Spielen wurde zum Beispiel der erste Stein ungefähr 15.000 Mal in die Spalte 3 gesetzt, allerdings haben all diese Spiele zu unterschiedlichen Ergebnisse geführt.
+Generell wird empfohlen Duplikate zu verhinden und vor allem keine Daten aus dem Trainingsdatensatz in der Validierung und dem finalen Test des Netzwerks zu verwenden.
+Ich kann, um dieses Problem zu lösen, den Durchschnitt aller identischen Zustände im Datensatz bilden und den durchschnittlichen Wert als Trainingsziel des Netzwerks verwenden.
+
+Ob dies einen positiven Effekt hat weiß ich noch nicht.
+
+\bigskip
+Ich nehme für ein erstes Training 20.000 zufällige Zustände aus dem gesamten Datensatz nachdem Duplikate entfernt wurden.
+Davon werden je 10 Prozent für die Validierung und den Test beiseite gelegt.
+Beim ersten Training habe ich festgestellt, dass das Netzwerk in der Tat lernen kann, allerdings bereits nach ca.\ 10 Epochen des Trainings anfängt zu Overfitten.
+Es lernt die Trainingsbeispiele auswendig und kann dadurch nicht mehr generalisieren.
+
+% TODO insert tensorflow graph
+
+Um das Problem zu lösen habe ich versucht das Netzwerk auf nur zwei versteckte Schichten mit jeweils 50 Einheiten zu verkleinern, aber auch hier beginnt es nach wenigen Epochen an auswendig zu lernen.
+Eine weitere Reduktion der Größe des Netzwerks hat kaum Erfolg beim Verbessern der Generalisierung gebracht.
+
+% TODO insert tensorflow graph
+
+Als nächstes versuche ich, das Netzwerk auf einem größeren Datensatz zu trainieren.
+Statt 20.000 Beispielen verwende ich nun 100.000.
+Der Split der Validierungs und Test-Daten bleibt der gleiche.
+
+Hier sind die Trainings-Graphen für die 3 verschiedene Konfigurationen des Netwerks.
+Der Trainings-Prozess wird gestoppt, wenn sich der Validation Error seit 20 Epochen nicht verbessert hat.
+% TODO: hat es was gebracht?
+
+
+Auch wenn der Validierungsfehler geringer bleibt, scheint das Netzwerk nur sehr langsam zu trainieren.
+Mit reduzierter Lernrate $0.0001$ statt $0.001$ kann das Netzwerk besser lernen, die Generalisierung bleibt aber weiterhin schlecht.
+
+Ein Versuch die Aktivierungsfunktion auf $sigmoid$ zu ändern bringt auch keine wirkliche Verbesserung.
+Für diese neue Aktivierungsfunktion müssen auch die Trainingsdaten so angepasst werden, dass die Zielwerte im Bereich $[0,1]$ liegen.
+
+
+
+Das Netzwerk scheint also nicht von den Trainingsdaten in diesem Format generalisieren zu können.
+Ein wenig macht es Sinn, dass das Netzwerk Schwierigkeiten hat, da der tatsächliche Wert in einem Feld keine besondere Bedeutung hat.
+Vor allem nicht mit Werten 0.5 und 1 für Spieler 1 und 2, denn Spieler 2 ist ja nicht doppelt so gut oder wertvoll wie Spieler 1.
+Wie sieht es also aus, wenn diese Werte stattdessen -1 und 1 sind.
+
+
+
+\subsection{Kombination von MCTS mit neuronalen Netzen}
+\label{chap:mcts-mit-nn}
+
+Da die neuronalen Netze lernen, den Spielzustand zu bewerten, werden sie in der MCTS dafür verwendet um die Simulation zu ergänzen oder zu ersetzen.
+AlphaZero geht sogar noch einen Schritt weiter und hat einen weiteren Output im Netzwerk der die "move priors" für einen Spielzustand berechnet.
+Diese move priors werden benutzt, um die Auswahl von unbesuchten Knoten zu steuern.
+Dadurch werden vielversprechende Knoten bevorzugt besucht.
+
+Neuronale Netze haben aber einen Nachteil in der MCTS, sie sind deterministisch.
+Dadurch würde auch die Baumsuche selbst deterministisch

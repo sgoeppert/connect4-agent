@@ -1,11 +1,14 @@
 \section{Implementierung der Monte-Carlo-Baumsuche}
 \label{chap:mcts-impl}
 
+Der Quellcode des Projektes befindet sich auf Github: 
+
 In diesem Kapitel werde ich meine Implementierungen der Monte-Carlo-Baumsuche und der ausgewählten Verbesserungen erklären.
 Zunächst beschreibe ich kurz, wie das Spielfeld repräsentiert wird und wie die gemeinsame Schnittstelle der verschiedenen Agenten aussieht.
 Danach stelle ich die Vergleichs-Algorithmen vor, die verwendet werden, um die korrekte Funktionsweise der Agenten sicherzustellen und um ihre optimalen Parameter zu bestimmen.
 Anschließend wird zuerst die reine Monte-Carlo-Baumsuche ohne Verbesserung implementiert, dann wird sie um Transpositionserkennung erweitert.
-Die Agenten für Scorebounded MCTS und RAVE MCTS sind ebenfalls Modifikationen der reinen Monte-Carlo-Baumsuche. Zum Schluss versuche ich die verschiedenen Verbesserungen zu kombinieren.
+Die Agenten für Scorebounded MCTS und RAVE MCTS sind ebenfalls Modifikationen der reinen Monte-Carlo-Baumsuche.
+Zum Schluss versuche ich die verschiedenen Verbesserungen zu kombinieren.
 
 \subsection{Vier Gewinnt}
 \label{chap:viergewinnt-impl}
@@ -85,6 +88,7 @@ In jedem Schritt wird eine Aktion gleichmäßig zufällig ausgewählt und das Sp
 Das Ergebnis dieser Simulation wird für diese Aktion gespeichert.
 Der Agent führt zufällige Iterationen durch, bis ein Zeit oder Schrittlimit erreicht ist.
 Am Ende wird die Aktion gewählt, die die höchste durchschnittliche Bewertung hat.
+
 Eine stärkere Variante dieses Spielers wählt die Kindknoten nicht zufällig sondern mit der UCB-Formel (Gleichung~\ref{eqn:UCB1}) aus.
 
 \begin{lstlisting}[language=Python,caption=Flache Monte Carlo Suche.,label={lst:flat-mc}]
@@ -93,7 +97,7 @@ class FlatMonteCarlo(Player):
 
     def __init__(self,
                  max_steps: int = 1000,
-                 exploration_constant: float = 1.0,
+                 exploration_constant: float = 0.8,
                  ucb_selection: bool = True,
                  **kwargs):
 
@@ -102,16 +106,14 @@ class FlatMonteCarlo(Player):
         self.ucb_selection = ucb_selection
         self.c_p = exploration_constant
 
-    def evaluate_game_state(self,
-                            game: ConnectFour,
-                            scoring_player: int) -> int:
+\end{lstlisting}
 
-        while not game.is_terminal():
-            move = random.choice(game.list_moves())
-            game.play_move(move)
+Der Flat Monte Carlo Spieler kann durch den Parameter \verb|max_steps| und, wenn die UCB-Kindauswahl benutzt wird, zusätzlich mit dem Parameter \verb|exploration_constant| konfiguriert werden.
 
-        return game.get_reward(scoring_player)
+Die \texttt{get\_move} Methode simuliert \verb|max_steps| Spiele und wählt den ersten Zug vor der Simulation zufällig oder nach der UCB-Regel.
+Der Ergebnis dieser Simulation, aus der Sicht des Agenten, fließt in die durchschnittliche Bewertung $Q(a)$ ein.
 
+\begin{lstlisting}[language=Python]
     def get_move(self,
                  observation: Observation,
                  configuration: Configuration) -> int:
@@ -122,123 +124,39 @@ class FlatMonteCarlo(Player):
                            inarow=configuration.inarow,
                            mark=observation.mark)
 
-        visits = defaultdict(int)
-        rewards = defaultdict(int)
+        n = defaultdict(int)
+        q = defaultdict(float)
         scoring_player = game.get_current_player()
 
-        def move_score(move: int,
-                       N: int = 1,
-                       C: float = 0.0) -> float:
+        def ucb(m, N=1):
+            return q[m] + self.c_p * math.sqrt(math.log(N) / max(1,n[m]))
 
-            n = visits[move]
-            if n == 0:
-                return 10
-            else:
-                q = rewards[move] / visits[move]
-                return q + C * math.sqrt(2 * math.log(N) / n)
-
-        for i in range(self.max_steps):
+        for i in range(1, self.max_steps+1):
             if self.ucb_selection:
-                move = max(game.list_moves(),
-                           key=lambda m: move_score(m, i + 1, self.c_p))
+                a = max(game.list_moves(), key=lambda m: ucb(m, i))
             else:
-                move = random.choice(game.list_moves())
+                a = random.choice(game.list_moves())
 
-            next_state = game.copy().play_move(move)
-            result = self.evaluate_game_state(next_state, scoring_player)
-            visits[move] += 1
-            rewards[move] += result
+            end_state = simulate_game(game.copy().play_move(a))
+            r = end_state.get_reward(scoring_player)
+            n[a] += 1
+            q[a] += (r - q[a])/n[a]
 
-        chosen_move = max(visits.keys(), key=lambda m: move_score(m))
-
-        return chosen_move
+        return max(n.keys(), key=lambda m: ucb(m))
 \end{lstlisting}
 
-Der Flat Monte Carlo Spieler kann durch den Parameter \verb|max_steps| und die Variante mit UCB-Kindauswahl zusätzlich mit dem Parameter \verb|exploration_constant| konfiguriert werden.
-In den Vergleichen mit anderen Agenten sind die Parameter allerdings auf \verb|max_steps=1000, exploration_constant=0.8| fixiert.
+Die Spiele werden von der Funktion \verb|simulate_game(ConnectFour)| simuliert.
+Sie spielt so lange zufällige Spielzüge, bis ein terminaler Zustand erreicht ist.
 
-Der Wert des \verb|exploration_constant| Parameters wurde experimentell bestimmt, indem der Agent gegen sich selbst gespielt hat.
-Dafür wurde der Parameter für einen Spieler auf 1.0 fixiert, und mit verschiedenen Werten des anderen Spielers verglichen.
-Zuerst habe ich eine große Spanne von Werten zwischen 0.1 und 2.0 probiert, siehe Tabelle~\ref{tab:flat-mc}.
+\begin{lstlisting}[language=Python]
+def simulate_game(game):
+    while not game.is_terminal():
+        move = random.choice(game.list_moves())
+        game.play_move(move)
+    return game
+\end{lstlisting}
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
- Gewinnchance & 0.046 & 0.156 & 0.463 & 0.526 & 0.533 & 0.49 & 0.492 & 0.475 \\
- \hline
-\end{tabular}
-\caption{Gewinnchance für unterschiedliche Werte des \texttt{exploration\_constant} Parameters über 300 Spiele. Die Hälfte der Spiele hat der Spieler angefangen, die andere hälfte hat er als zweites gezogen.}
-\label{tab:flat-mc}
-\end{table}
-
-Ein guter Wert scheint also zwischen 0.707 ($\frac{1}{\sqrt{2}}$) und 1.0 zu liegen.
-Genauere Tests in diesem Interval haben die folgenden Werte ergeben:
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & $\frac{1}{\sqrt{2}}$ & 0.8 & 0.9 & 1.1 \\
- \hline
- Gewinnchance & 0.471 & 0.513 & 0.507 & 0.486 \\
- \hline
-\end{tabular}
-\caption{Verfeinerung des Parameters $C_p$ über 500 Spiele pro Parameter. }
-\label{tab:flat-mc-2}
-\end{table}
-
-Aufgrund dieser Daten wähle ich den Wert $C_p = 0.8$ als optimalen Parameter.
-
-
-Die dritte Art der Evaluation geschieht mit einem Datensatz aus 1000 Spielpositionen und Bewertungen jedes Zuges in dieser Position durch einen perfekten Spieler.
-Der Datensatz wurde vom Nutzer Peter Cnudde mit einem Vier Gewinnt Solver, einem in C++ geschriebenen Programm, das für jeden Zustand die optimalen Spielzüge berechnen kann, erstellt und auf Kaggle hochgeladen\footnote{Quelle: https://www.kaggle.com/petercnudde/scoring-connect-x-agents}.
-Jede Spielposition in diesem Datensatz hat das folgende Format:
-
-\begin{verbatim}
-{
-    "board": [
-        0, 0, 0, 0, 0, 0, 0,
-        0, 0, 2, 0, 0, 0, 2,
-        0, 0, 2, 0, 0, 0, 1,
-        0, 0, 1, 0, 0, 0, 2,
-        1, 0, 2, 0, 0, 0, 1,
-        1, 1, 2, 1, 0, 1, 2
-        ],
-    "score": -2,
-    "move score": [-3, -4, -4, -2, -6, -5, -4]
-}
-\end{verbatim}
-
-\verb|board| ist der Zustand des Spielfeldes, \verb|score| ist die maximal erzielbare Bewertung und \verb|move score| enthält die Bewertungen aller Spielzüge aus diesem Zustand.
-Eine Bewertung = 0 bedeutet das Spiel endet unentschieden, eine Bewertung > 0 bedeutet dass der Spieler gewinnt (je größer der Wert, desto schneller gewinnt der Spieler) und < 0 bedeutet der Spieler verliert.
-Ist eine Bewertung = -99 so ist dieser Zug nicht legal.
-Die Bewertung des Agenten basiert auf zwei Metriken:
-\begin{itemize}
-    \item Gute Züge: Zustände in denen eine Aktion gewählt wurde, die das selbe Spielergebnis zur Folge hat, wie der optimale Zug. Also beispielsweise ein Zug mit positiver Bewertung, falls der Spieler gewinnen könnte.
-    \item Perfekte Züge: Zustände in denen die Aktion gewählt wurde, die den selben Wert hat, wie die optimale Bewertung durch den perfekten Spieler.
-\end{itemize}
-
-Da die, durch die Baumsuche gewählten, Spielzüge auch durch Zufall beeinflusst sind, wird die Evaluation für jeden Spieler und jede Konfiguration mehrfach durchgeführt.
-Die Punktzahlen des zufälligen Spielers und des Flat Monte Carlo Spielers sind in Tabelle~\ref{tab:move-evaluation-baseline} gelistet.
-Die MCTS-Agenten müssen diese Werte übertreffen.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c| }
- \hline
- Spieler & Gut & Perfekt \\
- \hline
- Zufällig & 0.67 & 0.25 \\
- \hline
- Flat MC & 0.75 & 0.55 \\
- \hline
-\end{tabular}
-\caption{Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für den zufälligen und den Flat Monte Carlo Spieler. Jede Evaluation wurde 10 mal wiederholt und der Durchschnitt der Ergebnisse gebildet. Der Flat Monte Carlo Spieler benutzt die UCB-Formel zur Kindauswahl mit der Konstanten $C_p=1.0$ und hat 1000 Iterationen Bedenkzeit pro Zug.}
-\label{tab:move-evaluation-baseline}
-\end{table}
+Er wird benutzt, um Vergleichswerte der Spielstärke für die normale Monte-Carlo-Baumsuche zu haben.
 
 \subsection{Normale Monte-Carlo-Baumsuche}
 \label{subsec:normale-monte-carlo-baumsuche}
@@ -260,6 +178,9 @@ class Node:
         self.game_state = game_state  # der Spielzustand in diesem Knoten
         self.possible_moves = game_state.list_moves()  # Aktionen fuer die noch nicht erforschten Kindknoten
         self.expanded = False  # ob der Knoten vollstaendig expandiert ist
+
+    def Q(self) -> float:
+        return self.average_value
 
     def best_child(self, exploration_constant: float = 1.0) -> "Node":
         """Gibt das Kind mit dem hoechsten UCT-Wert zurueck"""
@@ -286,7 +207,7 @@ class Node:
 
 \end{lstlisting}
 
-Der Spieler \verb|MCTSPlayer| implementiert den "Upper Confidence Bound for Trees"-Algorithmus aus Kapitel~\ref{chap:UCT} direkt.
+Der Spieler \verb|MCTSPlayer| implementiert den "Upper Confidence Bound for Trees"-Algorithmus aus Kapitel~\ref{chap:UCT} direkt.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 Die Methode \verb|get_move| enthält zusätzliche Logik um den Spielbaum von einem Spielzug zum nächsten beizubehalten.
 Der eigentliche Algorithmus ist in der Methode \verb|perform_search(root: Node)| implementiert.
 
@@ -359,78 +280,27 @@ class MCTSPlayer(Player):
 \end{lstlisting}
 
 Die anpassbaren Parameter der \verb|MCTSPlayer|-Klasse sind die Anzahl der Iterationen pro Spielzug \verb|max_steps|, die Konstante \verb|exploration_constant| $C_p$ und das Beibehalten des Baumes zwischen Zügen.
-Um eine vergleichbare Grundlage zu haben, werden alle MCTS-Varianten mit 1000 Iterationen pro Zug getestet und verglichen.
-Manche Verbesserungen benötigen mehr Rechenzeit für 1000 Iterationen, weshalb ich in Kapitel~\ref{chap:results} auch noch Vergleiche bei gleicher Ausführungszeit durchführen werde.
 
-Zunächst habe ich den Agent gegen den zufälligen Spieler antreten lassen.
-Der Parameter \verb|exploration_constant| wurde, ausgehend vom Flat Monte Carlo Spieler, als Standardwert auf 1.0 gesetzt und der Baum wird nicht zwischen Spielzügen behalten.
-Von 100 Spielen hat der Agent 100 Prozent gewonnen.
-
-Als nächstes wurde der Agent mit dem Flat Monte Carlo Spieler mit UCB-Kindauswahl verglichen.
-Wieder wurden Werte der \verb|exploration_constant| zwischen $0.1$ und $2.0$ getestet, um einen optimalen Wert zu bestimmen.
-Die Ergebnisse der Parameter mit \verb|keep_tree=False| und \verb|keep_tree=True| sind in Tabelle~\ref{tab:mcts-flat-mc} zu finden.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
- \verb|keep_tree=False| & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
- \verb|keep_tree=True| & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-\end{tabular}
-\caption{Gewinnchance der MCTS gegen FlatMC über 300 Spiele für verschiedene Parameter.}
-\label{tab:mcts-flat-mc}
-\end{table}
-
-Die Experimente Zeigen, dass eine \verb|exploration_constant| nahe 1.0 die besten Ergebnisse liefert und dass die Spielstärke ansteigt, wenn der Spielbaum zwischen Zügen erhalten bleibt.
-
-In der Evaluation der Spielpositionen wird jeder Spielzug einzeln bewertet.
-Dadurch gibt es keine vorherigen Spielzüge, aus denen der Spielbaum wiederverwendet werden kann.
-Deshalb wird nur der Parameter $C_p$ mit Werten nahe 1.0 verglichen.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c| }
- \hline
- $C_p$ & Gut & Perfekt \\
- \hline
- 0.7 & 0.67 & 0.25 \\
- \hline
- 0.8 & 0.67 & 0.25 \\
- \hline
- 0.9 & 0.67 & 0.25 \\
- \hline
- 1.0 & 0.67 & 0.25 \\
- \hline
- 1.1 & 0.67 & 0.25 \\
- \hline
- 1.2 & 0.67 & 0.25 \\
- \hline
-\end{tabular}
-\caption{Prozentsatz der guten und perfekten Züge im Datensatz mit 1000 Spielpositionen für die normale Monte-Carlo-Baumsuche. Jede Evaluation wurde 10 mal wiederholt und der Durchschnitt der Ergebnisse gebildet.}
-\label{tab:move-evaluation-mcts}
-\end{table}
-
-Auch hier zeigt sich, dass ein Parameter $C_p$ nahe 1.0 die besten Ergebnisse liefert.
-Der optimierte MCTS-Agent wird für die Verbesserungen als Vergleich benutzt.
-Im direkten Vergleich muss eine Verbesserung mehr als 50\% der Spiele gegen den normalen MCTS-Agent gewinnen um als besser zu gelten.
+Die optimalen Parameter werden in Kapitel~\ref{chap:results-mcts} bestimmt.
 
 \subsection{MCTS mit Transpositionen}
 \label{subsec:mcts-mit-transpositionen}
 
-Bei der Implementierung der Transpositionen habe ich mich dafür entschieden, die UCT1 und UCT2 Algorithmen (Seite~\pageref{eqn:UCT1}) von Childs u.a.\ zu implementieren.
-Dafür war es notwendig, dass die Knoten zusätzlich zu ihren eigenen Statistiken $Q(v)$ und $N(v)$ auch die Informationen über die, von ihnen erreichten, Kindknoten $Q(v,a)$ und $N(v,a)$ speichern.
+Bei der Implementierung der Transpositionen habe ich mich dafür entschieden, die UCT1, UCT2 und UCT3 Algorithmen (Seite~\pageref{eqn:UCT1}) von Childs u.a.\ zu implementieren.
+Dafür war es notwendig, dass die Knoten zusätzlich zu ihren eigenen Statistiken $Q(v)$ und $N(v)$ auch die Informationen über die, von ihnen erreichten, Kindknoten $Q(v,a)$ und $N(v,a)$ speichern.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 Diese zusätzlichen Statistiken werden in der Methode \verb|best_child| verwendet, um UCT1 bzw.\ UCT2 zu implementieren.
 
 \begin{lstlisting}[language=Python,label={lst:transpos-node}]
+def normalize(val):
+    return (val + 1) / 2
+
 class TranspositionNode(Node):
     def __init__(self, *args, **kwargs):
         super(TranspositionNode, self).__init__( *args, **kwargs)
         self.child_values = defaultdict(float)
         self.child_visits = defaultdict(int)
+        self.UCT3_val = 0
+        self.sim_reward = 0
 
     def Qsa(self, move):
         return self.child_values[move]
@@ -438,37 +308,67 @@ class TranspositionNode(Node):
     def Nsa(self, move):
         return self.child_visits[move]
 
-    def best_child(self, exploration_constant: float = 1.0, uct_method: str = "UCT") -> "Node":
+    def best_child(self, C_p: float = 1.0, uct_method: str = "UCT") -> "Node":
         n_p = math.log(self.number_visits)
-
         parent = self
 
         def UCT1(action, _):
-            return parent.Qsa(action) + exploration_constant * math.sqrt(n_p / parent.Nsa(action))
+            return normalize(parent.Qsa(action)) + C_p * math.sqrt(n_p / parent.Nsa(action))
 
         def UCT2(action, child):
-            return child.Q() + exploration_constant * math.sqrt(n_p / parent.Nsa(action))
+            return normalize(child.Q()) + C_p * math.sqrt(n_p / parent.Nsa(action))
+
+        def UCT3(action, child):
+            return normalize(child.UCT3_val) + C_p * math.sqrt(n_p / parent.Nsa(action))
 
         def default(_, child):
-            return child.Q() + exploration_constant * math.sqrt(n_p / child.number_visits)
+            return normalize(child.Q()) + C_p * math.sqrt(n_p / child.number_visits)
 
         selection_method = default
         if uct_method == "UCT1":
             selection_method = UCT1
         elif uct_method == "UCT2":
             selection_method = UCT2
+        elif uct_method == "UCT3":
+            selection_method = UCT3
 
         _, c = max(self.children.items(), key=lambda ch: selection_method(*ch))
         return c
 
-    def get_random_action_and_state(self) -> Tuple[int, ConnectFour]:
-        m = random.choice(self.possible_moves)
-        self.possible_moves.remove(m)
+    def add_child(self, node: "TranspositionNode", move: int):
+        self.children[move] = node
+        node.parents.append(self)
+
+    def expand(self, player):
+        # Waehle einen zufaelligen naechsten Zustand
+        move = random.choice(self.possible_moves)
+        self.possible_moves.remove(move)
         if len(self.possible_moves) == 0:
             self.expanded = True
 
-        s = self.game_state.copy().play_move(m)
-        return m, s
+        next_state = self.game_state.copy().play_move(move)
+
+        # Und pruefe ob er bereits in der Transpositionstabelle enthalten ist
+        hash_state = hash(next_state)
+        if hash_state not in player.transpositions:
+            # Wenn nicht wird ein neuer Knoten hinzugefuegt
+            player.transpositions[hash_state] = TranspositionNode(game_state=next_state)
+        next_node = player.transpositions[hash_state]
+        self.add_child(next_node, move)
+
+        return next_node
+
+    def update_QUCT3(self):
+        if not self.children:
+            self.UCT3_val = self.sim_reward
+        else:
+            summed = 0
+            for a, c in self.children.items():
+                c_n = self.child_visits[a]
+                c_v = -c.UCT3_val
+                summed += c_n * c_v
+            self.UCT3_val = (self.sim_reward + summed) / self.number_visits
+
 \end{lstlisting}
 
 Die \verb|MCTSPlayer|-Klasse wurde um ein \verb|dict| Erweitert, das die Transpositionen speichert.
@@ -481,7 +381,7 @@ Bei lange laufenden Algorithmen kann es aber nötig sein, alte Knoten aus der Ta
 
 Da der Baum durch die Transpositionen zu einem gerichteten Graph wird, kann jeder Knoten mehrere Elternknoten haben.
 Dadurch kann die Belohnung in \verb|backup| nicht mehr über den Elternknoten bis zur Wurzel propagiert werden, da der korrekte Pfad daraus nicht ersichtlich ist.
-Um dieses Problem zu lösen, wird in \verb|tree_policy| eine Liste der Knoten, die in der Selektionsphase besucht wurden, erzeugt und diese Liste wird in \verb|backup| rückwärts durchlaufen.
+Um dieses Problem zu lösen, wird in \verb|tree_policy| eine Liste der Knoten, die in der Selektionsphase besucht wurden, erzeugt und diese Liste wird in \verb|backup| rückwärts durchlaufen.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 In \verb|backup| werden zusätzlich noch die Kind-Statistiken $Q(v,a)$ und $N(v,a)$ der jeweiligen Elternknoten aktualisiert.
 
 \begin{lstlisting}[language=Python,label={lst:transposition-player}]
@@ -527,64 +427,10 @@ class TranspositionPlayer(MCTSPlayer):
             reward = -reward
 \end{lstlisting}
 
-Für beide Selektionsverfahren UCT1 und UCT2 wird separat der optimale Parameter $C_p$ bestimmt indem der Agent gegen den Flat Monte Carlo Spieler spielt.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
- \verb|UCT1| & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
- \verb|UCT2| & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-\end{tabular}
-\caption{Gewinnchance von MCTS mit Transpositionen gegen FlatMC über 300 Spiele für verschiedene Parameter $C_p$.}
-\label{tab:transpos-flat-mc}
-\end{table}
-
-Auch mit Transpositionen scheint die Konstante $C_p$ einen optimalen Wert nahe 1.0 zu haben.
-Die Zug-Evaluation bestätigt diese Vermutung.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c|c||c|c|c|c|c|c|c|c| }
- \hline
- \multicolumn{2}{|c|}{$C_p$} & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
- \multirow{2}{*}{\texttt{UCT1}} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
-  & perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
- \multirow{2}{*}{\texttt{UCT2}} & gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- & perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-\end{tabular}
-\caption{Anteil guter und perfekter Züge der MCTS mit Transpositionen für verschiedene Parameter $C_p$.}
-\label{tab:transpos-move-eval}
-\end{table}
-
-Der direkte Vergleich mit der normalen MCTS mit $C_p=1.0$ und \verb|keep_tree=False| zeigt nur eine minimale Verbesserung durch Transpositionen, unabhängig vom gewählten Selektionsverfahren.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c| }
- \hline
- $C_p$ & 1.0 \\
- \hline
- \verb|UCT1| & 0.51  \\
- \hline
- \verb|UCT2| & 0.515 \\
- \hline
-\end{tabular}
-\caption{Gewinnchance von MCTS mit Transpositionen gegen normale MCTS über 300 Spiele mit optimiertem Parameter $C_p$.}
-\label{tab:transpos-MCTS}
-\end{table}
-
 \subsection{Score Bounded MCTS}
 
 Die Hauptveränderungen für die Score Bounded MCTS liegt in den zusätzlichen pessimistischen und optimistischen Grenzen \verb|pess| und \verb|opti| in den Knoten.
-In der Methode \verb|best_child| werden diese Grenzen benutzt, um gemäß dem in Kapitel~\ref{chap:scorebounded} beschriebenen Regeln nur die Kindknoten zu besuchen, die das Ergebnis verbessern können.
+In der Methode \verb|best_child| werden diese Grenzen benutzt, um gemäß dem in Kapitel~\ref{chap:scorebounded} beschriebenen Regeln nur die Kindknoten zu besuchen, die das Ergebnis verbessern können.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 Zusätzlich kann mit den Parametern \verb|cut_delta| und \verb|cut_gamma| die Auswahl der Kinder gelenkt werden.
 
 \begin{lstlisting}[language=Python,label={lst:scorebounded-node}]
@@ -697,52 +543,11 @@ class ScoreboundedPlayer(MCTSPlayer):
             current = current.parent
 \end{lstlisting}
 
-Die Auswertung des Agenten geschieht zuerst mit den Parametern \verb|cut_gamma=0| und \verb|cut_delta=0| um einen optimalen Wert für $C_p$ zu finden.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
-  & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-\end{tabular}
-\caption{Gewinnchance der Score Bounded MCTS gegen FlatMC über 300 Spiele für verschiedene Parameter.}
-\label{tab:scorebound-flat-mc}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{ |c||c|c|c|c|c|c|c|c| }
- \hline
- $C_p$ & 0.1 & 0.25 & 0.5 & $\frac{1}{\sqrt{2}}$ & 1.0 & 1.2 & $\sqrt{2}$ & 2.0 \\
- \hline
-  gut & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-  perfekt & 0.06 & 0.22 & 0.455 & 0.48 & 0.495 & 0.445 & 0.515 & 0.455 \\
- \hline
-\end{tabular}
-\caption{Move Score mit verschiedenen $C_p$}
-\label{tab:scorebound-move-score}
-\end{table}
-
-Der Optimale Wert für $C_p$ ist auch hier nicht verändert.
-
-Cazenave u.a.\ schlagen die Werte \verb|cut_gamma=0,cut_delta=-0.1| für Vier Gewinnt vor.
-Nachdem $C_p$ optimiert wurde, wird der Parameter fixiert und verschiedene Kombinationen von \verb|cut_gamma| und \verb|cut_delta| aus \verb|[-0.2,-0.1,0,0.1,0.2]| probiert.
-
-%TODO: Tabelle erstellen
-
-Nachdem eine optimale Kombination der Parameter gefunden wurde, wird noch einmal der Parameter $C_p$ für diese Kombination optimiert.
-
-%TODO: Weitere Tabelle
-%TODO: Vergleich mit MCTS mit optimierten Parametern
 
 \subsection{RAVE MCTS}
 
 Der \verb|RaveNode| wurde um die Rave Statistiken $Q_{RAVE}(v)$ und $N_{RAVE}(v)$ erweitert.
-In \verb|best_child| werden diese Rave Statistiken mit dem regulären Wert des Knotens $Q(v)$ wie in Gleichung~\ref{eqn:uct-rave} kombiniert.
+In \verb|best_child| werden diese Rave Statistiken mit dem regulären Wert des Knotens $Q(v)$ wie in Gleichung~\ref{eqn:uct-rave} kombiniert.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 Der Faktor $\beta$ berechnet sich wie in Gleichung~\ref{eqn:beta} aus der Anzahl der normalen Besuche und der Anzahl der RAVE-Updates des Knotens.
 
 \begin{lstlisting}[language=Python,label={lst:rave-node}]
@@ -795,7 +600,7 @@ Wenn ein Stein in eine Spalte gesetzt wird, wird basierend auf der Anzahl der St
 Die Felder sind von unten Links (0) bis oben rechts (\verb|spalten * zeilen - 1|) nummeriert.
 Die eindeutige Bezeichnung eines Zuges bildet sich als \verb|move_name = 10 * index + player| wobei \verb|player| das Symbol des ziehenden Spielers (1 oder 2) ist.
 Wenn Spieler 2 zum Beispiel einen Stein in Spalte 6, Zeile 0 (unten rechts) setzt, so hat dieser Zug die Nummer \verb|10 * 6 + 2 = 62|.
-Die Klasse \verb|ConnectFour| wurde dafür um die Methode \verb|get_move_name(column, played=False)| erweitert.
+Die Klasse \verb|ConnectFour| wurde dafür um die Methode\linebreak[2] \texttt{get\_move\_name(column, played=False)} erweitert.
 
 \begin{lstlisting}[language=Python,label={lst:move-name}]
 class ConnectFour:
@@ -818,7 +623,7 @@ class ConnectFour:
 \end{lstlisting}
 
 Der \verb|RavePlayer| hat einen Parameter \verb|b| der in der Berechnung des \verb|beta|-Wertes verwendet wird.
-Die \verb|tree_policy|, \verb|evaluate_game_state| und \verb|backup| Methoden wurden für Rave neu geschrieben und führen nun eine Liste der gemachten Spielzüge mit.
+Die \verb|tree_policy|, \verb|evaluate_game_state| und \verb|backup| Methoden wurden für Rave neu geschrieben und führen nun eine Liste der gemachten Spielzüge mit.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 In \verb|backup| wird diese Liste benutzt, um die Knoten auszuwählen, deren Rave Statistik aktualisiert werden soll.
 
 \begin{lstlisting}[language=Python,label={lst:raveplayer}]
@@ -877,7 +682,4 @@ class RavePlayer(MCTSPlayer):
         return self.best_move(root)
 \end{lstlisting}
 
-
-% TODO: Rave Ergebnisse gegen FlatMC
-% TODO: Rave Ergebnisse in Move Evaluation
-% TODO: Rave Ergebnisse gegen MCTS
+\improvement[inline]{Das Kapitel endet sehr abrupt, hier muss noch ein weitere Absatz mindestens hin.}

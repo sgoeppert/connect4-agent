@@ -123,7 +123,7 @@ Parallel zur Arbeit von Coulom haben Kocsis und Szepesv\'{a}ri 2006 den \textbf{
 \bigskip
 Banditenprobleme sind eine Klasse von Problemen im bestärkenden Lernen, in denen der Agent zu jedem Zeitschritt $t$ aus $K$ Optionen wählen muss, um eine kumulative Belohnung zu maximieren, indem die optimale Aktion so oft wie möglich gewählt wird. Die Verteilung der Belohnungen jeder Aktion ist unbekannt aber statisch und die Belohnungen aus sukzessiven Aktionen sind voneinander unabhängig. Der Agent muss lernen, nur durch gesammelte Erfahrung seine erhaltene Belohnung auf lange Sicht zu maximieren. Verhält er sich gierig und wählt nur die Aktion mit der höchsten durchschnittlichen Belohnung, so werden alle Aktionen ignoriert, die im ersten Versuch keine Belohnung geliefert haben. Verbringt er dagegen zu viel Zeit damit, andere Aktionen als die derzeit beste zu erforschen, wählt er häufig suboptimale Aktionen. 
 
-Dieses Problem, auch bekannt als \textbf{exploration-exploitation-Dilemma}, ist ein Grundproblem vieler Algorithmen des bestärkenden Lernens. Die beste Strategie für das Banditenproblem ist die upper confidence bound (UCB) Regel \textbf{UCB1} von Auer et.al \autocite[\ppno~237]{auerFinitetimeAnalysisMultiarmed2002}. Der Agent wählt die Aktion $j, 1 \le j \le K$, die die Gleichung
+Dieses Problem, auch bekannt als \textbf{exploration-exploitation-Dilemma}, ist ein Grundproblem vieler Algorithmen des bestärkenden Lernens. Die beste Strategie für das Banditenproblem ist die upper confidence bound (UCB) Regel \textbf{UCB1} von Auer u.a. \autocite[\ppno~237]{auerFinitetimeAnalysisMultiarmed2002}. Der Agent wählt die Aktion $j, 1 \le j \le K$, die die Gleichung
 
 \begin{equation}
 \bar{X}_j + \sqrt{\frac{2\ln n}{n_j}}
@@ -133,10 +133,10 @@ Dieses Problem, auch bekannt als \textbf{exploration-exploitation-Dilemma}, ist 
 maximiert. Wobei $\bar{X}_j$ die durchschnittliche Belohnung ist, die bisher durch das Spielen von Aktion $j$ erhalten wurde, $n_j$ ist die Anzahl der Spielzüge in denen $j$ gewählt wurde und $n$ ist die Anzahl der insgesamt gespielten Spielzüge. Diese Gleichung besteht aus einem exploitation-Teil $\bar{X}_j$ und einem exploration-Teil $\sqrt{\frac{2\ln n}{n_j}}$. Der exploration-Teil repräsentiert die Unsicherheit in der Bewertung der Aktion $j$. Wenn die Aktion noch nicht oft gewählt wurde, $n_j$ also im Vergleich zu $n$ gering ist, so wird dieser Teil größer. Die Bewertung $\bar{X}_j$ ist noch sehr unsicher. Wurde dagegen $j$ sehr häufig gewählt, so wird der exploration-Teil kleiner und somit drücken wir eine hohe Sicherheit in der Schätzung des Wertes $\bar{X}_j$ aus.
 
 \bigskip
-Im UCT-Algorithmus wird die Auswahl des Kindknotens zu einem Banditenproblem. Dafür hat jeder Knoten $v$ eine Statistik $Q(v)$ mit der insgesamt erhaltene Belohnung in diesem Knoten und $N(v)$ mit der Anzahl der Besuche des Knotens. Das gewählte Kind ist dann jenes, welches die Formel
+Im UCT-Algorithmus wird die Auswahl des Kindknotens zu einem Banditenproblem. Dafür hat jeder Knoten $v$ eine Statistik $Q(v)$ mit der durchschnittlichen erhaltenen Belohnung durch diesen Knoten und $N(v)$ mit der Anzahl der Besuche des Knotens. Das gewählte Kind $v^\prime$ ist dann jenes, welches die Formel
 
 \begin{equation}
-UCT = \frac{Q(v^\prime)}{N(v^ \prime)} + C_p\sqrt{\frac{\ln N(v)}{N(v^\prime)}}
+UCT = Q(v^\prime) + C_p\sqrt{\frac{\ln N(v)}{N(v^\prime)}}
 \label{eqn:UCT}
 \end{equation}
 
@@ -176,7 +176,7 @@ maximiert. Der Faktor $\sqrt{2}$ wurde aus der ursprünglichen UCB1-Formel (\ref
 \EndFunction
 
 \Function{BestesKind}{$v, C_p$}\\
-\State \textbf{return} $\argmax_{v^\prime \in\ \text{Kinder von}\ v} \frac{Q(v^\prime)}{N(v^\prime)} + C_p \sqrt{\frac{\ln N(v)}{N(v^\prime)}}$
+\State \textbf{return} $\argmax_{v^\prime \in\ \text{Kinder von}\ v} Q(v^\prime) + C_p \sqrt{\frac{\ln N(v)}{N(v^\prime)}}$
 \EndFunction
 
 \Function{SimuliereSpiel}{$s$}
@@ -230,7 +230,7 @@ Unter Transpositionen versteht man identische Spielzustände, die über untersch
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width=0.7\linewidth]{c4_transpos}
+	\includegraphics[width=0.6\linewidth]{c4_transpos}
 	\caption[Transposition in Vier Gewinnt]{Die Spielposition kann auf mehrere Wegen erreicht werden. Die Züge d1,e1;c1,d2 sowie d1,d2;c1,e1 und c1,e1;d1,d2 führen alle zum selben Ergebnis.}
 	\label{fig:c4transpos}
 \end{figure}
@@ -239,46 +239,38 @@ Eine andere Zugfolge, die zum selben Spielzustand führt, ist d1,d2;c1,e1. Durch
 
 Normale UCT-Algorithmen, die Transpositionen nicht berücksichtigen, werden im Paper als \textbf{UCT0} bezeichnet. 
 
-In Gleichung \ref{eqn:UCT} verwende ich die Statistiken eines Knotens $Q(v)$ und $N(v)$ direkt, also die Summe der Belohnungen aus Simulationen und die Anzahl an Simulationen durch diesen Knoten. Zusätzlich dazu kann diese Statistik abhängig von der gewählten Aktion $a$ im Knoten $v$, $Q(v,a)$ und $N(v,a)$ gespeichert werden. Wenn keine Transpositionen identifiziert werden, so sind die Werte identisch $v^\prime = \textsc{Transition}(s(v),a) \Rightarrow Q(v^\prime) = Q(v,a)$. Werden Transpositionen aber erkannt, kann es mehrere Aktionen in verschiedenen Knoten geben, die zum selben Kindknoten führen.
+In Gleichung \ref{eqn:UCT} verwende ich die Statistiken eines Knotens $Q(v)$ und $N(v)$ direkt, also die durschnittliche Belohnung aus Simulationen und die Anzahl an Simulationen durch diesen Knoten. Zusätzlich dazu kann diese Statistik abhängig von der gewählten Aktion $a$ im Knoten $v$, $Q(v,a)$ und $N(v,a)$ gespeichert werden. Wenn keine Transpositionen identifiziert werden, so sind die Werte identisch $v^\prime = \textsc{Transition}(s(v),a) \Rightarrow Q(v^\prime) = Q(v,a)$. Werden Transpositionen aber erkannt, kann es mehrere Aktionen in verschiedenen Knoten geben, die zum selben Kindknoten führen.
 
 Wenn Transpositionen erkannt werden, so können sich im einfachsten Fall die Knoten, unabhängig davon wo sie sich im Baum befinden, ihre Statistiken teilen. Dies hat vor allem den Vorteil, dass der gesamte Baum kleiner wird. Die von Childs u.a. vorgeschlagene einfache Auswahlregel \textbf{UCT1} ist:
 
 \begin{equation}
-UCT1 = \argmax_{a \in A(v)} \frac{Q(v,a)}{N(v,a)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
+UCT1 = \argmax_{a \in A(v)} Q(v,a) + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
 \label{eqn:UCT1}
 \end{equation}
 
-Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. Die zweite Vorgeschlagene Auswahlregel macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung~\ref{eqn:uct2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.
+Diese unterscheidet zwischen den verschiedenen Wegen, die zum selben Knoten geführt haben können, kumuliert aber die Statistiken von Knoten mit identischen Zuständen. 
+
+Die zweite Vorgeschlagene Auswahlregel \textbf{UCT2} macht Gebrauch von mehr Informationen aus den Transpositionen, indem statt der Bewertung der Aktion $Q(v,a)$ die Bewertung des Folgezustands $Q(v^\prime)$ wie in der originalen UCT Implementierung verwendet wird (siehe Gleichung~\ref{eqn:UCT2}). Für die Berechnung des Erkundungsfaktors wird weiterhin $N(v,a)$ anstatt $N(v^\prime)$ im Nenner benutzt, da laut Childs die Auswahl sonst nicht mehr auf den korrekten Knoten konvergiert, wenn der der Knoten $v^\prime$ sehr häufig über einen anderen Pfad besucht wurde.\autocite[\ppno~390]{childsTranspositionsMoveGroups2008}
 
 \begin{equation}
-UCT2 = \argmax_{a \in A(v)} \frac{Q(v^\prime)}{N(v^\prime)} + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
+UCT2 = \argmax_{a \in A(v)} Q(v^\prime) + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}}
 \label{eqn:UCT2}
 \end{equation}
 
-Die letzte vorgeschlagene Variante berechnet den Wert der Kinder $Q(v^\prime)$ rekursiv als gewichteter Durschnitt aller Kinder dieses Kindknotens. Dadurch, dass rekursiv alle Kinder eines Knotens betrachtet werden müssen, ist der Rechenaufwand in der Methode \textsc{bestesKind} sehr hoch. Um ihn zu reduzieren, können die Durchschnittswerte in den Knoten zwischengespeichert werden und müssen sich nur ändern, wenn sich ein Kind verändert. Damit kann der Rechenaufwand aus der teuren Selektionsphase in die Backupphase verlagert werden.
+Die letzte vorgeschlagene Variante \textbf{UCT3} berechnet den Wert der Kinder $Q(v^\prime)$ rekursiv als gewichteter Durchschnitt aller Kinder dieses Kindknotens. Dadurch, dass rekursiv alle Kinder eines Knotens betrachtet werden müssen, ist der Rechenaufwand in der Methode \textsc{bestesKind} sehr hoch. Um ihn zu reduzieren, können die Durchschnittswerte in den Knoten zwischengespeichert werden und müssen sich nur ändern, wenn sich ein Kind verändert. Damit kann der Rechenaufwand aus der teuren Selektionsphase in die Backupphase verlagert werden.
 
-%TODO: UCT3 Gleichung
 \begin{equation}
-UCT3 = \argmax_{a \in A(v)}
+\begin{split}
+UCT3 & = \argmax_{a \in A(v)}Q^{UCT3}(v^\prime) + C_p\sqrt{\frac{\ln N(v)}{N(v,a)}} \\
+Q^{UCT3}(v) & = \sum_{a \in A(v)}\frac{N(v,a)}{N(v)}Q^{UCT3}(v^\prime)
+\end{split}
 \label{eqn:uct3}
 \end{equation}
 
-Durch das Kombinieren der Knoten entsteht ein gerichteter azyklischer Graph. Es kann nützlich sein, zur Bewertung eines Knotens nicht nur die direkten Kinder und Eltern zu betrachten, sondern beliebig tief im Graph auf- und abzusteigen. Cazenave, Mehat und Saffidine schlagen einen parametrisierbaren UCT Algorithmus, den sie Upper confidence bound for rooted directed acyclic graphs (UCD) nennen, vor. Sie zeigen wie mit dieser Parametrisierung die UCT1-3 Algorithmen von Childs u.a. implementiert werden können. Cazenave u.a. argumentieren dafür, die Statistiken nicht in den Knoten sondern in den Kanten zu speichern, dies kann allerdings die Implementierung verkomplizieren und wird deshalb bei der Anwendung von Transpositionen eher selten umgesetzt.
-Der UCD-Algorithmus besteht aus drei Komponenten.
-%TODO: UCD Gleichungen und Quelle
-\begin{equation}
-Gleichung1
-\label{eqn:ucd1}
-\end{equation}
-\begin{equation}
-Gleichung2
-\label{eqn:ucd2}
-\end{equation}
-\begin{equation}
-Gleichung3
-\label{eqn:ucd3}
-\end{equation}
+$v^\prime$ ist der Kindknoten von $v$, der erreicht wird, wenn in $v$ die Aktion $a \in A(v)$ gewählt wird.
 
+Durch das Kombinieren der Knoten entsteht ein gerichteter azyklischer Graph. 
+Cazenave, Mehat und Saffidine\autocite{cazenaveUCDUpperConfidence2012} argumentieren dafür, die Statistiken nicht in den Knoten sondern in den Kanten zu speichern, dies kann allerdings die Implementierung verkomplizieren und wird deshalb bei der Anwendung von Transpositionen eher selten umgesetzt.
 
 \subsubsection{Score Bounded MCTS}
 \label{chap:scorebounded}
@@ -309,6 +301,15 @@ Erst dann ist die tatsächliche Bewertung eines Knotens bekannt.
 
 Die Grenzen können benutzt werden um Teile des Suchbaumes zu ignorieren, wenn durch die Grenzen bekannt ist, dass dieser Teilbaum die Bewertung nicht weiter verbessern kann, der Baum wird "beschnitten" (engl.\ pruned).
 In einem Max-Knoten (bzw.\ Min-Knoten) $n$ kann der Kindknoten $s$ ignoriert werden, wenn $opti(s) \le pess(n)$ ($pess(s) \ge opti(n)$).\autocite[\ppno~5]{cazenaveScoreBoundedMonteCarlo2011}
+
+\pagebreak[4]
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{scorebound_cut_big}
+	\caption{Beispiel eines Schnitts. Der Knoten $d$ kann ignoriert werden, weil der optimistische Wert kleiner oder gleich dem pessimistischen Wert des Elternknotens ist.\footnotemark}
+	\label{fig:scoreboundcut}
+\end{figure}
+\footnotetext{\cite[\ppno~5]{cazenaveScoreBoundedMonteCarlo2011}}
 
 Zusätzlich zum Beschneiden des Baumes können die Grenzen benutzt werden, um die Selektion zu beeinflussen.
 So können zum Beispiel Knoten mit einer hohen optimistischer Grenze bevorzugt besucht werden, während versucht wird Knoten mit geringer pessimistischer Grenze zu vermeiden.
@@ -371,15 +372,16 @@ Dafür schlagen Cazenave und Saffidine zwei einfache Algorithmen vor, die die Gr
 
 \subsubsection{Rapid Action Value Estimation}
 
-Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen.
+Rapid Action Value Estimation (RAVE) gehört zur Gruppe der All Moves as First (AMAF)-Verbesserungen
 In der regulären Monte-Carlo-Baumsuche werden nur die tatsächlich besuchten Knoten in der Backup-Phase aktualisiert.
-Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.
+Anstatt die besuchten Knoten und damit die konkreten Zustände zu betrachten, berücksichtigt die All Moves as First Verbesserung die gemachten Spiel\textbf{züge}. Der Gedanke dahinter ist, dass ein Spielzug $A$ der im Zustand $s_1$ gemacht wurde, in den Zuständen $s_t, t > 1$ genauso oder ähnlich gut ist. Im Schach ist zum Beispiel ein Zug, in dem ein Bauer eine stärkere Figur schlägt, (fast) immer gut, egal wie das restliche Spielfeld aussieht.\autocite{helmboldAllMovesAsFirstHeuristicsMonteCarlo}
+\improvement[inline]{Grafik finden oder erstellen, die die RAVE-Updates zeigt}
 
-%TODO: Quelle für RAVE
-Die verschiedenen AMAF-Verfahren unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_RAVE(v)$ und $N_RAVE(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten. Die Kombination der RAVE-Statistik mit der regulären MCTS-Statistik wird durch einen Parameter $\beta$ gesteuert.
+Die verschiedenen AMAF-Varianten der Monte-Carlo-Baumsuche unterscheiden sich dadurch, wie sie dieses Wissen speichern und verwenden. Manche verfahren aktualisieren die Statistik $Q(v)$ direkt, andere führen separate AMAF-Statistiken, um sie später gewichtet zu kombinieren. RAVE speichert die AMAF-Statistik $Q_{RAVE}(v)$ und $N_{RAVE}(v)$ separat und verwendet sie in der Selektionsphase bei der Auswahl der Kindknoten. Die Kombination der RAVE-Statistik mit der regulären MCTS-Statistik wird durch einen Parameter $\beta$ gesteuert.
 
+\medskip
 \begin{equation}
-UCT_{RAVE}=\beta * \frac{Q_RAVE(v^\prime)}{N_RAVE(v^\prime)} + (1-\beta) * \frac{Q(v^\prime)}{N(v^\prime)} + C_p * \sqrt{\frac{\ln(N(v))}{N(v^\prime)}}
+UCT_{RAVE}=\beta * Q_{RAVE}(v^\prime) + (1-\beta) * Q(v^\prime) + C_p * \sqrt{\frac{\ln(N(v))}{N(v^\prime)}}
 \label{eqn:uct-rave}
 \end{equation}
 
@@ -389,7 +391,8 @@ UCT_{RAVE}=\beta * \frac{Q_RAVE(v^\prime)}{N_RAVE(v^\prime)} + (1-\beta) * \frac
 \end{equation}
 
 
-Wenn dieser Parameter während der gesamten Baumsuche konstant bleibt, so nennt man diesen Algorithmus auch $\alpha$-AMAF, mit einem konstanten $\alpha \in [0,1]$. Das besondere an RAVE ist, dass sich dieser Parameter im Laufe der Baumsuche verändert. Wenn ein Knoten noch wenig besucht wurde, so ist $\beta$ nahe $1$, wodurch fast ausschließlich die RAVE-Statistik benutzt wird. Mit mehr Besuchen der Kindknoten, wird die gesammelte Statistik $Q(v)$ genauer und somit kann ein niedrigerer Wert für $\beta$ verwendet werden. Der Hyperparameter $b$ in Gleichung \ref{eqn:beta} kann angepasst werden, um RAVE gezielter anzupassn.
+\medskip
+Wenn dieser Parameter während der gesamten Baumsuche konstant bleibt, so nennt man diesen Algorithmus auch $\alpha$-AMAF, mit einem konstanten $\alpha \in [0,1]$. Das besondere an RAVE ist, dass sich dieser Parameter im Laufe der Baumsuche \change{besser formulieren, Referenz zu Quelle Gelly und Silver 2007}verändert. Wenn ein Knoten noch wenig besucht wurde, so ist $\beta$ nahe $1$, wodurch fast ausschließlich die RAVE-Statistik benutzt wird. Mit mehr Besuchen der Kindknoten, wird die gesammelte Statistik $Q(v)$ genauer und somit kann ein niedrigerer Wert für $\beta$ verwendet werden. Der Hyperparameter $b$ in Gleichung \ref{eqn:beta} kann angepasst werden, um RAVE gezielter anzupassn.
 
 In der Selektions- und Simulations-Phase wird eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
 
