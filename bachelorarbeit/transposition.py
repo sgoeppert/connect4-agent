@@ -39,7 +39,6 @@ class TranspositionNode(Node):
 
     def best_child(self, C_p: float = 1.0, uct_method: str = "UCT") -> "Node":
         n_p = math.log(self.number_visits)
-
         parent = self
 
         def UCT1(action, _):
@@ -65,21 +64,30 @@ class TranspositionNode(Node):
         _, c = max(self.children.items(), key=lambda ch: selection_method(*ch))
         return c
 
-    def get_random_action_and_state(self) -> Tuple[int, ConnectFour]:
-        m = random.choice(self.possible_moves)
-        self.possible_moves.remove(m)
+    def expand(self, player):
+        # Wähle einen zufälligen nächsten Zustand
+        move = random.choice(self.possible_moves)
+        self.possible_moves.remove(move)
         if len(self.possible_moves) == 0:
             self.expanded = True
 
-        s = self.game_state.copy().play_move(m)
-        return m, s
+        next_state = self.game_state.copy().play_move(move)
+
+        # Und prüfe ob er bereits in der Transpositionstabelle enthalten ist
+        hash_state = hash(next_state)
+        if hash_state not in player.transpositions:
+            # Wenn nicht wird ein neuer Knoten hinzugefügt
+            player.transpositions[hash_state] = TranspositionNode(game_state=next_state)
+        next_node = player.transpositions[hash_state]
+        self.add_child(next_node, move)
+
+        return next_node
 
     def add_child(self, node: "TranspositionNode", move: int):
         self.children[move] = node
         node.parents.append(self)
 
     def update_QUCT3(self):
-        # print("updating UCT3")
         if not self.children:
             self.UCT3_val = self.sim_reward
         else:
@@ -145,16 +153,8 @@ class TranspositionPlayer(MCTSPlayer):
                 current = current.best_child(self.exploration_constant, uct_method=self.uct_method)
                 path.append(current)
             else:
-                # Wähle einen zufälligen nächsten Zustand
-                move, next_state = current.get_random_action_and_state()
-                # Und prüfe ob er bereits in der Transpositionstabelle enthalten ist
-                hash_state = hash(next_state)
-                if hash_state not in self.transpositions:
-                    # Wenn nicht wird ein neuer Knoten hinzugefügt
-                    self.transpositions[hash_state] = TranspositionNode(game_state=next_state)
-                next_node = self.transpositions[hash_state]
-                current.add_child(next_node, move)
-                path.append(next_node)
+                current = current.expand(self)
+                path.append(current)
                 return path
         return path
 
