@@ -1,10 +1,7 @@
-from typing import List, Dict, Tuple
-import math
-import numpy as np
 import random
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.mcts import Node, MCTSPlayer
+from bachelorarbeit.games import Configuration, ConnectFour
+from bachelorarbeit.players.mcts import MCTSPlayer
 
 
 class AdaptivePlayoutPlayer(MCTSPlayer):

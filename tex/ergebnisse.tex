@@ -16,7 +16,7 @@ Die besten Parameter werden experimentell durch Spiele gegen den normalen MCTS-S
 \bigskip
 Der Optimierte Spieler wird danach dadurch bewertet, wie genau er gute und perfekte Spielzüge in einem Datensatz mit Spielpositionen findet.
 Der Datensatz dieser Zug-Evaluation besteht aus 1000 Spielpositionen und Bewertungen jedes Zuges in dieser Position durch einen perfekten Spieler.
-Der Datensatz wurde vom Nutzer Peter Cnudde mit einem Vier Gewinnt Solver, einem in C++ geschriebenen Programm, das für jeden Zustand die optimalen Spielzüge berechnen kann, erstellt und auf Kaggle hochgeladen\footnote{Quelle: https://www.kaggle.com/petercnudde/scoring-connect-x-agents}.
+Der Datensatz wurde vom Nutzer Peter Cnudde mit einem Vier Gewinnt\change{Schreibweise von "Vier gewinnt" vereinheitlichen} Solver, einem in C++ geschriebenen Programm, das für jeden Zustand die optimalen Spielzüge berechnen kann, erstellt und auf Kaggle hochgeladen\footnote{Quelle: https://www.kaggle.com/petercnudde/scoring-connect-x-agents}.
 Jede Spielposition in diesem Datensatz hat das folgende Format:
 
 \begin{verbatim}
@@ -275,7 +275,7 @@ Genauso wie zuvor wird der Parameter $C_p$ im Vergleich gegen den normalen MCTS-
 	\label{tab:score-bounded-cp-2}
 \end{table}
 
-Der beste gefundene Parameter $C_p$ ist $0.95$. Damit werden nun die Parameter $\gamma$ und $\delta$ bestimmt. Die Spanne der getesteten Werte liegt im Bereich $\left[-0.2,\dots,0.2\right]$. Cazenave und Saffidine haben in ihren Experimenten\autocite[\ppno~11]{cazenaveScoreBoundedMonteCarlo2011} die Werte $\gamma=0$ und $\delta=-0.1$ für Vier Gewinnt gefunden, weshalb ich mich auf diesen Bereich begrenzt habe. 
+Der beste gefundene Parameter $C_p$ ist $0.95$. Damit werden nun die Parameter $\gamma$ und $\delta$ bestimmt. Die Spanne der getesteten Werte liegt im Bereich $\left[-0.2,\dots,0.2\right]$. Cazenave und Saffidine haben in ihren Experimenten\autocite[\ppno~11]{cazenaveScoreBoundedMonteCarlo2011} die Werte $\gamma=0$ und $\delta=-0.1$ für Vier Gewinnt\change{Schreibweise von "Vier gewinnt" vereinheitlichen} gefunden, weshalb ich mich auf diesen Bereich begrenzt habe. 
 
 \begin{table}[h!]
 	\centering

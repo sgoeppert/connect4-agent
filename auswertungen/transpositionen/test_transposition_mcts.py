@@ -1,5 +1,5 @@
-from bachelorarbeit.transposition import TranspositionPlayer
-from bachelorarbeit.mcts import MCTSPlayer
+from bachelorarbeit.players.transposition import TranspositionPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Transposition vs MCTS"

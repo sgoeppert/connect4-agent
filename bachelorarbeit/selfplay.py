@@ -11,7 +11,7 @@ from pathlib import Path
 import json
 
 from bachelorarbeit.games import Configuration, Observation, ConnectFour
-from bachelorarbeit.base_players import Player
+from bachelorarbeit.players.base_players import Player
 import config
 
 GameResult = Tuple[float, float]
@@ -270,8 +270,7 @@ class Memory:
         self.num_states -= num_to_forget
 
 if __name__ == "__main__":
-    from bachelorarbeit.base_players import RandomPlayer
-    from bachelorarbeit.mcts import MCTSPlayer
+    from bachelorarbeit.players.mcts import MCTSPlayer
     # memory = Memory(file_name="random_data.pkl")
     arena = Arena(players=(MCTSPlayer, MCTSPlayer), num_games=1, num_processes=6)
 

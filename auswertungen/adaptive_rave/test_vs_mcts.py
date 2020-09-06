@@ -1,5 +1,5 @@
-from bachelorarbeit.mcts import MCTSPlayer
-from bachelorarbeit.adaptive_rave import AdaptiveRavePlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.adaptive_rave import AdaptiveRavePlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "AdaptiveRave vs MCTS"

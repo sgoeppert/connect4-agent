@@ -1,5 +1,5 @@
-from bachelorarbeit.base_players import RandomPlayer
-from bachelorarbeit.scorebounded import ScoreboundedPlayer
+from bachelorarbeit.players.base_players import RandomPlayer
+from bachelorarbeit.players.scorebounded import ScoreboundedPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Scorebounded vs Random"

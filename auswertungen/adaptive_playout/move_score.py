@@ -1,4 +1,4 @@
-from bachelorarbeit.adaptive_playout import AdaptivePlayoutPlayer
+from bachelorarbeit.players.adaptive_playout import AdaptivePlayoutPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
 NUM_PROCESSES = 7

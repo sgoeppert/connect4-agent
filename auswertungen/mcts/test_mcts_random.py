@@ -1,5 +1,5 @@
-from bachelorarbeit.base_players import RandomPlayer
-from bachelorarbeit.mcts import MCTSPlayer
+from bachelorarbeit.players.base_players import RandomPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "MCTS vs Random"

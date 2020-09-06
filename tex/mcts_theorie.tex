@@ -86,7 +86,7 @@ Die gesammelten Statistiken werden dann bei nachfolgenden Simulationen benutzt, 
 Eine Iteration der Monte-Carlo-Baumsuche läuft in vier Schritten ab (siehe Abb.~\ref{fig:mctssurveyalgorithm}).
 Zunächst wird der bestehende Spielbaum in einer \textbf{Selektions-Phase} durchlaufen, bis ein Blattknoten gefunden wurde.
 Dabei folgt der Algorithmus eine bestimmten Strategie (engl. policy) um die Knoten im Baum zu wählen.
-Ein Knoten ist ein Blatt des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden.
+Ein Knoten ist ein Blatt\change{Unklare Definition, da ein Blatt in der Graphentheorie etwas anderes ist, als in dieser Definition.} des Baumes, wenn er terminal ist, oder noch nicht vollständig erforscht wurde, es also noch potentielle Kindknoten gibt, die noch nicht von diesem Knoten besucht wurden.
 Wenn dieser Blattknoten nicht terminal ist, so wird er \textbf{expandiert} indem ein noch nicht besuchtes Kind hinzugefügt und besucht wird.
 Ausgehend von diesem neuen Kindknoten wird nun eine \textbf{Simulation} gestartet.
 Es werden so lange zufällige Spielzüge ausgewählt bis das Spiel einen Endzustand erreicht hat.
@@ -132,7 +132,6 @@ Dieses Problem, auch bekannt als \textbf{exploration-exploitation-Dilemma}, ist 
 
 maximiert. Wobei $\bar{X}_j$ die durchschnittliche Belohnung ist, die bisher durch das Spielen von Aktion $j$ erhalten wurde, $n_j$ ist die Anzahl der Spielzüge in denen $j$ gewählt wurde und $n$ ist die Anzahl der insgesamt gespielten Spielzüge. Diese Gleichung besteht aus einem exploitation-Teil $\bar{X}_j$ und einem exploration-Teil $\sqrt{\frac{2\ln n}{n_j}}$. Der exploration-Teil repräsentiert die Unsicherheit in der Bewertung der Aktion $j$. Wenn die Aktion noch nicht oft gewählt wurde, $n_j$ also im Vergleich zu $n$ gering ist, so wird dieser Teil größer. Die Bewertung $\bar{X}_j$ ist noch sehr unsicher. Wurde dagegen $j$ sehr häufig gewählt, so wird der exploration-Teil kleiner und somit drücken wir eine hohe Sicherheit in der Schätzung des Wertes $\bar{X}_j$ aus.
 
-\bigskip
 Im UCT-Algorithmus wird die Auswahl des Kindknotens zu einem Banditenproblem. Dafür hat jeder Knoten $v$ eine Statistik $Q(v)$ mit der durchschnittlichen erhaltenen Belohnung durch diesen Knoten und $N(v)$ mit der Anzahl der Besuche des Knotens. Das gewählte Kind $v^\prime$ ist dann jenes, welches die Formel
 
 \begin{equation}
@@ -175,7 +174,7 @@ maximiert. Der Faktor $\sqrt{2}$ wurde aus der ursprünglichen UCB1-Formel (\ref
 		\State \textbf{return} $v^\prime$
 \EndFunction
 
-\Function{BestesKind}{$v, C_p$}\\
+\Function{BestesKind}{$v, C_p$}
 \State \textbf{return} $\argmax_{v^\prime \in\ \text{Kinder von}\ v} Q(v^\prime) + C_p \sqrt{\frac{\ln N(v)}{N(v^\prime)}}$
 \EndFunction
 
@@ -221,7 +220,6 @@ Zusätzlich zu $Q(v)$ und $N(v)$ enthalten die Knoten noch Informationen über i
 Dieser normale UCT (engl. plain UCT) Algorithmus, wie er von Kocsis und Szepesv\'{a}ri vorgestellt wurde, wird in Kapitel \ref{chap:mcts-impl} implementiert und als Ausgangslage für alle weiteren Verbesserungen genommen. 
 
 \subsection{Verbesserungen}
-
 Die verschiedenen Schritte der Baumsuche können verändert und verbessert werden und werden dadurch besser für die jeweiligen Anwendungsfälle geeignet. Im Paper "A Survey of Monte Carlo Methods" von Browne u.a.\autocite{browneSurveyMonteCarlo2012} wird eine große Menge von Verbesserungen vorgestellt und eine Übersicht darüber gegeben, für welche klassischen Spiele sie nützlich sein könnten. Im folgenden werde ich eine Handvoll ausgewählter Verbesserungen vorstellen.
 
 \subsubsection{Transpositionen}
@@ -231,7 +229,7 @@ Unter Transpositionen versteht man identische Spielzustände, die über untersch
 \begin{figure}[hbt!]
 	\centering
 	\includegraphics[width=0.6\linewidth]{c4_transpos}
-	\caption[Transposition in Vier Gewinnt]{Die Spielposition kann auf mehrere Wegen erreicht werden. Die Züge d1,e1;c1,d2 sowie d1,d2;c1,e1 und c1,e1;d1,d2 führen alle zum selben Ergebnis.}
+	\caption[Transposition in "Vier gewinnt"]{Die Spielposition kann auf mehrere Wegen erreicht werden. Die Züge d1,e1;c1,d2 sowie d1,d2;c1,e1 und c1,e1;d1,d2 führen alle zum selben Ergebnis.}
 	\label{fig:c4transpos}
 \end{figure}
 
@@ -397,5 +395,5 @@ Wenn dieser Parameter während der gesamten Baumsuche konstant bleibt, so nennt 
 In der Selektions- und Simulations-Phase wird eine Liste aller gemachten Spielzüge geführt. Beim Backup werden dann auch alle Nachbarknoten im Baum aktualisiert, die durch einen der, später in der Simulation gemachten, Spielzüge erreicht werden könnten.
 
 Was in der Literatur nicht erwähnt wird, ist die Notwendigkeit die Spielzüge eindeutig zu identifizieren. Die meisten Untersuchungen des Algorithmus beziehen sich nur auf Schach und Go, in denen ein Spielzug klar definiert ist (schwarzer Bauer von E2 nach E3 oder schwarzer Stein auf Kreuzung 3,3).
-Für Vier Gewinnt reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
+Für Vier Gewinnt\change{Schreibweise von "Vier gewinnt" vereinheitlichen} reicht es nicht, dass Spieler 1 einen Stein in Spalte 4 setzt, denn der tatsächlich resultierende Zug hängt davon ab, wie viele Steine sich bereits in der Spalte befinden. Darum muss jeder Zugname in Vier Gewinnt\change{Schreibweise von "Vier gewinnt" vereinheitlichen} Informationen über den agierenden Spieler, die Spalte und die Zeile im Spielbrett enthalten.
 

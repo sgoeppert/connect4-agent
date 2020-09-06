@@ -1,10 +1,7 @@
-from typing import List, Dict, Tuple
+from typing import List, Tuple
 import math
-import numpy as np
-import random
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.rave import RaveNode, RavePlayer
+from bachelorarbeit.players.rave import RaveNode, RavePlayer
 
 class ScoreBoundedRaveNode(RaveNode):
     def __init__(self, delta: float = 0.0, gamma: float = 0.0, max_node: bool = True, *args, **kwargs):
@@ -124,7 +121,8 @@ class ScoreBoundedRavePlayer(RavePlayer):
         move_set = set(moves)
         current = node
         while current is not None:
-            current.increment_visit_and_add_reward(reward)
+            current.number_visits += 1
+            current.average_value += (reward - current.average_value) / current.number_visits
 
             # Wenn eines der Kinder dieses Knotens über einen in der Simulation gemachten Spielzug
             # erreicht werden könnte, aktualisiere seine Rave Statistik

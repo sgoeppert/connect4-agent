@@ -9,7 +9,7 @@ import time
 import numbers
 
 from bachelorarbeit.selfplay import Arena, MoveEvaluation
-from bachelorarbeit.base_players import Player, RandomPlayer, FlatMonteCarlo
+from bachelorarbeit.players.base_players import Player, RandomPlayer, FlatMonteCarlo
 import config
 
 def run_selfplay_experiment(

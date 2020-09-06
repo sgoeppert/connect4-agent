@@ -1,10 +1,9 @@
-from typing import List, Tuple
+from typing import List
 import random
 import math
 from collections import defaultdict
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.mcts import Node, MCTSPlayer
+from bachelorarbeit.players.mcts import Node, MCTSPlayer
 
 
 def normalize(val):
@@ -25,10 +24,6 @@ class TranspositionNode(Node):
             if _c == child:
                 return m
         return None
-
-    def increment_child_visit_and_add_reward(self, move, reward):
-        self.child_visits[move] += 1
-        self.child_values[move] += (reward - self.child_values[move]) / self.child_visits[move]
 
     def Qsa(self, move):
         return self.child_values[move]
@@ -166,11 +161,13 @@ class TranspositionPlayer(MCTSPlayer):
 
         prev = None
         for _node in reversed(path):
-            _node.increment_visit_and_add_reward(reward)
+            _node.number_visits += 1
+            _node.average_value += (reward - _node.average_value) / _node.number_visits
 
             if prev is not None:
                 m = _node.find_child_action(prev)
-                _node.increment_child_visit_and_add_reward(m, -reward)
+                _node.child_visits[m] += 1
+                _node.child_values[m] += (-reward - _node.child_values[m]) / _node.child_visits[m]
 
             if self.uct_method == "UCT3":
                 nodes_to_update.add(_node)

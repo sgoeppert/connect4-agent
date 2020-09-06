@@ -1,10 +1,7 @@
-from typing import List, Dict, Union
+from typing import List
 import math
-import numpy as np
-import random
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.rave import RaveNode, RavePlayer
+from bachelorarbeit.players.rave import RaveNode, RavePlayer
 
 
 class SarsaNode(RaveNode):

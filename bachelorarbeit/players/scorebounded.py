@@ -1,9 +1,6 @@
-from typing import List
 import math
-import numpy as np
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.mcts import Node, MCTSPlayer
+from bachelorarbeit.players.mcts import Node, MCTSPlayer
 
 
 class ScoreboundedNode(Node):
@@ -121,7 +118,8 @@ class ScoreboundedPlayer(MCTSPlayer):
 
         current = node
         while current is not None:
-            current.increment_visit_and_add_reward(reward)
+            current.number_visits += 1
+            current.average_value += (reward - current.average_value) / current.number_visits
             reward = -reward
 
             current = current.parent

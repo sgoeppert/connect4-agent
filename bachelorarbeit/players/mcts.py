@@ -1,17 +1,13 @@
 import random
 import math
-import numpy as np
-from typing import List
-import time
 
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.base_players import Player
+from bachelorarbeit.players.base_players import TreePlayer
 
 
 class Node:
     def __init__(self, game_state: ConnectFour, parent: "Node" = None):
         self.average_value = 0  # Q(v)
-        self.total_value = 0  # V(v)
         self.number_visits = 0  # N(v)
         self.children = {}  # C(v), Kinder des Knotens
 
@@ -63,7 +59,7 @@ class Node:
         return f"Node(Q:{self.Q()}, N:{self.number_visits})"
 
 
-class MCTSPlayer(Player):
+class MCTSPlayer(TreePlayer):
     name = "MCTSPlayer"
 
     def __init__(
@@ -71,42 +67,16 @@ class MCTSPlayer(Player):
             exploration_constant: float = 0.8,
             max_steps: int = 1000,
             keep_tree: bool = False,
-            time_buffer: float = 0.3,
+            time_buffer_pct: float = 0.05,
             **kwargs
     ):
-        super(MCTSPlayer, self).__init__(**kwargs)
+        super(MCTSPlayer, self).__init__(max_steps=max_steps, keep_tree=keep_tree, time_buffer_pct=time_buffer_pct)
 
         # UCT Exploration Konstante Cp
         self.exploration_constant = exploration_constant
-        self.keep_tree = keep_tree  # ob der Baum zwischen Zügen erhalten bleibt
-        self.root = None  # die Wurzel des Baumes
-
-        # Limitiert die Ausführungszeit
-        self.start_time = 0
-        self.time_limit = 0
-        self.time_buffer = time_buffer
-
-        # Verbrauchte und maximale Schritte pro Zug
-        self.max_steps = max_steps
-        self.steps_taken = 0
 
     def reset(self, conf: Configuration = None):
-        self.steps_taken = 0
-        self.start_time = time.time()
-
-        if not self.keep_tree:
-            self.root = None
-
-        if conf is not None:
-            if conf.timeout > 0:
-                self.time_limit = conf.timeout - self.time_buffer
-
-    def has_resources(self) -> bool:
-        if self.time_limit > 0:
-            return time.time() - self.start_time < self.time_limit
-        else:
-            self.steps_taken += 1
-            return self.steps_taken <= self.max_steps
+        super(MCTSPlayer, self).reset(conf)
 
     def evaluate_game_state(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
@@ -138,37 +108,10 @@ class MCTSPlayer(Player):
         move, n = max(node.children.items(), key=lambda c: c[1].Q())
         return move
 
-    def determine_opponent_move(self, new_board: List[int], old_board: List[int], columns: int = 7) -> int:
-        i = 0
-        for new_s, old_s in zip(new_board, old_board):
-            if new_s != old_s:
-                return i % columns
-            i += 1
-        return -1
-
-    def _restore_root(self, observation, configuration):
-        root = None
-        # if we're keeping the tree and have a stored node, try to determine the opponents move and apply that move
-        # the resulting node is out starting root-node
-        if self.keep_tree and self.root is not None:
-            root = self.root
-            opp_move = self.determine_opponent_move(observation.board, self.root.game_state.board, configuration.columns)
-            if opp_move in root.children:
-                root = root.children[opp_move]
-                root.remove_parent(self)
-            else:
-                root = None
-        return root
-
-    def _store_root(self, new_root):
-        if self.keep_tree:
-            self.root = new_root
-            self.root.remove_parent(self)
-
     def init_root_node(self, root_game):
         return Node(root_game)
 
-    def perform_search(self, root):
+    def perform_search(self, root) -> int:
         """
         Führe die Monte-Carlo-Baumsuche ausgehend von einem Wurzelknoten durch.
 
@@ -189,27 +132,6 @@ class MCTSPlayer(Player):
             self.backup(leaf, reward)
         return self.best_move(root)
 
-    def get_move(self, observation: Observation, conf: Configuration) -> int:
-        self.reset(conf)
-
-        # load the root if it was persisted
-        root = self._restore_root(observation, conf)
-
-        # if no root could be determined, create a new tree from scratch
-        if root is None:
-            root_game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow,
-                                    mark=observation.mark, board=observation.board)
-            root = self.init_root_node(root_game)
-
-        # run the search
-        best = self.perform_search(root)
-        # print(root)
-        # print("Children:", *list(root.children.items()), sep="\n\t")
-        # persist the root if we're keeping the tree
-        self._store_root(root.children[best])
-
-        return best
-
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
@@ -220,7 +142,3 @@ if __name__ == "__main__":
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
-
-    with timer(f"{steps} steps"):
-        m = p.get_move(obs, conf)
-    print(m)

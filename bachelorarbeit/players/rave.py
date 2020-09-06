@@ -1,17 +1,16 @@
 from typing import List, Dict, Tuple
 import math
-import numpy as np
 import random
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.mcts import Node, MCTSPlayer
+from bachelorarbeit.games import ConnectFour
+from bachelorarbeit.players.mcts import Node, MCTSPlayer
 
 
 class RaveNode(Node):
     def __init__(self, *args, **kwargs):
         super(RaveNode, self).__init__(*args, **kwargs)
-        self.rave_count = 0
-        self.rave_score = 0
+        self.rave_count: int = 0
+        self.rave_score: float = 0
         self.rave_children: Dict[int, "RaveNode"] = {}
 
     def beta(self, b: float = 0.0) -> float:
@@ -40,14 +39,16 @@ class RaveNode(Node):
     def expand_one_child_rave(self, moves: List[int]) -> "RaveNode":
         nodeclass = type(self)
         move = random.choice(self.possible_moves)  # wähle zufälligen Zug
+
+        self.possible_moves.remove(move)
+        if len(self.possible_moves) == 0:
+            self.expanded = True
+
         child_state = self.game_state.copy().play_move(move)
         move_name = child_state.get_move_name(move, played=True)
         moves.append(move_name)
         self.children[move] = nodeclass(game_state=child_state, parent=self)
         self.rave_children[move_name] = self.children[move]
-        self.possible_moves.remove(move)
-        if len(self.possible_moves) == 0:
-            self.expanded = True
 
         return self.children[move]
 
@@ -74,8 +75,7 @@ class RavePlayer(MCTSPlayer):
             if current.is_expanded():
                 current, m = current.best_child(self.exploration_constant, b=self.b, alpha=self.alpha)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
-                move_name = current.game_state.get_move_name(m, played=True)
-                moves.append(move_name)
+                moves.append(current.game_state.get_move_name(m, played=True))
             else:
                 return current.expand_one_child_rave(moves)
 
@@ -96,7 +96,8 @@ class RavePlayer(MCTSPlayer):
         move_set = set(moves)
         current = node
         while current is not None:
-            current.increment_visit_and_add_reward(reward)
+            current.number_visits += 1
+            current.average_value += (reward - current.average_value) / current.number_visits
 
             # Wenn eines der Kinder dieses Knotens über einen in der Simulation gemachten Spielzug
             # erreicht werden könnte, aktualisiere seine Rave Statistik
@@ -121,7 +122,6 @@ class RavePlayer(MCTSPlayer):
 
     def best_move(self, node: RaveNode) -> int:
         n, move = node.best_child(C_p=0, b=self.b, alpha=self.alpha)
-        # move, n = max(node.children.items(), key=lambda c: (1 - c[1].beta(0)) * c[1].Q() + c[1].beta(0) * c[1].QRave())
         return move
 
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 200
+    steps = 10000
     pl = RavePlayer(max_steps=steps, exploration_constant=0.5, b=0.0)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)

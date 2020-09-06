@@ -1,5 +1,5 @@
-from bachelorarbeit.mcts import MCTSPlayer
-from bachelorarbeit.sarsa_rave_alt import SarsaPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.sarsa_rave_alt import SarsaPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Sarsa exploration"

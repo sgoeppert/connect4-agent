@@ -1,11 +1,10 @@
 from typing import List, Dict, Tuple
 import math
-import numpy as np
 import random
 from collections import defaultdict
 
-from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from bachelorarbeit.mcts import Node, MCTSPlayer
+from bachelorarbeit.games import ConnectFour
+from bachelorarbeit.players.mcts import Node, MCTSPlayer
 
 
 def normalize(val):
@@ -216,7 +215,8 @@ class TpRavePlayer(MCTSPlayer):
         nodes_to_update = set()
 
         for _node in reversed(path):
-            _node.increment_visit_and_add_reward(reward)
+            _node.number_visits += 1
+            _node.average_value += (reward - _node.average_value) / _node.number_visits
 
             if prev is not None:
                 m = _node.find_child_action(prev)

@@ -1,4 +1,4 @@
-from bachelorarbeit.mcts import MCTSPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
 from bachelorarbeit.tools import evaluate_against_random, dump_json
 
 if __name__ == "__main__":

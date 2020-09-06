@@ -1,4 +1,4 @@
-from bachelorarbeit.scorebounded import ScoreboundedPlayer
+from bachelorarbeit.players.scorebounded import ScoreboundedPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
 NUM_PROCESSES = 6

@@ -1,5 +1,5 @@
-from bachelorarbeit.mcts import MCTSPlayer
-from bachelorarbeit.base_players import RandomPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.base_players import RandomPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
 NUM_PROCESSES = 10

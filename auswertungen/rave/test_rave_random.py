@@ -1,5 +1,5 @@
-from bachelorarbeit.base_players import RandomPlayer
-from bachelorarbeit.rave import RavePlayer
+from bachelorarbeit.players.base_players import RandomPlayer
+from bachelorarbeit.players.rave import RavePlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Rave vs Random"

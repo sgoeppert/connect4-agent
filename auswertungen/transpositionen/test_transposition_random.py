@@ -1,5 +1,5 @@
-from bachelorarbeit.base_players import RandomPlayer
-from bachelorarbeit.transposition import TranspositionPlayer
+from bachelorarbeit.players.base_players import RandomPlayer
+from bachelorarbeit.players.transposition import TranspositionPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Transposition vs Random"

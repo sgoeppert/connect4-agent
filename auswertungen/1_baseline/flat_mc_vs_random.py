@@ -1,4 +1,4 @@
-from bachelorarbeit.base_players import FlatMonteCarlo
+from bachelorarbeit.players.base_players import FlatMonteCarlo
 from bachelorarbeit.tools import evaluate_against_random, dump_json
 
 import math

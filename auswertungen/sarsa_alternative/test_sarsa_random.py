@@ -1,5 +1,5 @@
-from bachelorarbeit.base_players import RandomPlayer
-from bachelorarbeit.sarsa_rave_alt import SarsaPlayer
+from bachelorarbeit.players.base_players import RandomPlayer
+from bachelorarbeit.players.sarsa_rave_alt import SarsaPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Sarsa vs Random"

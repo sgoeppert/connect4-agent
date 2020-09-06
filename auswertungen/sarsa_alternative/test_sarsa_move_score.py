@@ -1,4 +1,4 @@
-from bachelorarbeit.sarsa_rave_alt import SarsaPlayer
+from bachelorarbeit.players.sarsa_rave_alt import SarsaPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
 NUM_PROCESSES = 8

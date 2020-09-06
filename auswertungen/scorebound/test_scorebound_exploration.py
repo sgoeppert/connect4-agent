@@ -1,5 +1,5 @@
-from bachelorarbeit.mcts import MCTSPlayer
-from bachelorarbeit.scorebounded import ScoreboundedPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.scorebounded import ScoreboundedPlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "Scorebounded exploration"

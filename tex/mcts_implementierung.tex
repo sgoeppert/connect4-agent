@@ -14,10 +14,10 @@ Zum Schluss versuche ich die verschiedenen Verbesserungen zu kombinieren.
 \subsection{Vier Gewinnt}
 \label{chap:viergewinnt-impl}
 Die Monte-Carlo-Baumsuche benötigt eine Simulation der Umgebung.
-Der Kaggle-Wettbewerb liefert bereits mit dem Python Package \verb|kaggle-environments| eine Spielumgebung für ein parametrisierbares Vier Gewinnt.
+Der Kaggle-Wettbewerb liefert bereits mit dem Python Package \verb|kaggle-environments| eine Spielumgebung für ein parametrisierbares Vier Gewinnt.\change{Schreibweise von "Vier gewinnt" vereinheitlichen}
 Diese Umgebung wird vom Wettbewerb selbst für die Evaluierung der eingereichten Agenten verwendet, ist aber für meine Zwecke unnötig Umfangreich und unbequem zu verwenden.
 
-Deshalb war es zuerst notwendig, eine eigene Implementierung von Vier Gewinnt zu erstellen.
+Deshalb war es zuerst notwendig, eine eigene Implementierung von Vier Gewinnt\change{Schreibweise von "Vier gewinnt" vereinheitlichen} zu erstellen.
 Die Klasse \verb|bachelorarbeit.games.ConnectFour| ist eine Erweiterung der Logik aus dem \verb|connectx.py| Modul von kaggle-environments\footnote{Quelle: \texttt{https://github.com/Kaggle/kaggle-environments/tree/master/kaggle\_environments/envs/connectx}}.
 
 Das Spielfeld wird in einer Liste der Länge \verb|anzahl_spalten * anzahl_zeilen| gespeichert.

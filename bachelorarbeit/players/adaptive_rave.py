@@ -2,7 +2,7 @@ from typing import List
 import random
 
 from bachelorarbeit.games import Configuration, ConnectFour
-from bachelorarbeit.rave import RavePlayer
+from bachelorarbeit.players.rave import RavePlayer
 
 
 class AdaptiveRavePlayer(RavePlayer):

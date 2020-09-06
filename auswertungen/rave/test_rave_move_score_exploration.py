@@ -1,4 +1,4 @@
-from bachelorarbeit.rave import RavePlayer
+from bachelorarbeit.players.rave import RavePlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
 NUM_PROCESSES = 8
