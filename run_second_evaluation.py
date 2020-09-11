@@ -1,11 +1,11 @@
-from bachelorarbeit.mcts import MCTSPlayer
-from bachelorarbeit.rave import RavePlayer
-from bachelorarbeit.scorebounded import ScoreboundedPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.rave import RavePlayer
+from bachelorarbeit.players.scorebounded import ScoreboundedPlayer
 from bachelorarbeit.selfplay import Arena
 from bachelorarbeit.tools import run_selfplay_experiment, run_move_evaluation_experiment
 from bachelorarbeit.tools import evaluate_against_random, evaluate_against_flat_monte_carlo
 from bachelorarbeit.tools import Table, dump_json
-from bachelorarbeit.base_players import RandomPlayer, FlatMonteCarlo
+from bachelorarbeit.players.base_players import RandomPlayer, FlatMonteCarlo
 
 import config
 
@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-from bachelorarbeit.transposition import TranspositionPlayer
+from bachelorarbeit.players.transposition import TranspositionPlayer
 
 DEBUG = False
 
