@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-
 @dataclass
 class Configuration:
     rows: int = 6
@@ -140,7 +139,7 @@ class ConnectFour:
         return cp
 
     def hash(self) -> int:
-        return hash(str(self.board))
+        return hash(tuple(self.board))
 
     def __hash__(self):
         return self.hash()
