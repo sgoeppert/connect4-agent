@@ -3,7 +3,23 @@ import math
 import random
 
 from bachelorarbeit.games import ConnectFour
-from bachelorarbeit.players.mcts import Node, MCTSPlayer
+from bachelorarbeit.players.mcts import Node, MCTSPlayer, Evaluator
+
+
+class RaveEvaluator(Evaluator):
+    def __init__(self, move_list):
+        self.moves = move_list
+
+    def __call__(self, game_state: ConnectFour):
+        game = game_state.copy()
+        scoring = game.get_other_player(game.get_current_player())
+        while not game.is_terminal():
+            m = random.choice(game.list_moves())
+            move_name = game.get_move_name(m)
+            self.moves.append(move_name)  # merke welche Züge gespielt wurden
+            game.play_move(m)
+
+        return game.get_reward(scoring)
 
 
 class RaveNode(Node):
@@ -65,35 +81,26 @@ class RavePlayer(MCTSPlayer):
 
     def __init__(self, b: float = 0.0, alpha: float = None, *args, **kwargs):
         super(RavePlayer, self).__init__(*args, **kwargs)
+        self.move_list = []
+        self.evaluate = RaveEvaluator(self.move_list)
         self.b = b
         self.alpha = alpha
 
-    def tree_policy_rave(self, root: "RaveNode", moves) -> "RaveNode":
+    def tree_policy(self, root: "RaveNode") -> "RaveNode":
         current = root
 
         while not current.game_state.is_terminal():
             if current.is_expanded():
                 current, m = current.best_child(self.exploration_constant, b=self.b, alpha=self.alpha)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
-                moves.append(current.game_state.get_move_name(m, played=True))
+                self.move_list.append(current.game_state.get_move_name(m, played=True))
             else:
-                return current.expand_one_child_rave(moves)
+                return current.expand_one_child_rave(self.move_list)
 
         return current
 
-    def evaluate_game_state_rave(self, game_state: ConnectFour, moves: List[int]) -> float:
-        game = game_state.copy()
-        scoring = game.get_other_player(game.get_current_player())
-        while not game.is_terminal():
-            m = random.choice(game.list_moves())
-            move_name = game.get_move_name(m)
-            moves.append(move_name)  # merke welche Züge gespielt wurden
-            game.play_move(m)
-
-        return game.get_reward(scoring)
-
-    def backup_rave(self, node: RaveNode, reward: float, moves: List[int]):
-        move_set = set(moves)
+    def backup(self, node: RaveNode, reward: float):
+        move_set = set(self.move_list)
         current = node
         while current is not None:
             current.number_visits += 1
@@ -110,10 +117,10 @@ class RavePlayer(MCTSPlayer):
 
     def perform_search(self, root):
         while self.has_resources():
-            moves = []  # die Liste aller gemachten Spielzüge in dieser Iteration
-            leaf = self.tree_policy_rave(root, moves)
-            reward = self.evaluate_game_state_rave(leaf.game_state, moves)
-            self.backup_rave(leaf, reward, moves)
+            self.move_list.clear()  # Bereinige die move_list aber behalte die selbe Referenz bei, da der Evaluator sie braucht
+            leaf = self.tree_policy(root)
+            reward = self.evaluate(leaf.game_state)
+            self.backup(leaf, reward)
 
         return self.best_move(root)
 
@@ -129,7 +136,7 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 10000
+    steps = 50000
     pl = RavePlayer(max_steps=steps, exploration_constant=0.5, b=0.0)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)

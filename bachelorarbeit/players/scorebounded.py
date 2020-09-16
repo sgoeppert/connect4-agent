@@ -1,19 +1,22 @@
 import math
+from typing import TypeVar
 
 from bachelorarbeit.players.mcts import Node, MCTSPlayer
-
 
 class ScoreboundedNode(Node):
     def __init__(self,
                  cut_delta: float = 0.0,
                  cut_gamma: float = 0.0,
                  *args, **kwargs):
+
         super(ScoreboundedNode, self).__init__(*args, **kwargs)
+
         self.pess = -1
         self.opti = 1
         self.cut_delta = cut_delta
         self.cut_gamma = cut_gamma
 
+        self.parent: "ScoreboundedNode"
         if self.parent:
             self.is_max_node = not self.parent.is_max_node
             self.cut_delta = self.parent.cut_delta
@@ -42,17 +45,16 @@ class ScoreboundedNode(Node):
                 elif not self.is_max_node and c.pess >= self.opti:
                     children.remove(c)
 
-        c = max(children, key=lambda c: score_func(c) + C_p * math.sqrt(n_p / c.number_visits))
-        return c
+        return max(children, key=lambda c: score_func(c) + C_p * math.sqrt(n_p / c.number_visits))
 
-    def min_pess_child(self):
+    def min_pess_child(self) -> float:
         c_pess = [c.pess for c in self.children.values()]
         if not self.is_expanded():
             c_pess.append(-1)
 
         return min(c_pess)
 
-    def max_opti_child(self):
+    def max_opti_child(self) -> float:
         c_opti = [c.opti for c in self.children.values()]
         if not self.is_expanded():
             c_opti.append(1)
@@ -124,17 +126,17 @@ class ScoreboundedPlayer(MCTSPlayer):
 
             current = current.parent
 
-    def best_move(self, node: Node) -> int:
+    def best_move(self, node: ScoreboundedNode) -> int:
         move, n = max(node.children.items(), key=lambda c: c[1].Q() + c[1].opti + c[1].pess)
         return move
 
-    def init_root_node(self, root_game):
+    def init_root_node(self, root_game: "ConnectFour") -> ScoreboundedNode:
         return ScoreboundedNode(game_state=root_game, cut_delta=self.cut_delta, cut_gamma=self.cut_gamma)
 
-    def perform_search(self, root):
+    def perform_search(self, root: ScoreboundedNode) -> int:
         while self.has_resources():
-            leaf = self.tree_policy(root)
-            reward = self.evaluate_game_state(leaf.game_state)
+            leaf = self.tree_policy(root)  # type: ScoreboundedNode
+            reward = self.evaluate(leaf.game_state)
             self.backup(leaf, reward)
 
         return self.best_move(root)

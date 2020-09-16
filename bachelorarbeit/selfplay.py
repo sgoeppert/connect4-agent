@@ -81,7 +81,7 @@ class Arena:
         # print(game_states, rewards)
         return rewards, game_states
 
-    def run_game_mp(self, show_progress_bar: bool = True, max_tasks: int = 10) -> List[GameResult]:
+    def run_game_mp(self, pool=None, show_progress_bar: bool = True, max_tasks: int = 10) -> List[GameResult]:
         self.flip_players = False
         mp.set_start_method("spawn", force=True)
         pbar = None
@@ -93,27 +93,35 @@ class Arena:
             n_games = [self.num_games // 2, self.num_games - (self.num_games // 2)]
 
         game_results = []
+        if pool is None:
+            close_pool = True
+            pool = mp.Pool(self.num_processes, maxtasksperchild=max_tasks)
+        else:
+            close_pool = False
+
         for num_games in n_games:
-            with mp.Pool(self.num_processes, maxtasksperchild=max_tasks) as pool:
-                pending_results = pool.imap_unordered(self.run_game, range(num_games))
+            pending_results = pool.imap_unordered(self.run_game, range(num_games))
 
-                for res, game_states in pending_results:
-                    if self.flip_players:
-                        game_results.append(res[::-1])
-                    else:
-                        game_results.append(res)
+            for res, game_states in pending_results:
+                if self.flip_players:
+                    game_results.append(res[::-1])
+                else:
+                    game_results.append(res)
 
-                    if self.memory is not None:
-                        self.memory.add_full_game(game_states)
+                if self.memory is not None:
+                    self.memory.add_full_game(game_states)
 
-                    if show_progress_bar:
-                        mean_results = np.mean((np.array(game_results) + 1) / 2, axis=0)
-                        pbar.set_postfix({
-                            "Mean result": mean_results
-                        }, refresh=False)
-                        pbar.update()
+                if show_progress_bar:
+                    mean_results = np.mean((np.array(game_results) + 1) / 2, axis=0)
+                    pbar.set_postfix({
+                        "Mean result": mean_results
+                    }, refresh=False)
+                    pbar.update()
 
             self.flip_players = True
+
+        if close_pool:
+            pool.close()
 
         if show_progress_bar:
             pbar.close()
@@ -122,7 +130,6 @@ class Arena:
             self.memory.save_data()
 
         return game_results
-
 
 # class TensorFlowArena(Arena):
 #     def run_game(self, _dummy=0) -> Tuple[GameResult, List]:

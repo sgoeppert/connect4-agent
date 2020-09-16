@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from bachelorarbeit.games import ConnectFour
 from bachelorarbeit.players.mcts import Node, MCTSPlayer
+from bachelorarbeit.players.rave import RaveEvaluator
 
 
 def normalize(val):
@@ -183,32 +184,34 @@ class TpRavePlayer(MCTSPlayer):
         self.uct_method = uct_method
         self.transpositions = {}
         self.alpha = alpha
+        self.move_list = []
+        self.evaluate = RaveEvaluator(self.move_list)
 
     def reset(self, *args, **kwargs):
         super(TpRavePlayer, self).reset(*args, **kwargs)
         if not self.keep_tree:
             self.transpositions = {}
 
-    def tree_policy_rave(self, root: "TpRaveNode", moves) -> List["TpRaveNode"]:
+    def tree_policy(self, root: "TpRaveNode") -> List["TpRaveNode"]:
         current = root
         path = [root]  # Der Pfad, der während der Selektion durchlaufen wird
         while not current.game_state.is_terminal():
             if current.is_expanded():
                 current, m = current.best_child(self.exploration_constant, uct_method=self.uct_method, b=self.b, alpha=self.alpha)
                 move_name = current.game_state.get_move_name(m, played=True)
-                moves.append(move_name)
+                self.move_list.append(move_name)
                 path.append(current)
             else:
                 # Wähle einen zufälligen nächsten Zustand
-                current, new_node = current.expand(self.transpositions, moves)
+                current, new_node = current.expand(self.transpositions, self.move_list)
                 path.append(current)
                 if new_node:
                     return path
         return path
 
-    def backup_rave(self, path: List["TpRaveNode"], reward: float, moves: List[int]):
+    def backup(self, path: List["TpRaveNode"], reward: float):
         prev = None
-        move_set = set(moves)
+        move_set = set(self.move_list)
 
         leaf = path[-1]
         leaf.sim_reward = reward
@@ -241,37 +244,20 @@ class TpRavePlayer(MCTSPlayer):
             prev = _node
             reward = -reward
 
-    def evaluate_game_state_rave(self, game_state: ConnectFour, moves: List[int]) -> float:
-        _g = game_state.copy()
-        scoring = _g.get_other_player(_g.get_current_player())
-        while not _g.is_terminal():
-            m = random.choice(_g.list_moves())
-            move_name = _g.get_move_name(m)
-            moves.append(move_name)  # merke welche Züge gespielt wurden
-            _g.play_move(m)
-
-        return _g.get_reward(scoring)
-
-    def perform_search(self, root):
+    def perform_search(self, root) -> int:
         while self.has_resources():
-            # print(root.rave_children)
-            # print(root.children)
-            moves = []
-            path = self.tree_policy_rave(root, moves)
-            reward = self.evaluate_game_state_rave(path[-1].game_state, moves)
-            # if self.uct_method == "UCT3":
-            #     self.backup_uct3(path, reward)
-            # else:
-            self.backup_rave(path, reward, moves)
+            self.move_list.clear()
+            path = self.tree_policy(root)
+            reward = self.evaluate(path[-1].game_state)
+            self.backup(path, reward)
 
         return self.best_move(root)
 
-    def init_root_node(self, root_game):
+    def init_root_node(self, root_game) -> TpRaveNode:
         return TpRaveNode(game_state=root_game)
 
     def best_move(self, node: "TpRaveNode") -> int:
         n, move = node.best_child(C_p=0, b=self.b, alpha=self.alpha)
-        # move, n = max(node.children.items(), key=lambda c: (1 - c[1].beta(0)) * c[1].Q() + c[1].beta(0) * c[1].QRave())
         return move
 
 

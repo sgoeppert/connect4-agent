@@ -1,17 +1,31 @@
 import random
 import math
+from typing import Type, TypeVar
 
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
 from bachelorarbeit.players.base_players import TreePlayer
 
 
+class Evaluator:
+    def __call__(self, game_state: ConnectFour) -> float:
+        game = game_state.copy()
+        scoring = game.get_other_player(game.get_current_player())
+        while not game.is_terminal():
+            game.play_move(random.choice(game.list_moves()))
+
+        return game.get_reward(scoring)
+
+    def reset(self):
+        pass
+
+
 class Node:
-    def __init__(self, game_state: ConnectFour, parent: "Node" = None):
+    def __init__(self, game_state: ConnectFour, parent=None):
         self.average_value = 0  # Q(v)
         self.number_visits = 0  # N(v)
         self.children = {}  # C(v), Kinder des Knotens
 
-        self.parent = parent  # der direkte Elternknoten
+        self.parent = parent
 
         self.game_state = game_state  # der Spielzustand in diesem Knoten
         self.possible_moves = game_state.list_moves()  # Aktionen der noch nicht erforschten Kindknoten
@@ -20,7 +34,7 @@ class Node:
     def Q(self) -> float:
         return self.average_value
 
-    def best_child(self, C_p: float = 1.0) -> "Node":
+    def best_child(self, C_p: float = 1.0):
         n_p = math.log(self.number_visits)
 
         def UCT(child: Node):
@@ -41,7 +55,7 @@ class Node:
     def is_expanded(self) -> bool:
         return self.expanded
 
-    def expand_one_child(self) -> "Node":
+    def expand_one_child(self):
         node_class = type(self)
 
         move = random.choice(self.possible_moves)
@@ -64,7 +78,7 @@ class MCTSPlayer(TreePlayer):
 
     def __init__(
             self,
-            exploration_constant: float = 0.8,
+            exploration_constant: float = 1.0,
             max_steps: int = 1000,
             keep_tree: bool = False,
             time_buffer_pct: float = 0.05,
@@ -74,21 +88,13 @@ class MCTSPlayer(TreePlayer):
 
         # UCT Exploration Konstante Cp
         self.exploration_constant = exploration_constant
+        self.evaluate = Evaluator()
 
     def reset(self, conf: Configuration = None):
         super(MCTSPlayer, self).reset(conf)
+        self.evaluate.reset()
 
-    def evaluate_game_state(self, game_state: ConnectFour) -> float:
-        game = game_state.copy()
-        # Die Bewertung Geschieht aus Sicht des Spielers, der uns in diesen Zustand geführt hat, darum muss der Spieler
-        # geholt werden, der zuletzt gezogen hat, nicht der der gerade an der Reihe ist.
-        scoring = game.get_other_player(game.get_current_player())
-        while not game.is_terminal():
-            game.play_move(random.choice(game.list_moves()))
-
-        return game.get_reward(scoring)
-
-    def tree_policy(self, root: Node) -> Node:
+    def tree_policy(self, root):
         current = root
         while not current.game_state.is_terminal():
             if current.is_expanded():
@@ -97,18 +103,18 @@ class MCTSPlayer(TreePlayer):
                 return current.expand_one_child()
         return current
 
-    def backup(self, node: Node, reward: float):
+    def backup(self, node, reward: float):
         current = node
         while current is not None:
             current.increment_visit_and_add_reward(reward)
             reward = -reward
             current = current.parent
 
-    def best_move(self, node: Node) -> int:
+    def best_move(self, node) -> int:
         move, n = max(node.children.items(), key=lambda c: c[1].Q())
         return move
 
-    def init_root_node(self, root_game):
+    def init_root_node(self, root_game) -> Node:
         return Node(root_game)
 
     def perform_search(self, root) -> int:
@@ -127,8 +133,8 @@ class MCTSPlayer(TreePlayer):
         :return:
         """
         while self.has_resources():
-            leaf = self.tree_policy(root)
-            reward = self.evaluate_game_state(leaf.game_state)
+            leaf = self.tree_policy(root)  # type: Node
+            reward = self.evaluate(leaf.game_state)
             self.backup(leaf, reward)
         return self.best_move(root)
 
@@ -137,8 +143,11 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 2000
+    steps = 50000
     p = MCTSPlayer(max_steps=steps)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
+
+    with timer(steps):
+        p.get_move(obs, conf)

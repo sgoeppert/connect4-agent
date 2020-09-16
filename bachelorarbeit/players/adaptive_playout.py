@@ -1,24 +1,41 @@
 import random
 
 from bachelorarbeit.games import Configuration, ConnectFour
-from bachelorarbeit.players.mcts import MCTSPlayer
+from bachelorarbeit.players.mcts import MCTSPlayer, Evaluator
 
 
-class AdaptivePlayoutPlayer(MCTSPlayer):
-    name = "AdaptivePlayoutPlayer"
-
-    def __init__(self, forgetting=False, keep_replies=False, *args, **kwargs):
-        super(AdaptivePlayoutPlayer, self).__init__(*args, **kwargs)
+class AdaptiveEvaluator(Evaluator):
+    def __init__(self, forgetting=False, keep_replies=False):
         self.replies = {}
         self.forgetting = forgetting
         self.keep_replies = keep_replies
 
-    def reset(self, conf: Configuration = None):
-        super(AdaptivePlayoutPlayer, self).reset(conf)
-        if not self.keep_replies:
-            self.replies = {}
+    def get_next_move(self, game: "ConnectFour", last_move: int) -> int:
+        move = None
+        legal_moves = game.list_moves()
+        if last_move is not None and last_move in self.replies:
+            reply = self.replies[last_move]
+            reply_move = (reply // 10) % game.cols
+            mname = game.get_move_name(reply_move, played=False)
+            if reply == mname:
+                move = reply_move
 
-    def evaluate_game_state(self, game_state: ConnectFour) -> float:
+        if move not in legal_moves:
+            move = random.choice(game.list_moves())
+
+        return move
+
+    def memorize(self, replies, winner: int):
+        if winner is not None:
+            loser = 3 - winner
+            for move, reply in replies.items():
+                replying_to = move % 10
+                if replying_to == loser:
+                    self.replies[move] = reply
+                elif self.forgetting and replying_to == winner:
+                    self.replies.pop(move, None)
+
+    def __call__(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
         simulating_player = game.get_current_player()
         scoring = 3 - simulating_player
@@ -27,18 +44,7 @@ class AdaptivePlayoutPlayer(MCTSPlayer):
         simulation_replies = {}
 
         while not game.is_terminal():
-            move = None
-            legal_moves = game.list_moves()
-            if last_move is not None and last_move in self.replies:
-                reply = self.replies[last_move]
-                reply_move = (reply // 10) % game.cols
-                mname = game.get_move_name(reply_move, played=False)
-                if reply == mname:
-                    move = reply_move
-
-            if move not in legal_moves:
-                move = random.choice(game.list_moves())
-
+            move = self.get_next_move(game, last_move)
             game.play_move(move)
 
             move_name = game.get_move_name(move, played=True)
@@ -47,24 +53,26 @@ class AdaptivePlayoutPlayer(MCTSPlayer):
 
             last_move = move_name
 
-        winner = game.winner
-        if winner is not None:
-            loser = 3 - winner
-            for move, reply in simulation_replies.items():
-                replying_to = move % 10
-                if replying_to == loser:
-                    self.replies[move] = reply
-                elif self.forgetting and replying_to == winner:
-                    self.replies.pop(move, None)
-
+        self.memorize(simulation_replies, game.winner)
         return game.get_reward(scoring)
+
+    def reset(self):
+        if not self.keep_replies:
+            self.replies = {}
+
+class AdaptivePlayoutPlayer(MCTSPlayer):
+    name = "AdaptivePlayoutPlayer"
+
+    def __init__(self, forgetting=False, keep_replies=False, *args, **kwargs):
+        super(AdaptivePlayoutPlayer, self).__init__(*args, **kwargs)
+        self.evaluate = AdaptiveEvaluator(forgetting, keep_replies)
 
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 1000
+    steps = 50000
     pl = AdaptivePlayoutPlayer(max_steps=steps, exploration_constant=0.85)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
