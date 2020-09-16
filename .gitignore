@@ -9,3 +9,12 @@
 /tex/main.run.xml
 /tex/main.bbl
 /tex/main.bcf
+/tensorboard_log_autokeras/
+/tensorboard_log/
+/memory_ak/
+/memory/
+/auto_models/
+/models/
+/auswertungen/
+/best_models/
+/timing_tests/
