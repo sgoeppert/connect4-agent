@@ -181,6 +181,15 @@ def run_move_evaluation_experiment(
     }
 
 
+def get_range(center, num_vals=5, step=0.1):
+    vals_left = num_vals // 2
+    vals_right = num_vals - vals_left - 1
+
+    values = [center - (i * step) for i in range(vals_left, 0, -1)]
+    values += [center + (i * step) for i in range(vals_right + 1)]
+    return list(map(lambda v: round(v, 4), values))
+
+
 def dump_json(filename, data):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     out_file = filename.format(timestamp)
@@ -192,43 +201,49 @@ def dump_json(filename, data):
 
 
 def transform_board_large(board):
-    b1 = (np.array(board) == 1)
-    b2 = (np.array(board) == 2)
-    return np.append(b1, b2).astype(int).tolist()
+    b = np.asarray(board)
+    if b.ndim == 1:
+        b.shape = (1,) + b.shape
+    return np.append(b == 1, b == 2, axis=1).astype(int).tolist()
 
 
 def transform_board(board):
-    return (np.array(board) / 2).tolist()
+    b = np.asarray(board)
+    if b.ndim == 1:
+        b.shape = (1,) + b.shape
+    return (b / 2).tolist()
 
 
 def transform_board_nega(board):
-    b = np.array(board)
+    b = np.asarray(board)
+    if b.ndim == 1:
+        b.shape = (1,) + b.shape
     b[b == 2] = -1
     return b.tolist()
 
 
 def transform_board_cnn(board):
-    b = np.array(board).reshape((6, 7))
-    stones = np.count_nonzero(board)
-    owning_player = 1 - (stones % 2)
-    b1 = (b == 1).tolist()
-    b2 = (b == 2).tolist()
-    owner_board = np.full((6, 7), owning_player).tolist()
+    b = np.asarray(board)
+    if b.ndim == 1:
+        b.shape = (1,) + b.shape
+    owner = 1 - (np.count_nonzero(b, axis=-1) % 2)
+    new_board = np.concatenate((b == 1, b == 2, [[x] * b.shape[1] for x in owner]), axis=1).reshape((-1,3,6,7))
+    return np.moveaxis(new_board, -3, -1).tolist()
 
-    # print(type(b1), type(b2), type(owner_board))
-    # print(b1, b2, owner_board)
-    stack = np.array([b1, b2, owner_board]).astype(int)
-    # print(stack)
 
-    return np.moveaxis(stack, 0, -1)
-
+def transform_board_cnn_nega(board):
+    b = np.asarray(board)
+    if b.ndim == 1:
+        b.shape = (1,) + b.shape
+    b[b == 2] = -1
+    return b.reshape((-1,6,7)).tolist()
 
 @contextmanager
 def timer(name="Timer"):
     tick = time.time()
     yield
     tock = time.time()
-    print(f"{name} took {tock - tick}s")
+    print(f"{name} took {tock - tick}s.")
 
 
 class Table:
