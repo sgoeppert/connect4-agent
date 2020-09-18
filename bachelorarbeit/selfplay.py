@@ -36,7 +36,8 @@ class Arena:
         self.flip_players = False
         self.memory = memory
 
-    def update_players(self, player_classes: Optional[Tuple[Callable, Callable]], constructor_args: Optional[Tuple[any, any]] = None):
+    def update_players(self, player_classes: Optional[Tuple[Callable, Callable]],
+                       constructor_args: Optional[Tuple[any, any]] = None):
         if player_classes is not None:
             self.player_classes = player_classes
         if constructor_args is not None:
@@ -131,11 +132,6 @@ class Arena:
 
         return game_results
 
-# class TensorFlowArena(Arena):
-#     def run_game(self, _dummy=0) -> Tuple[GameResult, List]:
-#         from tensorflow import keras
-#         return super(TensorFlowArena, self).run_game(_dummy)
-
 
 class MoveEvaluation:
     def __init__(self,
@@ -143,7 +139,7 @@ class MoveEvaluation:
                  dataset_file: str,
                  player_config: Union[dict, None] = None,
                  num_processes: int = config.NUM_PROCESSES
-    ):
+                 ):
         self.player_class = player
         self.player_config = player_config
         self.dataset_file = dataset_file
@@ -276,8 +272,10 @@ class Memory:
         self.game_data = self.game_data[num_to_forget:]
         self.num_states -= num_to_forget
 
+
 if __name__ == "__main__":
     from bachelorarbeit.players.mcts import MCTSPlayer
+
     # memory = Memory(file_name="random_data.pkl")
     arena = Arena(players=(MCTSPlayer, MCTSPlayer), num_games=1, num_processes=6)
 

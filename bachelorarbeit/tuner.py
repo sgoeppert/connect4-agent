@@ -1,7 +1,7 @@
 import multiprocessing
 import random
 import itertools
-from math import sqrt, log
+from math import sqrt, log, ceil
 from typing import List, Tuple, Any, Type
 from tqdm import tqdm
 import os
@@ -11,12 +11,60 @@ from datetime import datetime
 from pathlib import Path
 
 import config
+from bachelorarbeit.games import Configuration, ConnectFour, Observation
 from bachelorarbeit.selfplay import Arena
 from bachelorarbeit.players.base_players import Player
 from bachelorarbeit.players.mcts import MCTSPlayer
 
 DEFAULT_DIR = "MCTSTuner"
+VIRTUAL_LOSS = 4
 
+class TinyArena:
+    def __init__(
+            self,
+            players: Tuple[Type[Player], Type[Player]],
+            opponent_config: dict
+    ):
+        self.player_classes = players
+        self.opponent_config = opponent_config
+        self.player_config = None
+        self.flip_players = False
+
+    def instantiate_players(self) -> List[Player]:
+        players = []
+        for pclass, arg in zip(self.player_classes, (self.player_config, self.opponent_config)):
+            if arg:
+                players.append(pclass(**arg))
+            else:
+                players.append(pclass())
+
+        if self.flip_players:
+            players = players[::-1]
+        return players
+
+    def run_game(self):
+        conf = Configuration()
+        game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
+        players = self.instantiate_players()
+
+        s = 0
+        while not game.is_terminal():
+            obs = Observation(board=game.board.copy(), mark=game.mark)
+            active_player = s & 1
+            m = players[active_player].get_move(obs, conf)
+            # print(m)
+            game.play_move(m)
+            s += 1
+
+        return game.get_reward(1), game.get_reward(2)
+
+    def run(self, leaf: "TunerNode"):
+        self.player_config = leaf.fixed_parameters
+
+        results = [self.run_game()]
+        self.flip_players = True
+        results.append(self.run_game()[::-1])
+        return results
 
 class Parametrization:
     def __init__(self):
@@ -68,16 +116,6 @@ class Parametrization:
         cp.default_config = self.default_config.copy()
         return cp
 
-    def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
-    @classmethod
-    def fromJson(cls, str):
-        obj = cls()
-        dict = json.loads(str)
-        obj.default_config = dict["default_config"]
-        obj.options = [ tuple([ tuple(inner) for inner in outer ]) for outer in dict["options"] ]
-        return obj
 
 class TunerNode:
     def __init__(self, free_parameters: Parametrization, fixed_parameters: dict, parent: "TunerNode" = None):
@@ -99,6 +137,8 @@ class TunerNode:
         self.draws = 0
         self.n = 0
 
+        self.virtual_losses = 0
+
     def q(self) -> float:
         if self.n == 0:
             return -1
@@ -109,13 +149,24 @@ class TunerNode:
         if self.n == 0:
             return float("inf")
         else:
-            return sqrt(log(self.parent.n) / self.n)
+            return sqrt(2 * log(self.parent.n) / self.n)
 
     def is_expanded(self) -> bool:
         return self._expanded
 
     def is_terminal(self) -> bool:
         return self._terminal
+
+    def add_virtual_loss(self):
+        self.virtual_losses += 1
+        self.losses += VIRTUAL_LOSS
+        self.n += VIRTUAL_LOSS
+
+    def remove_virtual_loss(self):
+        if self.virtual_losses > 0:
+            self.virtual_losses -= 1
+            self.losses -= VIRTUAL_LOSS
+            self.n -= VIRTUAL_LOSS
 
     def expand(self) -> "TunerNode":
         for name, val in self.options:
@@ -128,7 +179,7 @@ class TunerNode:
         return max(self.children.values(), key=lambda ch: ch.q() + c * ch.explo())
 
     def __repr__(self):
-        return f"Node(n:{self.n}, q:{self.q()}, W/D/L: {self.wins}/{self.draws}/{self.losses})"
+        return f"Node(n:{self.n}, q:{self.q()}, W/D/L: {self.wins}/{self.draws}/{self.losses}, vloss: {self.virtual_losses})"
 
 
 class MCTSTuner:
@@ -250,10 +301,12 @@ class MCTSTuner:
     def _write_checkpoint_data(self, run_dir):
         cp_dir = run_dir / "checkpoint_{}".format(self.checkpoint_number)
         os.makedirs(cp_dir, exist_ok=True)
-        # write pickled self to dir
-        with open(cp_dir / "tuner.dat", "wb+") as f:
+        if self.process_pool is not None:
             self.process_pool.close()
             self.process_pool = None
+
+        # write pickled self to dir
+        with open(cp_dir / "tuner.dat", "wb+") as f:
             pickle.dump(self, f)
         # write terminal_nodes to dir
         with open(cp_dir / "node_stats.json", "w+") as f:
@@ -262,23 +315,25 @@ class MCTSTuner:
     def write_checkpoint(self):
         # update meta_json next_run_number and last_run
         run_dir = self.project_dir / "run_{}".format(self.run_number)
-        self._update_meta()
         self._update_checkpoint_meta(run_dir)
+        self._update_meta()
         self._write_checkpoint_data(run_dir)
 
     @staticmethod
     def tree_policy(root, c) -> TunerNode:
         current = root
+        current.add_virtual_loss()
         while not current.is_terminal():
             if current.is_expanded():
-                current = current.best_child(c)
+                current: TunerNode = current.best_child(c)
             else:
                 current = current.expand()
+            current.add_virtual_loss()
         return current
 
-    def evaluate(self, leaf) -> Tuple[int, int, int]:
-        num_processes = 10
-        num_games = 30
+    def evaluate_single_leaf(self, leaf) -> List[Tuple[float, float]]:
+        num_processes = 7
+        num_games = 10
 
         if self.process_pool is None:
             self.process_pool = multiprocessing.Pool(processes=num_processes, maxtasksperchild=20)
@@ -288,43 +343,86 @@ class MCTSTuner:
         arena = Arena(players=players, constructor_args=player_args, num_games=num_games, num_processes=num_processes)
         results = arena.run_game_mp(pool=self.process_pool, show_progress_bar=False, max_tasks=20)
 
-        wins = results.count((1, -1))
-        draws = results.count((0, 0))
-        losses = results.count((-1, 1))
+        return results
 
-        return wins, draws, losses
+    def evaluate_and_backup(self, leafs, total):
+        if self.process_pool is None:
+            self.process_pool = multiprocessing.Pool(config.NUM_PROCESSES, maxtasksperchild=100)
 
-    @staticmethod
-    def backup(leaf, score):
-        current = leaf
-        win, draw, lose = score
+        leafs1, leafs2 = itertools.tee(leafs)
+
+        players = (self.player, self.opponent)
+        arena = TinyArena(players=players, opponent_config=self.opponent_config)
+        pbar = tqdm(total=total, desc="Processing leafs", leave=False)
+        for res, leaf in zip(self.process_pool.imap(arena.run, leafs1), leafs2):
+            self.backup(leaf, res)
+            pbar.update()
+        pbar.close()
+
+    def leaf_generator(self, root, chunk_size):
+        for i in range(chunk_size):
+            yield self.tree_policy(root, 1.0)
+        return
+
+    def backup(self, leaf, score):
+        if leaf not in self.terminal_nodes:
+            self.terminal_nodes.append(leaf)
+
+        self.n += 1  # keep track of number of leafs processed
+
+        current: TunerNode = leaf
+        win = score.count((1, -1))
+        draw = score.count((0, 0))
+        lose = score.count((-1, 1))
+
         while current is not None:
+            current.remove_virtual_loss()
             current.n += 1
             current.wins += win
             current.draws += draw
             current.losses += lose
             current = current.parent
 
+
     def search(self, iterations):
         total_combinations = len(list(itertools.product(*self.parameters.options)))
-        if iterations < total_combinations:
+        if (self.n + iterations) < total_combinations:
             print(f"Warning: {iterations} iterations will not explore all possible {total_combinations} combinations.")
 
         if self.root is None:
             self.root = TunerNode(self.parameters.copy(), self.parameters.default_config.copy())
 
-        for _ in tqdm(range(iterations)):
-            root = self.root
-            leaf = self.tree_policy(root, 1.0)
-            score = self.evaluate(leaf)
-            self.backup(leaf, score)
+        chunk_size = self.checkpoint_interval
+        n_chunks = ceil(iterations / chunk_size)
+        pbar = tqdm(total=n_chunks, desc="Processing chunks")
+        processed = 0
+        steps = 0
+        while processed < iterations:
+            chunk_size = min(chunk_size, iterations - processed)
 
-            self.n += 1
-            if leaf not in self.terminal_nodes:
-                self.terminal_nodes.append(leaf)
+            # the generator yields a new leaf each time next() is called on it
+            leafs = self.leaf_generator(self.root, chunk_size)
+            # these leaves are consumed by a pool of processes. A process grabs a leaf, evaluates it
+            # and the result is then backed up the tree. Uses virtual loss so it becomes less likely
+            # for two processes to evaluate the same leaf
+            self.evaluate_and_backup(leafs, chunk_size)
+            pbar.update()
+            steps += 1
+            processed += chunk_size
+            self.write_checkpoint()
+        pbar.close()
 
-            if self.n % self.checkpoint_interval == 0:
-                self.write_checkpoint()
+        # Runs n games in each leaf node in parallel
+        # for _ in tqdm(range(iterations)):
+        #     root = self.root
+        #     leaf = self.tree_policy(root, 1.0)
+        #     score = self.evaluate(leaf)
+        #     self.backup(leaf, score)
+        #
+        #     self.n += 1
+        #
+        #     if self.n % self.checkpoint_interval == 0:
+        #         self.write_checkpoint()
 
         self.write_checkpoint()
 
@@ -338,7 +436,7 @@ class MCTSTuner:
         return current.fixed_parameters
 
 
-def create_tuner(player, params,
+def create_tuner(player: Type["Player"], parametrization: Parametrization,
                  name=None, directory=DEFAULT_DIR,
                  opponent=MCTSPlayer, opponent_config=None,
                  checkpoint_interval=100
@@ -346,7 +444,7 @@ def create_tuner(player, params,
 
     if opponent_config is None:
         opponent_config = {}
-    return MCTSTuner(player, params, opponent, opponent_config, name=name, directory=directory, checkpoint_interval=checkpoint_interval)
+    return MCTSTuner(player, parametrization, opponent, opponent_config, name=name, directory=directory, checkpoint_interval=checkpoint_interval)
 
 
 def load_tuner(name, directory=DEFAULT_DIR, run_nr=None, checkpoint=None) -> MCTSTuner:
@@ -380,25 +478,8 @@ if __name__ == "__main__":
     from bachelorarbeit.players.mcts import MCTSPlayer
     from bachelorarbeit.tools import get_range
 
-    param = Parametrization()
-    param.choice("exploration_constant", get_range(1.0, 9), default=1.0)
+    params = Parametrization()
+    params.choice("exploration_constant", get_range(1.0, 9), default=1.0)
 
-    tuner = create_tuner(MCTSPlayer, param, checkpoint_interval=20)
-    tuner.search(500)
-
-    # param = Parametrization()
-    # opponent_config = {"exploration_constant": 1.0}
-    #
-    # param.choice("exploration_constant", [0.8, 0.9, 1.0, 1.1], default=1.0)
-    # # param.xor(("alpha", [0.1, 0.5, 0.9]), ("b", [0.1, 0.01]), default=(("b", 0), ("alpha", None)))
-    # # param.boolean("keep_tree", default=False)
-    # tuner = MCTSTuner(MCTSPlayer, param, MCTSPlayer, opponent_config, name="Test")
-    # tuner.search(5)
-    # print(tuner.root.children)
-    # print(tuner.get_best_parameters())
-    #
-    # tuner.write_checkpoint()
-
-    # l = list(itertools.product(*param.options))
-    # print(len(itertools.product(*param.options)))
-    # print(l)
+    tuner = create_tuner(MCTSPlayer, params, checkpoint_interval=100)
+    tuner.search(2000)
