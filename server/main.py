@@ -8,18 +8,18 @@ import threading
 import logging
 import time
 
-from bachelorarbeit.tools import transform_board_cnn
+from bachelorarbeit.tools import transform_board_cnn, flip_board, denormalize
 import config
 
 cache_conf = {
     "CACHE_TYPE": "simple",
     "CACHE_DEFAULT_TIMEOUT": 1000,
-    "CACHE_THRESHOLD": 100_000
+    "CACHE_THRESHOLD": 1_000_000
 }
 
-BATCH_SIZE = 64
-BATCH_TIMEOUT = 0.01
-CHECK_INTERVAL = 0.001
+BATCH_SIZE = 15
+BATCH_TIMEOUT = 0.05
+CHECK_INTERVAL = 0.0001
 
 requests_queue = Queue()
 
@@ -31,12 +31,15 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 
-MODEL_PATH = config.ROOT_DIR + "/best_models/cnn_bonus_channel_aug"
+MODEL_PATH = config.ROOT_DIR + "/best_models/400000/padded_cnn_norm"
 
-# model = tf.keras.models.load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH)
+model(np.array(transform_board_cnn([0] * 42)), training=False)
 
 
 def handle_requests_by_batch():
+    start = time.time()
+    items = 0
     while True:
         requests_batch = []
         while not (len(requests_batch) > BATCH_SIZE
@@ -48,14 +51,28 @@ def handle_requests_by_batch():
             except Empty:
                 continue
 
-        batch_inputs = np.array([req["input"] for req in requests_batch])
+        items += len(requests_batch)
+        # if len(requests_batch) > BATCH_SIZE:
+        #     print("Batch full")
+        # else:
+        #     print("timeout with batch size: ", len(requests_batch))
+
+        batch_inputs = []
+        for req in requests_batch:
+            batch_inputs.append(req["input"])
+            batch_inputs.append(flip_board(req["input"]))
+
         batch_inputs = transform_board_cnn(batch_inputs)
-        # print(batch_inputs)
-        # batch_outputs = model(batch_inputs, training=False)
-        batch_outputs = [np.asarray(x).reshape((1,-1))[0] for x in batch_inputs]
-        # print(batch_outputs)
-        for req, output in zip(requests_batch, batch_outputs):
-            req["output"] = output
+        batch_outputs = model(np.array(batch_inputs), training=False).numpy()
+        batch_outputs = denormalize(batch_outputs)
+
+        for i, req in enumerate(requests_batch):
+            req["output"] = np.mean([batch_outputs[2*i], batch_outputs[2*i+1]])
+
+        if time.time() - start > 1:
+            start = time.time()
+            print(f"Requests per second: {items}")
+            items = 0
 
 
 threading.Thread(target=handle_requests_by_batch).start()
@@ -66,15 +83,12 @@ def predict():
     global stats, request_count
     data = request.json
 
-    # print(data)
-
-    key = str(data["input"][0])
+    key = tuple(data["input"])
     if cache.get(key) is not None:
-        # print("cache hit")
         return cache.get(key)
 
     req = {
-        "input": data["input"][0],
+        "input": data["input"],
         "time": time.time()
     }
     requests_queue.put(req)
@@ -82,8 +96,8 @@ def predict():
     while "output" not in req:
         time.sleep(CHECK_INTERVAL)
 
-    cache.set(key, {"predictions": req["output"].tolist()})
-    return {"predictions": req["output"].tolist()}
+    cache.set(key, {"predictions": float(req["output"])})
+    return {"predictions": float(req["output"])}
 
 
 """

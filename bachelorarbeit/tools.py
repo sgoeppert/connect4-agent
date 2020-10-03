@@ -9,7 +9,7 @@ import time
 import numbers
 
 from bachelorarbeit.selfplay import Arena, MoveEvaluation
-from bachelorarbeit.players.base_players import Player, RandomPlayer, FlatMonteCarlo
+from bachelorarbeit.players.base_players import Player, RandomPlayer
 import config
 
 
@@ -117,31 +117,6 @@ def evaluate_against_random(
     }
 
 
-def evaluate_against_flat_monte_carlo(
-        player: Type[Player],
-        constructor_args: Optional[dict] = None,
-        opponent_steps: int = 500,
-        num_games: int = 100,
-        num_processes: int = config.NUM_PROCESSES
-):
-    # print(f"Evaluation against flat Monte Carlo player({opponent_steps} steps): ", player.name, constructor_args)
-    arena = Arena(players=(player, FlatMonteCarlo), constructor_args=(constructor_args, {"max_steps": opponent_steps}),
-                  num_processes=num_processes, num_games=num_games)
-
-    results = arena.run_game_mp()
-    mean_scores = (np.mean(results, axis=0) + 1) / 2  # calculate the mean score per player as value between 0 and 1
-
-    return {
-        "title": "Eval against flat MC",
-        "num_games": num_games,
-        "player": player.name,
-        "opponent_steps": opponent_steps,
-        "configuration": constructor_args,
-        # "raw_results": results,
-        "mean": mean_scores.tolist()
-    }
-
-
 def run_move_evaluation_experiment(
         title: str,
         player: Type[Player],
@@ -237,6 +212,17 @@ def transform_board_cnn_nega(board):
         b.shape = (1,) + b.shape
     b[b == 2] = -1
     return b.reshape((-1,6,7)).tolist()
+
+
+def normalize(val):
+    return (val + 1) / 2
+
+def denormalize(val):
+    return (2 * val) - 1
+
+def flip_board(board, rows=6, cols=7):
+    return np.array(board).reshape((rows, cols))[:, ::-1].reshape(-1).tolist()
+
 
 @contextmanager
 def timer(name="Timer"):

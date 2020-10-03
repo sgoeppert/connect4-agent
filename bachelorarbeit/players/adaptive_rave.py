@@ -1,7 +1,5 @@
-from typing import List
-import random
-
 from bachelorarbeit.games import Configuration, ConnectFour
+from bachelorarbeit.players.mcts import MCTSPlayer
 from bachelorarbeit.players.rave import RavePlayer
 from bachelorarbeit.players.adaptive_playout import AdaptiveEvaluator
 
@@ -47,8 +45,8 @@ class AdaptiveRaveEvaluator(AdaptiveEvaluator):
 class AdaptiveRavePlayer(RavePlayer):
     name = "AdaptiveRavePlayer"
 
-    def __init__(self, forgetting=False, keep_replies=False, exploration_constant=0.25, *args, **kwargs):
-        super(AdaptiveRavePlayer, self).__init__(*args, exploration_constant=exploration_constant, **kwargs)
+    def __init__(self, forgetting=False, keep_replies=False, exploration_constant=0.25, **kwargs):
+        super(AdaptiveRavePlayer, self).__init__(exploration_constant=exploration_constant, **kwargs)
         self.evaluate = AdaptiveRaveEvaluator(self.move_list, forgetting, keep_replies)
 
     def reset(self, conf: Configuration = None):
@@ -57,17 +55,21 @@ class AdaptiveRavePlayer(RavePlayer):
 
 
 if __name__ == "__main__":
-    from bachelorarbeit.games import Observation, Configuration, ConnectFour
-    from bachelorarbeit.tools import timer
+    from bachelorarbeit.selfplay import Arena
 
-    steps = 50000
-    pl = AdaptiveRavePlayer(max_steps=steps, exploration_constant=0.85)
-    conf = Configuration()
-    game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
-    obs = Observation(board=game.board.copy(), mark=game.mark)
+    rave_steps = 100
+    regular_steps = 1000
 
-    with timer(f"{steps} steps"):
-        m = pl.get_move(obs, conf)
-        print(m)
-
-    # print(pl.replies)
+    arena = Arena(players=(AdaptiveRavePlayer, MCTSPlayer),
+                  constructor_args=(
+                      {
+                          "max_steps": rave_steps,
+                          "exploration_constant": 0.3,
+                          "k": 100,
+                          "keep_replies": True
+                      },
+                      {"max_steps": regular_steps, "exploration_constant": 1.0}),
+                  num_games=400,
+                  num_processes=8
+                  )
+    arena.run_game_mp(show_progress_bar=True)

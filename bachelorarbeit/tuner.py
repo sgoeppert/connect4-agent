@@ -19,6 +19,11 @@ from bachelorarbeit.players.mcts import MCTSPlayer
 DEFAULT_DIR = "MCTSTuner"
 VIRTUAL_LOSS = 4
 
+
+def get_timestamp():
+    return datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+
+
 class TinyArena:
     def __init__(
             self,
@@ -66,10 +71,15 @@ class TinyArena:
         results.append(self.run_game()[::-1])
         return results
 
+
 class Parametrization:
     def __init__(self):
         self.options = []
         self.default_config = {}
+
+    def add_default_option(self, name, value):
+        self._check_key(name)
+        self.default_config[name] = value
 
     def pop_option(self) -> List:
         return list(self.options.pop(0))
@@ -184,7 +194,11 @@ class TunerNode:
 
 class MCTSTuner:
     def __init__(self, player: Type[Player], parameters: Parametrization, opponent: Type[Player], opponent_config: dict,
-                 name: str = None, directory: str = DEFAULT_DIR, checkpoint_interval=100):
+                 name: str = None, directory: str = DEFAULT_DIR, checkpoint_interval: int = 100, exploration: float = 1.0):
+
+        if len(parameters) == 0:
+            raise ValueError("Parametrization has no options. Supply add least one tunable option with .choice(), "
+                             ".boolean() or .xor()")
 
         self.player = player
         self.parameters = parameters
@@ -192,6 +206,7 @@ class MCTSTuner:
         self.opponent_config = opponent_config
 
         self.root = None
+        self.exploration = exploration
 
         self.checkpoint_interval = checkpoint_interval
         self.name = self.player.name if name is None else name
@@ -216,7 +231,7 @@ class MCTSTuner:
                 "q": n.q(),
                 "n": n.n
             })
-        return statistics
+        return sorted(statistics, key=lambda d: -d["q"])
 
     def _load_meta(self):
         meta_file_path = self.project_dir / "meta.json"
@@ -256,7 +271,7 @@ class MCTSTuner:
         return meta["run_nr"] + 1
 
     def _update_meta(self):
-        timestamp: str = datetime.now().strftime("%Y%m%d-%H%M%S")
+        timestamp: str = get_timestamp()
         meta_file_path = self.project_dir / "meta.json"
 
         meta = self._load_meta()
@@ -284,7 +299,7 @@ class MCTSTuner:
         self._write_meta(meta, meta_file_path)
 
     def _update_checkpoint_meta(self, run_dir):
-        timestamp: str = datetime.now().strftime("%Y%m%d-%H%M%S")
+        timestamp: str = get_timestamp()
         cp_meta = self._load_checkpoint_meta(run_dir)
         # else get next cp number from cp.json
         self.checkpoint_number = cp_meta["cp_num"] + 1
@@ -345,23 +360,23 @@ class MCTSTuner:
 
         return results
 
-    def evaluate_and_backup(self, leafs, total):
+    def evaluate_and_backup(self, leaves, total):
         if self.process_pool is None:
-            self.process_pool = multiprocessing.Pool(config.NUM_PROCESSES, maxtasksperchild=100)
+            self.process_pool = multiprocessing.Pool(config.NUM_PROCESSES, maxtasksperchild=10)
 
-        leafs1, leafs2 = itertools.tee(leafs)
+        leaves1, leaves2 = itertools.tee(leaves)
 
         players = (self.player, self.opponent)
         arena = TinyArena(players=players, opponent_config=self.opponent_config)
-        pbar = tqdm(total=total, desc="Processing leafs", leave=False)
-        for res, leaf in zip(self.process_pool.imap(arena.run, leafs1), leafs2):
+        pbar = tqdm(total=total, desc="Processing leaves", leave=False)
+        for res, leaf in zip(self.process_pool.imap(arena.run, leaves1), leaves2):
             self.backup(leaf, res)
             pbar.update()
         pbar.close()
 
     def leaf_generator(self, root, chunk_size):
         for i in range(chunk_size):
-            yield self.tree_policy(root, 1.0)
+            yield self.tree_policy(root, self.exploration)
         return
 
     def backup(self, leaf, score):
@@ -383,7 +398,6 @@ class MCTSTuner:
             current.losses += lose
             current = current.parent
 
-
     def search(self, iterations):
         total_combinations = len(list(itertools.product(*self.parameters.options)))
         if (self.n + iterations) < total_combinations:
@@ -401,11 +415,11 @@ class MCTSTuner:
             chunk_size = min(chunk_size, iterations - processed)
 
             # the generator yields a new leaf each time next() is called on it
-            leafs = self.leaf_generator(self.root, chunk_size)
+            leaves = self.leaf_generator(self.root, chunk_size)
             # these leaves are consumed by a pool of processes. A process grabs a leaf, evaluates it
             # and the result is then backed up the tree. Uses virtual loss so it becomes less likely
             # for two processes to evaluate the same leaf
-            self.evaluate_and_backup(leafs, chunk_size)
+            self.evaluate_and_backup(leaves, chunk_size)
             pbar.update()
             steps += 1
             processed += chunk_size
@@ -439,12 +453,17 @@ class MCTSTuner:
 def create_tuner(player: Type["Player"], parametrization: Parametrization,
                  name=None, directory=DEFAULT_DIR,
                  opponent=MCTSPlayer, opponent_config=None,
-                 checkpoint_interval=100
+                 checkpoint_interval=100,
+                 exploration: float = 1.0
                  ) -> MCTSTuner:
 
     if opponent_config is None:
         opponent_config = {}
-    return MCTSTuner(player, parametrization, opponent, opponent_config, name=name, directory=directory, checkpoint_interval=checkpoint_interval)
+    return MCTSTuner(player, parametrization,
+                     opponent, opponent_config,
+                     name=name, directory=directory,
+                     checkpoint_interval=checkpoint_interval,
+                     exploration=exploration)
 
 
 def load_tuner(name, directory=DEFAULT_DIR, run_nr=None, checkpoint=None) -> MCTSTuner:
@@ -470,7 +489,8 @@ def load_tuner(name, directory=DEFAULT_DIR, run_nr=None, checkpoint=None) -> MCT
     cp_dir = run_dir / "checkpoint_{}".format(checkpoint)
     tuner_file = cp_dir / "tuner.dat"
     with open(tuner_file, "rb") as f:
-        tuner = pickle.load(f)
+        tuner: MCTSTuner = pickle.load(f)
+    tuner.name = name
 
     return tuner
 

@@ -60,6 +60,7 @@ class AdaptiveEvaluator(Evaluator):
         if not self.keep_replies:
             self.replies = {}
 
+
 class AdaptivePlayoutPlayer(MCTSPlayer):
     name = "AdaptivePlayoutPlayer"
 

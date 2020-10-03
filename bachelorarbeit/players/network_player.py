@@ -1,12 +1,32 @@
-import random
 import numpy as np
 
 from bachelorarbeit.games import ConnectFour
 from bachelorarbeit.players.mcts import MCTSPlayer, Evaluator
+from bachelorarbeit.tools import flip_board, transform_board_cnn, denormalize
+from requests import Session
+import config
+
+DEBUG = False
+
+
+class RequestEvaluator(Evaluator):
+    def __init__(self, alpha=0.9):
+        self.session = Session()
+        self.alpha = alpha
+
+    def __call__(self, game_state: ConnectFour):
+        payload = {"input": game_state.board[:]}
+        resp = self.session.post('http://127.0.0.1:5000/predict', json=payload)
+        pred = resp.json()["predictions"]
+        playout_reward = super().__call__(game_state)
+        score = self.alpha * pred + (1 - self.alpha) * playout_reward
+
+        return score
 
 
 class NNEvaluator(Evaluator):
-    def __init__(self, model_path, transform_input, transform_output=None):
+    def __init__(self, model_path, transform_input, transform_output=None, alpha=0.9):
+        # lazy load tensorflow so it is imported separately in each running process with memory growth enabled
         import os
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
         import tensorflow as tf
@@ -19,36 +39,35 @@ class NNEvaluator(Evaluator):
             pass
 
         self.model = keras.models.load_model(model_path, compile=False)
-        self.model(np.array([transform_input([0]*42)]))
+        self.model(np.array(transform_input([0] * 42)),
+                   training=False)  # run one prediction to initialize the network graph
         self.transform_input_func = transform_input
         self.transform_output_func = transform_output
+        self.alpha = alpha
 
-    def __call__(self, game_state: ConnectFour):
-        playout_reward = super().__call__(game_state)
-        # nn_prediction = self.model.predict(np.array([game_state.board]))
-        # b = np.array(game_state.board).reshape((game_state.rows, game_state.cols))
-        # flip_b = np.fliplr(b)
-        # transformed = np.array([self.transform_input(b.tolist()), self.transform_input(flip_b.tolist())])
-        transformed = np.array([self.transform_input_func(game_state.board)])
+    def _get_prediction(self, game_state: ConnectFour):
+        boards = [game_state.board, flip_board(game_state.board)]
+        transformed = np.array(self.transform_input_func(boards))
         nn_prediction = self.model(transformed, training=False)
+
         if self.transform_output_func is not None:
             nn_prediction = self.transform_output_func(nn_prediction)
 
         pred = np.mean(nn_prediction)
+        return pred
 
-        def _weight(x):
-            return (-3*x**2+124*x+160)/1600
+    def __call__(self, game_state: ConnectFour):
+        playout_reward = super().__call__(game_state)
+        pred = self._get_prediction(game_state)
 
-        stones_played = sum(game_state.stones_per_column)
-        # weight = 0.1 + (stones_played / 41)
-        weight = _weight(stones_played)
+        weight = self.alpha
 
-        score = weight * pred + (1-weight) * playout_reward
-        # print("Eval for board", np.array(game_state.board).reshape((game_state.rows, game_state.cols)), sep="\n")
-        # # print("Transformed", transformed)
-        # print("Current player", game_state.get_current_player())
-        # print("Pred, playout, weight, stones", pred, playout_reward, weight, stones_played)
-        # print("Calculated reward", score)
+        score = weight * pred + (1 - weight) * playout_reward
+        if DEBUG:
+            print("Eval for board", np.array(game_state.board).reshape((game_state.rows, game_state.cols)), sep="\n")
+            print("Current player", game_state.get_current_player())
+            print("Pred, playout, weight", pred, playout_reward, weight)
+            print("Calculated reward", score)
 
         return score
 
@@ -58,13 +77,23 @@ class NetworkPlayer(MCTSPlayer):
 
     def __init__(
             self,
-            model_path: str,
-            transform_func: callable,
-            transform_output: callable = None,
+            network_weight: float = 0.5,
+            model_path: str = config.DEFAULT_MODEL,
+            transform_func: callable = transform_board_cnn,
+            transform_output: callable = denormalize,
+            use_server: bool = False,
             **kwargs
     ):
         super(NetworkPlayer, self).__init__(**kwargs)
-        self.evaluate = NNEvaluator(model_path=model_path, transform_input=transform_func, transform_output=transform_output)
+
+        if use_server:
+            self.evaluate = RequestEvaluator(alpha=network_weight)
+        else:
+            self.evaluate = NNEvaluator(model_path=model_path,
+                                        transform_input=transform_func,
+                                        transform_output=transform_output,
+                                        alpha=network_weight)
+
 
 
 if __name__ == "__main__":
@@ -75,9 +104,9 @@ if __name__ == "__main__":
     steps = 100
 
     # from tensorflow import keras
-    model_path = config.ROOT_DIR + "/best_models/cnn_bonus_channel_aug"
+    model_path = config.ROOT_DIR + "/best_models/400000/padded_cnn_norm"
 
-    play = NetworkPlayer(model_path=model_path, transform_func=transform_board_cnn, max_steps=300)
+    play = NetworkPlayer(model_path=model_path, transform_func=transform_board_cnn, max_steps=steps)
     g = ConnectFour()
     obs = Observation(board=g.board[:], mark=g.mark)
     conf = Configuration()
@@ -85,39 +114,3 @@ if __name__ == "__main__":
     with timer():
         m = play.get_move(obs, conf)
         print(m)
-
-
-    #
-    # model = keras.models.load_model(config.ROOT_DIR + "/best_models/cnn_bonus_channel_aug")
-    #
-    # g = ConnectFour()
-    # g.play_move(3)
-    #
-    # with timer("Setup"):
-    #     evaluate = NNEvaluator(model_path=model_path, transform_input=transform_board_cnn)
-    # print("Setup done")
-    # with timer("Eval"):
-    #     evaluate(g)
-
-    # b = np.array([transform_board_cnn(g.board)])
-    # repeats = 100
-    # model.predict(np.zeros_like(b))
-    # model(np.zeros_like(b),training=False)
-    #
-    # with timer(f"model.__call__"):
-    #     for i in range(repeats):
-    #         print(model(b, training=False))
-    #
-    # with timer(f"model.predict"):
-    #     for i in range(repeats):
-    #         print(model.predict(b))
-
-
-    # p = NetworkPlayer(max_steps=steps, predictor=predictor)
-    # conf = Configuration()
-    # game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
-    # obs = Observation(board=game.board.copy(), mark=game.mark)
-    #
-    # with timer(f"{steps} steps"):
-    #     m = p.get_move(obs, conf)
-    # print(m)
