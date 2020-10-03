@@ -68,6 +68,7 @@ class Player(ABC):
 
 \subsection{Vergleichsalgorithmen}
 \label{chap:vergleiche-impl}
+\info[inline]{Vergleichsalgorithmen können raus}
 
 Die Agenten werden mit einer Reihe verschiedener Algorithmen verglichen.
 Der einfachste Vergleich ist gegen einen rein zufälligen Spieler \verb|RandomPlayer|.
@@ -92,59 +93,12 @@ Am Ende wird die Aktion gewählt, die die höchste durchschnittliche Bewertung h
 
 Eine stärkere Variante dieses Spielers wählt die Kindknoten nicht zufällig sondern mit der UCB-Formel (Gleichung~\ref{eqn:UCB1}) aus.
 
-\begin{lstlisting}[language=Python,caption=Flache Monte Carlo Suche.,label={lst:flat-mc}]
-class FlatMonteCarlo(Player):
-    name = "FlatMonteCarloPlayer"
-
-    def __init__(self,
-                 max_steps: int = 1000,
-                 exploration_constant: float = 0.8,
-                 ucb_selection: bool = True,
-                 **kwargs):
-
-        super(FlatMonteCarlo, self).__init__(**kwargs)
-        self.max_steps = max_steps
-        self.ucb_selection = ucb_selection
-        self.c_p = exploration_constant
-
-\end{lstlisting}
 
 Der Flat Monte Carlo Spieler kann durch den Parameter \verb|max_steps| und, wenn die UCB-Kindauswahl benutzt wird, zusätzlich mit dem Parameter \verb|exploration_constant| konfiguriert werden.
 
 Die \texttt{get\_move} Methode simuliert \verb|max_steps| Spiele und wählt den ersten Zug vor der Simulation zufällig oder nach der UCB-Regel.
 Der Ergebnis dieser Simulation, aus der Sicht des Agenten, fließt in die durchschnittliche Bewertung $Q(a)$ ein.
 
-\begin{lstlisting}[language=Python]
-    def get_move(self,
-                 observation: Observation,
-                 configuration: Configuration) -> int:
-
-        game = ConnectFour(board=observation.board,
-                           rows=configuration.rows,
-                           columns=configuration.columns,
-                           inarow=configuration.inarow,
-                           mark=observation.mark)
-
-        n = defaultdict(int)
-        q = defaultdict(float)
-        scoring_player = game.get_current_player()
-
-        def ucb(m, N=1):
-            return q[m] + self.c_p * math.sqrt(math.log(N) / max(1,n[m]))
-
-        for i in range(1, self.max_steps+1):
-            if self.ucb_selection:
-                a = max(game.list_moves(), key=lambda m: ucb(m, i))
-            else:
-                a = random.choice(game.list_moves())
-
-            end_state = simulate_game(game.copy().play_move(a))
-            r = end_state.get_reward(scoring_player)
-            n[a] += 1
-            q[a] += (r - q[a])/n[a]
-
-        return max(n.keys(), key=lambda m: ucb(m))
-\end{lstlisting}
 
 Die Spiele werden von der Funktion \verb|simulate_game(ConnectFour)| simuliert.
 Sie spielt so lange zufällige Spielzüge, bis ein terminaler Zustand erreicht ist.
@@ -429,120 +383,12 @@ class TranspositionPlayer(MCTSPlayer):
 \end{lstlisting}
 
 \subsection{Score Bounded MCTS}
-
+\info[inline]{Ersetzen durch Adaptive Playouts}
 Die Hauptveränderungen für die Score Bounded MCTS liegt in den zusätzlichen pessimistischen und optimistischen Grenzen \verb|pess| und \verb|opti| in den Knoten.
 In der Methode \verb|best_child| werden diese Grenzen benutzt, um gemäß dem in Kapitel~\ref{chap:scorebounded} beschriebenen Regeln nur die Kindknoten zu besuchen, die das Ergebnis verbessern können.\improvement{Der Code muss in mehrere Blöcke aufgeteilt und gekürzt werden.}
 Zusätzlich kann mit den Parametern \verb|cut_delta| und \verb|cut_gamma| die Auswahl der Kinder gelenkt werden.
 
-\begin{lstlisting}[language=Python,label={lst:scorebounded-node}]
-class ScoreboundedNode(Node):
-    def __init__(self, cut_delta: float = 0.0, cut_gamma: float = 0.0, *args, **kwargs):
-        super(ScoreboundedNode, self).__init__(*args, **kwargs)
-        self.pess = -1
-        self.opti = 1
-        self.cut_delta = cut_delta
-        self.cut_gamma = cut_gamma
-
-        if self.parent:
-            self.is_max_node = not self.parent.is_max_node
-        else:
-            self.is_max_node = True
-
-    def best_child(self, exploration_constant: float = 1.0) -> "ScoreboundedNode":
-        n_p = math.log(self.number_visits)
-        parent = self
-        gamma = self.cut_gamma
-        delta = self.cut_delta
-
-        def score_func(c):
-            if parent.is_max_node:
-                return c.Q() + gamma * c.pess + delta * c.opti
-            else:
-                return c.Q() - delta * c.pess - gamma * c.opti
-
-        children = list(self.children.values())
-        # Entferne Kindknoten die das Ergebnis nicht verbessern koennen
-        for c in children:
-            if len(children) > 1:
-                if self.is_max_node and c.opti <= self.pess:
-                    children.remove(c)
-                elif not self.is_max_node and c.pess >= self.opti:
-                    children.remove(c)
-
-        c = max(children, key=lambda c: score_func(c) + exploration_constant * math.sqrt(n_p / c.number_visits))
-        return c
-
-    def min_pess_child(self):
-        c_pess = [c.pess for c in self.children.values()]
-        if not self.is_expanded():
-            c_pess.append(-1)
-
-        return min(c_pess)
-
-    def max_opti_child(self):
-        c_opti = [c.opti for c in self.children.values()]
-        if not self.is_expanded():
-            c_opti.append(1)
-
-        return max(c_opti)
-\end{lstlisting}
-
 Der \verb|ScoreBoundedPlayer| implementiert die Algorithmen zur Aktualisierung der Grenzen (siehe Algorithmus~\ref{algo:prop-scorebound} auf Seite~\pageref{algo:prop-scorebound}).
-
-\begin{lstlisting}[language=Python,label={lst:scorebounded-player}]
-class ScoreboundedPlayer(MCTSPlayer):
-    name = "ScoreboundedPlayer"
-
-    def __init__(self,
-                 cut_delta: float = 0.0,
-                 cut_gamma: float = 0.0,
-                 *args, **kwargs):
-        super(ScoreboundedPlayer, self).__init__(*args, **kwargs)
-        self.cut_delta = cut_delta
-        self.cut_gamma = cut_gamma
-
-    def prop_pess(self, s: ScoreboundedNode):
-        if s.parent:
-            n = s.parent
-            old_pess = n.pess
-            if old_pess < s.pess:
-                if n.is_max_node:
-                    n.pess = s.pess
-                    self.prop_pess(n)
-                else:
-                    n.pess = n.min_pess_child()
-                    if old_pess > n.pess:
-                        self.prop_pess(n)
-
-    def prop_opti(self, s: ScoreboundedNode):
-        if s.parent:
-            n = s.parent
-            old_opti = n.opti
-            if old_opti > s.opti:
-                if n.is_max_node:
-                    n.opti = n.max_opti_child()
-                    if old_opti > n.opti:
-                        self.prop_opti(n)
-                else:
-                    n.opti = s.opti
-                    self.prop_opti(n)
-
-    def backup(self, node: ScoreboundedNode, reward: float):
-        if node.game_state.is_terminal():
-            bound_score = -reward if node.is_max_node else reward
-            node.opti = bound_score
-            node.pess = bound_score
-
-            self.prop_pess(node)
-            self.prop_opti(node)
-
-        current = node
-        while current is not None:
-            current.increment_visit_and_add_reward(reward)
-            reward = -reward
-
-            current = current.parent
-\end{lstlisting}
 
 
 \subsection{RAVE MCTS}

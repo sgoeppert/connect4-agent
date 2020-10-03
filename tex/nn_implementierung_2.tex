@@ -79,6 +79,7 @@ Ein NNEvaluator führt weiterhin die zufällige Simulation des Zustandes aus, l�
 Der Durchschnitt der Vorhersagen des Netzwerks wird mit einem Gewichtungsfaktor $\alpha$ mit dem Ergebnis der Simulation kombiniert.
 Das Ergebnis der Evaluation ist dann \texttt{prediction * alpha + (1 - alpha) * simulation}.
 
+\info[inline]{Virtual Loss kann raus, wird doch nicht benutzt. Eher was für den Ausblick - Parallelisierung generell was für Ausblick.}
 Da die sequenzielle Verarbeitung von Spielzuständen durch das Netzwerk sehr langsam ist, kann die Baumsuche parallelisiert werden, um die Grafikkarte besser auszureizen.
 Die möglichen Arten der Parallelisierung sind die Wurzel-Parallelisierung, bei der jeder Prozess oder Thread eine eigene Kopie des Baumes erstellt, welche in regelmäßigen Abständen zusammengefügt werden, und die Baum-Parallelisierung, bei der sich die Prozesse den Baum teilen.
 \info{Grafik der Parallelisierungen, Quelle Parallelisierung}
