@@ -29,8 +29,8 @@ class RaveNode(Node):
         self.rave_score: float = 0
         self.rave_children: Dict[int, "RaveNode"] = {}
 
-    def beta(self, b: float = 0.0) -> float:
-        return self.rave_count / (self.rave_count + self.number_visits + self.rave_count * self.number_visits * b * b)
+    def beta(self, k: int = 1) -> float:
+        return math.sqrt(k / (3 * self.number_visits + k))
 
     def QRave(self) -> float:
         return self.rave_score
@@ -38,14 +38,14 @@ class RaveNode(Node):
     def exploration(self, parent_visits):
         return math.sqrt(parent_visits / self.number_visits)
 
-    def best_child(self, C_p: float = 1.0, b: float = 0.0, alpha: float = None) -> Tuple["RaveNode", int]:
+    def best_child(self, C_p: float = 1.0, k: int = 1, alpha: float = None) -> Tuple["RaveNode", int]:
         n_p = math.log(self.number_visits)
 
         def UCT_Rave(child: RaveNode):
             if alpha is not None:
                 beta = alpha
             else:
-                beta = child.beta(b)
+                beta = child.beta(k)
             return (1 - beta) * child.Q() + beta * child.QRave() \
                    + C_p * math.sqrt(n_p / child.number_visits)
 
@@ -79,11 +79,11 @@ class RaveNode(Node):
 class RavePlayer(MCTSPlayer):
     name = "RavePlayer"
 
-    def __init__(self, b: float = 0.0, alpha: float = None, *args, **kwargs):
+    def __init__(self, k: int = 100, alpha: float = None, *args, **kwargs):
         super(RavePlayer, self).__init__(*args, **kwargs)
         self.move_list = []
         self.evaluate = RaveEvaluator(self.move_list)
-        self.b = b
+        self.k = k
         self.alpha = alpha
 
     def tree_policy(self, root: "RaveNode") -> "RaveNode":
@@ -91,7 +91,7 @@ class RavePlayer(MCTSPlayer):
 
         while not current.game_state.is_terminal():
             if current.is_expanded():
-                current, m = current.best_child(self.exploration_constant, b=self.b, alpha=self.alpha)
+                current, m = current.best_child(self.exploration_constant, k=self.k, alpha=self.alpha)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
                 self.move_list.append(current.game_state.get_move_name(m, played=True))
             else:
@@ -128,7 +128,7 @@ class RavePlayer(MCTSPlayer):
         return RaveNode(game_state=root_game)
 
     def best_move(self, node: RaveNode) -> int:
-        n, move = node.best_child(C_p=0, b=self.b, alpha=self.alpha)
+        n, move = node.best_child(C_p=0, k=self.k, alpha=self.alpha)
         return move
 
 
@@ -136,8 +136,8 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 50000
-    pl = RavePlayer(max_steps=steps, exploration_constant=0.5, b=0.0)
+    steps = 3000
+    pl = RavePlayer(max_steps=steps, exploration_constant=0.5, k=100)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
