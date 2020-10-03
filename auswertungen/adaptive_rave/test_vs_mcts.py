@@ -3,9 +3,9 @@ from bachelorarbeit.players.adaptive_rave import AdaptiveRavePlayer
 from bachelorarbeit.tools import run_selfplay_experiment, dump_json
 
 TITLE = "AdaptiveRave vs MCTS"
-NUM_GAMES = 500
+NUM_GAMES = 100
 NUM_PROCESSES = 7
-MAX_STEPS = 1000
+MAX_STEPS = 500
 
 if __name__ == "__main__":
     res = run_selfplay_experiment(
