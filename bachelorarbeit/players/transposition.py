@@ -4,6 +4,7 @@ import math
 from collections import defaultdict
 
 from bachelorarbeit.players.mcts import Node, MCTSPlayer
+from bachelorarbeit.tools import flip_board
 
 
 class TranspositionNode(Node):
@@ -16,11 +17,12 @@ class TranspositionNode(Node):
         self.UCT3_val = 0
         self.sim_reward = 0
 
-    def find_child_action(self, child):
+    def find_child_actions(self, child):
+        actions = []
         for m, _c in self.children.items():
             if _c == child:
-                return m
-        return None
+                actions.append(m)
+        return actions
 
     def Qsa(self, move):
         return self.child_values[move]
@@ -63,13 +65,8 @@ class TranspositionNode(Node):
             self.expanded = True
 
         next_state = self.game_state.copy().play_move(move)
-
         # Und prüfe ob er bereits in der Transpositionstabelle enthalten ist
-        hash_state = hash(next_state)
-        if hash_state not in player.transpositions:
-            # Wenn nicht wird ein neuer Knoten hinzugefügt
-            player.transpositions[hash_state] = TranspositionNode(game_state=next_state)
-        next_node = player.transpositions[hash_state]
+        next_node = player.get_or_store_transposition(next_state)
         self.add_child(next_node, move)
 
         return next_node
@@ -121,15 +118,36 @@ class TranspositionNode(Node):
 
 
 class TranspositionPlayer(MCTSPlayer):
-    name = "Transpositionplayer"
+    name = "TranspositionPlayer"
 
-    def __init__(self, uct_method: str = "UCT", **kwargs):
+    def __init__(self, uct_method: str = "UCT", with_symmetry: bool = False, **kwargs):
         super(TranspositionPlayer, self).__init__(**kwargs)
         self.transpositions = {}
         self.uct_method = uct_method
+        self.with_symmetry = with_symmetry
 
     def __repr__(self) -> str:
         return self.name
+
+    def get_or_store_transposition(self, state):
+        hsh = hash(state)
+        flipped_hash = 0
+
+        if hsh in self.transpositions:
+            return self.transpositions[hsh]
+
+        if self.with_symmetry:
+            flipped = flip_board(state.board)
+            flipped_hash = hash(tuple(flipped))
+            if flipped_hash in self.transpositions:
+                return self.transpositions[flipped_hash]
+
+        tp_node = TranspositionNode(game_state=state)
+        self.transpositions[hsh] = tp_node
+        if self.with_symmetry:
+            self.transpositions[flipped_hash] = tp_node
+
+        return tp_node
 
     def reset(self, *args, **kwargs):
         super(TranspositionPlayer, self).reset(*args, **kwargs)
@@ -161,9 +179,10 @@ class TranspositionPlayer(MCTSPlayer):
             _node.average_value += (reward - _node.average_value) / _node.number_visits
 
             if prev is not None:
-                m = _node.find_child_action(prev)
-                _node.child_visits[m] += 1
-                _node.child_values[m] += (-reward - _node.child_values[m]) / _node.child_visits[m]
+                ms = _node.find_child_actions(prev)
+                for m in ms:
+                    _node.child_visits[m] += 1
+                    _node.child_values[m] += (-reward - _node.child_values[m]) / _node.child_visits[m]
 
             if self.uct_method == "UCT3":
                 nodes_to_update.add(_node)
@@ -192,11 +211,12 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 50000
+    steps = 50
     conf = Configuration()
-    p = TranspositionPlayer(max_steps=steps, uct_method="UCT3", keep_tree=True, exploration_constant=0.707)
+    p = TranspositionPlayer(max_steps=steps, uct_method="UCT2", exploration_constant=3.0, with_symmetry=True)
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
 
     with timer(f"{steps} steps"):
         m = p.get_move(obs, conf)
+        print(m)
