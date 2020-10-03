@@ -257,7 +257,8 @@ class MCTSTuner:
         return {
             "cp_num": -1,
             "last_cp": {},
-            "checkpoints": []
+            "checkpoints": [],
+            "opponent": {}
         }
 
     def _write_checkpoint_meta(self, meta_dict: dict, run_dir):
@@ -311,6 +312,7 @@ class MCTSTuner:
         cp_meta["last_cp"] = cp_data
         cp_meta["cp_num"] = self.checkpoint_number
         cp_meta["checkpoints"].append(cp_data)
+        cp_meta["opponent"] = self.opponent_config
         self._write_checkpoint_meta(cp_meta, run_dir)
 
     def _write_checkpoint_data(self, run_dir):
@@ -498,8 +500,9 @@ if __name__ == "__main__":
     from bachelorarbeit.players.mcts import MCTSPlayer
     from bachelorarbeit.tools import get_range
 
-    params = Parametrization()
-    params.choice("exploration_constant", get_range(1.0, 9), default=1.0)
+    # params = Parametrization()
+    # params.choice("exploration_constant", get_range(1.0, 9), default=1.0)
 
-    tuner = create_tuner(MCTSPlayer, params, checkpoint_interval=100)
-    tuner.search(2000)
+    # tuner = create_tuner(MCTSPlayer, params, checkpoint_interval=1, opponent_config={"max_steps": 10})
+    tuner = load_tuner("MCTSPlayer")
+    tuner.search(10)
