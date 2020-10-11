@@ -1,0 +1,270 @@
+[
+  {
+    "title": "Random",
+    "player": "RandomPlayer",
+    "configuration": null,
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.258,
+    "good_pct": 0.6782,
+    "perfect_std": 0.01067707825203132,
+    "good_std": 0.00872696969170855,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        0.26,
+        0.266,
+        0.263,
+        0.264,
+        0.237
+      ],
+      "good": [
+        0.69,
+        0.681,
+        0.682,
+        0.674,
+        0.664
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 20
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.3889,
+    "good_pct": 0.751,
+    "perfect_std": 0.017242099640125044,
+    "good_std": 0.007211102550927985,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.398,
+        0.378,
+        0.4,
+        0.375,
+        0.405,
+        0.372,
+        0.365,
+        0.388,
+        0.425,
+        0.383
+      ],
+      "good": [
+        0.754,
+        0.748,
+        0.765,
+        0.749,
+        0.751,
+        0.755,
+        0.751,
+        0.742,
+        0.757,
+        0.738
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 50
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.488,
+    "good_pct": 0.8081,
+    "perfect_std": 0.012049896265113656,
+    "good_std": 0.008055432949258496,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.487,
+        0.51,
+        0.497,
+        0.481,
+        0.467,
+        0.485,
+        0.489,
+        0.497,
+        0.495,
+        0.472
+      ],
+      "good": [
+        0.82,
+        0.819,
+        0.809,
+        0.816,
+        0.797,
+        0.806,
+        0.808,
+        0.808,
+        0.803,
+        0.795
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 100
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.5805,
+    "good_pct": 0.8522,
+    "perfect_std": 0.00976985158536199,
+    "good_std": 0.007743384273042382,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.58,
+        0.584,
+        0.568,
+        0.581,
+        0.569,
+        0.603,
+        0.583,
+        0.572,
+        0.588,
+        0.577
+      ],
+      "good": [
+        0.857,
+        0.858,
+        0.848,
+        0.863,
+        0.843,
+        0.857,
+        0.862,
+        0.84,
+        0.848,
+        0.846
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 200
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6496,
+    "good_pct": 0.885,
+    "perfect_std": 0.014228141129465941,
+    "good_std": 0.008366600265340762,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.646,
+        0.662,
+        0.669,
+        0.644,
+        0.623,
+        0.635,
+        0.659,
+        0.642,
+        0.647,
+        0.669
+      ],
+      "good": [
+        0.886,
+        0.878,
+        0.892,
+        0.881,
+        0.867,
+        0.885,
+        0.893,
+        0.884,
+        0.885,
+        0.899
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 400
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6843,
+    "good_pct": 0.8953,
+    "perfect_std": 0.007707788269017226,
+    "good_std": 0.008614522621712717,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.684,
+        0.682,
+        0.673,
+        0.676,
+        0.684,
+        0.69,
+        0.682,
+        0.686,
+        0.683,
+        0.703
+      ],
+      "good": [
+        0.885,
+        0.894,
+        0.889,
+        0.881,
+        0.897,
+        0.894,
+        0.911,
+        0.905,
+        0.902,
+        0.895
+      ]
+    }
+  },
+  {
+    "title": "MCTS player",
+    "player": "MCTSPlayer",
+    "configuration": {
+      "max_steps": 800
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.711,
+    "good_pct": 0.9123,
+    "perfect_std": 0.007602631123499292,
+    "good_std": 0.004960846701924989,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.708,
+        0.714,
+        0.723,
+        0.701,
+        0.713,
+        0.713,
+        0.696,
+        0.71,
+        0.712,
+        0.72
+      ],
+      "good": [
+        0.919,
+        0.915,
+        0.914,
+        0.904,
+        0.915,
+        0.913,
+        0.907,
+        0.913,
+        0.905,
+        0.918
+      ]
+    }
+  }
+]

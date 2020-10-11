@@ -1,0 +1,260 @@
+[
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 20
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.4549,
+    "good_pct": 0.7867,
+    "perfect_std": 0.008431488599292531,
+    "good_std": 0.012000416659433131,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.455,
+        0.453,
+        0.442,
+        0.447,
+        0.456,
+        0.461,
+        0.464,
+        0.455,
+        0.445,
+        0.471
+      ],
+      "good": [
+        0.802,
+        0.776,
+        0.765,
+        0.789,
+        0.789,
+        0.792,
+        0.806,
+        0.777,
+        0.778,
+        0.793
+      ]
+    }
+  },
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 50
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.5827,
+    "good_pct": 0.8581,
+    "perfect_std": 0.010119782606360681,
+    "good_std": 0.009822932352408834,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.581,
+        0.57,
+        0.581,
+        0.596,
+        0.592,
+        0.576,
+        0.568,
+        0.597,
+        0.591,
+        0.575
+      ],
+      "good": [
+        0.859,
+        0.854,
+        0.856,
+        0.877,
+        0.862,
+        0.861,
+        0.856,
+        0.863,
+        0.858,
+        0.835
+      ]
+    }
+  },
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 100
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6654,
+    "good_pct": 0.8895,
+    "perfect_std": 0.008957678270623486,
+    "good_std": 0.007697402159170335,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.666,
+        0.684,
+        0.668,
+        0.657,
+        0.651,
+        0.668,
+        0.66,
+        0.676,
+        0.662,
+        0.662
+      ],
+      "good": [
+        0.888,
+        0.893,
+        0.888,
+        0.877,
+        0.878,
+        0.894,
+        0.883,
+        0.9,
+        0.898,
+        0.896
+      ]
+    }
+  },
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 200
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7043,
+    "good_pct": 0.9061,
+    "perfect_std": 0.0050606323715520025,
+    "good_std": 0.0035623026261113783,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.697,
+        0.702,
+        0.706,
+        0.706,
+        0.716,
+        0.701,
+        0.705,
+        0.708,
+        0.703,
+        0.699
+      ],
+      "good": [
+        0.906,
+        0.903,
+        0.907,
+        0.903,
+        0.913,
+        0.908,
+        0.905,
+        0.904,
+        0.911,
+        0.901
+      ]
+    }
+  },
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 400
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7247,
+    "good_pct": 0.9201,
+    "perfect_std": 0.00880965379569482,
+    "good_std": 0.004158124577258362,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.733,
+        0.734,
+        0.719,
+        0.729,
+        0.719,
+        0.714,
+        0.742,
+        0.722,
+        0.715,
+        0.72
+      ],
+      "good": [
+        0.918,
+        0.926,
+        0.919,
+        0.915,
+        0.92,
+        0.918,
+        0.929,
+        0.922,
+        0.917,
+        0.917
+      ]
+    }
+  },
+  {
+    "title": "RAVE player",
+    "player": "RavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "max_steps": 800
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7459,
+    "good_pct": 0.9284,
+    "perfect_std": 0.009585927185202283,
+    "good_std": 0.004820788317277557,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.733,
+        0.755,
+        0.735,
+        0.753,
+        0.758,
+        0.742,
+        0.739,
+        0.751,
+        0.758,
+        0.735
+      ],
+      "good": [
+        0.925,
+        0.94,
+        0.924,
+        0.932,
+        0.931,
+        0.924,
+        0.93,
+        0.926,
+        0.928,
+        0.924
+      ]
+    }
+  }
+]
