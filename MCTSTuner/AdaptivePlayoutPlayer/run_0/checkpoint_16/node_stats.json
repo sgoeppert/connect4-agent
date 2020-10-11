@@ -1,0 +1,242 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2728,
+    "draws": 106,
+    "losses": 840,
+    "q": 0.7569406641262929,
+    "n": 1837
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 1885,
+    "draws": 100,
+    "losses": 601,
+    "q": 0.7482598607888631,
+    "n": 1293
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 1466,
+    "draws": 51,
+    "losses": 483,
+    "q": 0.74575,
+    "n": 1000
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 867,
+    "draws": 47,
+    "losses": 316,
+    "q": 0.7239837398373984,
+    "n": 615
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 851,
+    "draws": 47,
+    "losses": 316,
+    "q": 0.7203459637561779,
+    "n": 607
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 825,
+    "draws": 45,
+    "losses": 312,
+    "q": 0.7170050761421319,
+    "n": 591
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 584,
+    "draws": 43,
+    "losses": 235,
+    "q": 0.7024361948955916,
+    "n": 431
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 724,
+    "draws": 35,
+    "losses": 303,
+    "q": 0.698210922787194,
+    "n": 531
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 195,
+    "draws": 12,
+    "losses": 107,
+    "q": 0.6401273885350318,
+    "n": 157
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 156,
+    "draws": 10,
+    "losses": 92,
+    "q": 0.624031007751938,
+    "n": 129
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 250,
+    "draws": 10,
+    "losses": 158,
+    "q": 0.6100478468899522,
+    "n": 209
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 236,
+    "draws": 13,
+    "losses": 161,
+    "q": 0.5914634146341463,
+    "n": 205
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 145,
+    "draws": 17,
+    "losses": 116,
+    "q": 0.552158273381295,
+    "n": 139
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 183,
+    "draws": 14,
+    "losses": 151,
+    "q": 0.5459770114942529,
+    "n": 174
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 111,
+    "draws": 12,
+    "losses": 97,
+    "q": 0.5318181818181819,
+    "n": 110
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 113,
+    "draws": 14,
+    "losses": 101,
+    "q": 0.5263157894736842,
+    "n": 114
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 115,
+    "draws": 10,
+    "losses": 107,
+    "q": 0.5172413793103449,
+    "n": 116
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 132,
+    "draws": 11,
+    "losses": 123,
+    "q": 0.5169172932330827,
+    "n": 133
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 47,
+    "draws": 7,
+    "losses": 56,
+    "q": 0.4590909090909091,
+    "n": 55
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 48,
+    "draws": 2,
+    "losses": 58,
+    "q": 0.4537037037037037,
+    "n": 54
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "config": {
+      "max_steps": 800,
+      "exploration_constant": 0.8,
+      "network_weight": 0.5
+    },
+    "wins": 585,
+    "draws": 9,
+    "losses": 136,
+    "q": 0.8075342465753425,
+    "n": 365
+  },
+  {
+    "config": {
+      "max_steps": 500,
+      "exploration_constant": 0.8,
+      "network_weight": 0.5
+    },
+    "wins": 529,
+    "draws": 7,
+    "losses": 156,
+    "q": 0.7695086705202312,
+    "n": 346
+  },
+  {
+    "config": {
+      "max_steps": 300,
+      "exploration_constant": 0.8,
+      "network_weight": 0.5
+    },
+    "wins": 405,
+    "draws": 10,
+    "losses": 163,
+    "q": 0.7093425605536332,
+    "n": 289
+  }
+]

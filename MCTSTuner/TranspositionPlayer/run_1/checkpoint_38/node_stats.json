@@ -1,0 +1,482 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT2",
+      "with_symmetry": true
+    },
+    "wins": 989,
+    "draws": 104,
+    "losses": 867,
+    "q": 0.5311224489795918,
+    "n": 980
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 911,
+    "draws": 82,
+    "losses": 815,
+    "q": 0.5265486725663717,
+    "n": 904
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "default",
+      "with_symmetry": true
+    },
+    "wins": 725,
+    "draws": 65,
+    "losses": 654,
+    "q": 0.524584487534626,
+    "n": 722
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "default",
+      "with_symmetry": true
+    },
+    "wins": 605,
+    "draws": 51,
+    "losses": 552,
+    "q": 0.5219370860927153,
+    "n": 604
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "default",
+      "with_symmetry": true
+    },
+    "wins": 734,
+    "draws": 68,
+    "losses": 682,
+    "q": 0.5175202156334232,
+    "n": 742
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 588,
+    "draws": 57,
+    "losses": 551,
+    "q": 0.5154682274247492,
+    "n": 598
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT2",
+      "with_symmetry": true
+    },
+    "wins": 588,
+    "draws": 59,
+    "losses": 563,
+    "q": 0.5103305785123967,
+    "n": 605
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 579,
+    "draws": 51,
+    "losses": 556,
+    "q": 0.5096964586846543,
+    "n": 593
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 664,
+    "draws": 70,
+    "losses": 646,
+    "q": 0.5065217391304347,
+    "n": 690
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT2",
+      "with_symmetry": false
+    },
+    "wins": 541,
+    "draws": 45,
+    "losses": 530,
+    "q": 0.5049283154121864,
+    "n": 558
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "default",
+      "with_symmetry": false
+    },
+    "wins": 484,
+    "draws": 44,
+    "losses": 478,
+    "q": 0.5029821073558648,
+    "n": 503
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT3",
+      "with_symmetry": false
+    },
+    "wins": 394,
+    "draws": 41,
+    "losses": 391,
+    "q": 0.5018159806295399,
+    "n": 413
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 439,
+    "draws": 51,
+    "losses": 436,
+    "q": 0.5016198704103672,
+    "n": 463
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT2",
+      "with_symmetry": true
+    },
+    "wins": 383,
+    "draws": 35,
+    "losses": 382,
+    "q": 0.500625,
+    "n": 400
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "default",
+      "with_symmetry": false
+    },
+    "wins": 559,
+    "draws": 58,
+    "losses": 563,
+    "q": 0.49830508474576274,
+    "n": 590
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 490,
+    "draws": 39,
+    "losses": 495,
+    "q": 0.49755859375,
+    "n": 512
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT2",
+      "with_symmetry": true
+    },
+    "wins": 395,
+    "draws": 33,
+    "losses": 400,
+    "q": 0.4969806763285024,
+    "n": 414
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT3",
+      "with_symmetry": true
+    },
+    "wins": 514,
+    "draws": 47,
+    "losses": 523,
+    "q": 0.49584870848708484,
+    "n": 542
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 406,
+    "draws": 33,
+    "losses": 417,
+    "q": 0.4935747663551402,
+    "n": 428
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 430,
+    "draws": 40,
+    "losses": 442,
+    "q": 0.4934210526315789,
+    "n": 456
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT3",
+      "with_symmetry": false
+    },
+    "wins": 405,
+    "draws": 48,
+    "losses": 417,
+    "q": 0.49310344827586206,
+    "n": 435
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT2",
+      "with_symmetry": true
+    },
+    "wins": 398,
+    "draws": 38,
+    "losses": 410,
+    "q": 0.4929078014184397,
+    "n": 423
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "default",
+      "with_symmetry": false
+    },
+    "wins": 342,
+    "draws": 45,
+    "losses": 353,
+    "q": 0.4925675675675676,
+    "n": 370
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT2",
+      "with_symmetry": false
+    },
+    "wins": 526,
+    "draws": 51,
+    "losses": 545,
+    "q": 0.49153297682709446,
+    "n": 561
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "default",
+      "with_symmetry": true
+    },
+    "wins": 407,
+    "draws": 43,
+    "losses": 422,
+    "q": 0.4913990825688073,
+    "n": 436
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "default",
+      "with_symmetry": false
+    },
+    "wins": 434,
+    "draws": 46,
+    "losses": 450,
+    "q": 0.4913978494623656,
+    "n": 465
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 328,
+    "draws": 41,
+    "losses": 341,
+    "q": 0.4908450704225352,
+    "n": 355
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT3",
+      "with_symmetry": false
+    },
+    "wins": 350,
+    "draws": 45,
+    "losses": 365,
+    "q": 0.4901315789473684,
+    "n": 380
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT3",
+      "with_symmetry": false
+    },
+    "wins": 455,
+    "draws": 46,
+    "losses": 479,
+    "q": 0.48775510204081635,
+    "n": 490
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT3",
+      "with_symmetry": true
+    },
+    "wins": 368,
+    "draws": 49,
+    "losses": 389,
+    "q": 0.4869727047146402,
+    "n": 403
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT2",
+      "with_symmetry": false
+    },
+    "wins": 342,
+    "draws": 38,
+    "losses": 366,
+    "q": 0.4839142091152815,
+    "n": 373
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT3",
+      "with_symmetry": true
+    },
+    "wins": 344,
+    "draws": 28,
+    "losses": 368,
+    "q": 0.4837837837837838,
+    "n": 370
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "default",
+      "with_symmetry": true
+    },
+    "wins": 289,
+    "draws": 26,
+    "losses": 317,
+    "q": 0.4778481012658228,
+    "n": 316
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT2",
+      "with_symmetry": false
+    },
+    "wins": 243,
+    "draws": 28,
+    "losses": 283,
+    "q": 0.463898916967509,
+    "n": 277
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 238,
+    "draws": 24,
+    "losses": 278,
+    "q": 0.46296296296296297,
+    "n": 270
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "default",
+      "with_symmetry": false
+    },
+    "wins": 263,
+    "draws": 27,
+    "losses": 310,
+    "q": 0.4608333333333333,
+    "n": 300
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT3",
+      "with_symmetry": false
+    },
+    "wins": 243,
+    "draws": 35,
+    "losses": 292,
+    "q": 0.4570175438596491,
+    "n": 285
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT2",
+      "with_symmetry": false
+    },
+    "wins": 243,
+    "draws": 25,
+    "losses": 292,
+    "q": 0.45625,
+    "n": 280
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT3",
+      "with_symmetry": true
+    },
+    "wins": 198,
+    "draws": 27,
+    "losses": 249,
+    "q": 0.4462025316455696,
+    "n": 237
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT3",
+      "with_symmetry": true
+    },
+    "wins": 221,
+    "draws": 16,
+    "losses": 277,
+    "q": 0.4455252918287938,
+    "n": 257
+  }
+]

@@ -1,0 +1,1962 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 12,
+    "draws": 0,
+    "losses": 0,
+    "q": 1.0,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 16,
+    "draws": 0,
+    "losses": 0,
+    "q": 1.0,
+    "n": 8
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 1,
+    "losses": 0,
+    "q": 0.95,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 1,
+    "losses": 0,
+    "q": 0.9375,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 13,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9285714285714286,
+    "n": 7
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 11,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9166666666666666,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 11,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9166666666666666,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 11,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9166666666666666,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 9,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.9,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 10,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.875,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.85,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.85,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.85,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 9,
+    "draws": 2,
+    "losses": 1,
+    "q": 0.8333333333333334,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 1,
+    "q": 0.8333333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 10,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8333333333333334,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 10,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8333333333333334,
+    "n": 6
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.8125,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 6,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.8125,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 8,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 8,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 8,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.8,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.75,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.75,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.75,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.75,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 2,
+    "losses": 1,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.75,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 7,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.75,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.75,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.75,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.75,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.7,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 7,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.7,
+    "n": 5
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.6875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.6875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 5,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.6875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.6875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.6875,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 2,
+    "losses": 1,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.6666666666666666,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.625,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 5,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.625,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.5833333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.5833333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.5833333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.5833333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.5833333333333334,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.5,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.5,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.5,
+    "n": 4
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 2,
+    "losses": 2,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.5,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.5,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 1,
+    "losses": 3,
+    "q": 0.4166666666666667,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 1,
+    "losses": 3,
+    "q": 0.4166666666666667,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 3,
+    "losses": 2,
+    "q": 0.4166666666666667,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 1,
+    "losses": 3,
+    "q": 0.4166666666666667,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 1,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.375,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 1,
+    "losses": 2,
+    "q": 0.375,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 2,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.3333333333333333,
+    "n": 3
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 0,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.25,
+    "n": 1
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.25,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 1,
+      "alpha": 0.9,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.0,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.0,
+    "n": 1
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.0,
+    "n": 2
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 300,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": true
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.0,
+    "n": 1
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": null,
+      "keep_replies": false,
+      "forgetting": true
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 2,
+    "q": 0.0,
+    "n": 1
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 1,
+      "alpha": 0.5,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.0,
+    "n": 2
+  }
+]

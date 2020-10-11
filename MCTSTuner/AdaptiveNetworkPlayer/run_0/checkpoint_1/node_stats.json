@@ -1,0 +1,41 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 300
+    },
+    "wins": 305,
+    "draws": 11,
+    "losses": 72,
+    "q": 0.8002577319587629,
+    "n": 194
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 200
+    },
+    "wins": 264,
+    "draws": 7,
+    "losses": 89,
+    "q": 0.7430555555555556,
+    "n": 180
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 100
+    },
+    "wins": 133,
+    "draws": 6,
+    "losses": 113,
+    "q": 0.5396825396825397,
+    "n": 126
+  }
+]
