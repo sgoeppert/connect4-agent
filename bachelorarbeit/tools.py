@@ -128,6 +128,8 @@ def run_move_evaluation_experiment(
     dataset_file = str(Path(config.ROOT_DIR) / "auswertungen" / "data" / "refmoves1k_kaggle")
 
     good, perfect, total = 0, 0, 0
+    g = []
+    p = []
     for it in range(repeats):
         evaluator = MoveEvaluation(
             player=player,
@@ -136,9 +138,14 @@ def run_move_evaluation_experiment(
             num_processes=num_processes
         )
         _good, _perfect, _total = evaluator.score_player(show_progress_bar)
+        g.append(_good / _total)
+        p.append(_perfect / _total)
         good += _good
         perfect += _perfect
         total += _total
+
+    p_std = np.std(p)
+    g_std = np.std(g)
 
     return {
         "title": title,
@@ -148,10 +155,12 @@ def run_move_evaluation_experiment(
         "n_positions": total // repeats,
         "perfect_pct": perfect / total,
         "good_pct": good / total,
+        "perfect_std": p_std,
+        "good_std": g_std,
         "raw_results": {
             "total": total,
-            "perfect": perfect,
-            "good": good,
+            "perfect": p,
+            "good": g,
         }
     }
 

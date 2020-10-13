@@ -130,22 +130,20 @@ class TranspositionPlayer(MCTSPlayer):
         return self.name
 
     def get_or_store_transposition(self, state):
-        hsh = hash(state)
-        flipped_hash = 0
+        flipped = None
 
-        if hsh in self.transpositions:
-            return self.transpositions[hsh]
+        if state in self.transpositions:
+            return self.transpositions[state]
 
         if self.with_symmetry:
-            flipped = flip_board(state.board)
-            flipped_hash = hash(tuple(flipped))
-            if flipped_hash in self.transpositions:
-                return self.transpositions[flipped_hash]
+            flipped = tuple(flip_board(state.board))
+            if flipped in self.transpositions:
+                return self.transpositions[flipped]
 
         tp_node = TranspositionNode(game_state=state)
-        self.transpositions[hsh] = tp_node
+        self.transpositions[state] = tp_node
         if self.with_symmetry:
-            self.transpositions[flipped_hash] = tp_node
+            self.transpositions[flipped] = tp_node
 
         return tp_node
 
@@ -211,7 +209,7 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 50
+    steps = 3000
     conf = Configuration()
     p = TranspositionPlayer(max_steps=steps, uct_method="UCT2", exploration_constant=3.0, with_symmetry=True)
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)

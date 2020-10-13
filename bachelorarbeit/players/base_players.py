@@ -1,10 +1,8 @@
 import random
-import math
 from abc import ABC, abstractmethod
-from collections import defaultdict
 import time
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
-from typing import List, Optional
+from typing import List
 
 
 class Player(ABC):

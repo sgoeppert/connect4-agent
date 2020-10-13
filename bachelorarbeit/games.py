@@ -44,17 +44,11 @@ class ConnectFour:
     def list_moves(self) -> List[int]:
         return [c for c in range(self.cols) if self.board[c] == 0]
 
-    def get_action_space(self) -> int:
-        return self.cols
-
     def get_current_player(self) -> int:
         return self.mark
 
     def get_other_player(self, player: int) -> int:
         return 3 - player
-
-    def num_players(self) -> int:
-        return 2
 
     def play_move(self, col: int) -> "ConnectFour":
         try:
