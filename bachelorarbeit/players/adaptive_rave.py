@@ -5,16 +5,16 @@ from bachelorarbeit.players.adaptive_playout import AdaptiveEvaluator
 
 
 class AdaptiveRaveEvaluator(AdaptiveEvaluator):
-    def __init__(self, move_list: list, forgetting=False, keep_replies=False):
+    def __init__(self, forgetting=False, keep_replies=False):
         """
-        :param move_list: The list used to store information about all moves made during a selection + simulation phase
         :param forgetting:
         :param keep_replies:
         """
         super(AdaptiveRaveEvaluator, self).__init__(forgetting, keep_replies)
-        self.moves = move_list
+        self.moves = []
 
     def __call__(self, game_state: ConnectFour) -> float:
+        self.moves.clear()
         game = game_state.copy()
         simulating_player = game.get_current_player()
         scoring = 3 - simulating_player
@@ -47,7 +47,7 @@ class AdaptiveRavePlayer(RavePlayer):
 
     def __init__(self, forgetting=False, keep_replies=False, exploration_constant=0.25, **kwargs):
         super(AdaptiveRavePlayer, self).__init__(exploration_constant=exploration_constant, **kwargs)
-        self.evaluate = AdaptiveRaveEvaluator(self.move_list, forgetting, keep_replies)
+        self.evaluate = AdaptiveRaveEvaluator(forgetting, keep_replies)
 
     def reset(self, conf: Configuration = None):
         super(AdaptiveRavePlayer, self).reset(conf)

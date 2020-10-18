@@ -59,7 +59,11 @@ class Node:
         node_class = type(self)
 
         move = random.choice(self.possible_moves)
-        self.children[move] = node_class(game_state=self.game_state.copy().play_move(move), parent=self)
+        next_state = self.game_state.copy().play_move(move)
+        self.children[move] = node_class(
+            game_state=next_state,
+            parent=self
+        )
         self.possible_moves.remove(move)
         if len(self.possible_moves) == 0:
             self.expanded = True

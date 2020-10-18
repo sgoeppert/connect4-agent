@@ -16,6 +16,7 @@ import config
 
 GameResult = Tuple[float, float]
 
+
 class Arena:
     def __init__(
             self,
@@ -260,7 +261,7 @@ class Memory:
         self.num_states += 1
 
         self.added_since_save += 1
-        if self.save_interval > 0 and self.added_since_save > self.save_interval:
+        if 0 < self.save_interval < self.added_since_save:
             self.save_data()
             self.added_since_save = 0
 
