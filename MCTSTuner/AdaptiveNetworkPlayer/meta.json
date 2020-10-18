@@ -1,1 +1,1 @@
-{"run_nr": 1, "last_run": {"time": "2020/09/21-22:43:00", "run": 1, "checkpoint": 4, "n": 1000}, "runs": [{"time": "2020/09/21-19:52:14", "run": 0, "checkpoint": 4, "n": 1000}, {"time": "2020/09/21-22:43:00", "run": 1, "checkpoint": 4, "n": 1000}]}
+{"run_nr": 2, "last_run": {"time": "2020/10/12-03:37:38", "run": 2, "checkpoint": 8, "n": 2000}, "runs": [{"time": "2020/09/21-19:52:14", "run": 0, "checkpoint": 4, "n": 1000}, {"time": "2020/09/21-22:43:00", "run": 1, "checkpoint": 4, "n": 1000}, {"time": "2020/10/12-03:37:38", "run": 2, "checkpoint": 8, "n": 2000}]}

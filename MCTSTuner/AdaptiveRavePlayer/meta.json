@@ -1,1 +1,1 @@
-{"run_nr": 0, "last_run": {"time": "2020/09/20-15:43:07", "run": 0, "checkpoint": 25, "n": 12000}, "runs": [{"time": "2020/09/20-15:43:07", "run": 0, "checkpoint": 25, "n": 12000}]}
+{"run_nr": 1, "last_run": {"time": "2020/10/12-14:46:11", "run": 1, "checkpoint": 10, "n": 5000}, "runs": [{"time": "2020/09/20-15:43:07", "run": 0, "checkpoint": 25, "n": 12000}, {"time": "2020/10/12-14:46:11", "run": 1, "checkpoint": 10, "n": 5000}]}
