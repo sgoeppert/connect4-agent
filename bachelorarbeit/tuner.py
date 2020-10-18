@@ -117,6 +117,16 @@ class Parametrization:
 
         self.options.append(tuple(new_options))
 
+    def to_simple_dict(self):
+        out_dict = {}
+        for option in self.options:
+            for key, value in option:
+                if key in out_dict:
+                    out_dict[key].append(value)
+                else:
+                    out_dict[key] = [value]
+        return out_dict
+
     def __len__(self) -> int:
         return len(self.options)
 
@@ -313,6 +323,7 @@ class MCTSTuner:
         cp_meta["cp_num"] = self.checkpoint_number
         cp_meta["checkpoints"].append(cp_data)
         cp_meta["opponent"] = self.opponent_config
+        cp_meta["options"] = self.parameters.to_simple_dict()
         self._write_checkpoint_meta(cp_meta, run_dir)
 
     def _write_checkpoint_data(self, run_dir):
