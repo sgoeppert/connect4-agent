@@ -1,11 +1,7 @@
 from bachelorarbeit.players.adaptive_rave import AdaptiveRavePlayer
-from bachelorarbeit.players.mcts import MCTSPlayer
-from bachelorarbeit.players.base_players import RandomPlayer
-from bachelorarbeit.players.rave import RavePlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
-import gc
 
-NUM_PROCESSES = 6
+NUM_PROCESSES = 10
 
 if __name__ == "__main__":
 
