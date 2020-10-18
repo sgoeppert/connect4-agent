@@ -1,0 +1,167 @@
+[
+  {
+    "title": "NN-LGR-RAVE player",
+    "player": "AdaptiveRaveNetworkPlayer",
+    "configuration": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "max_steps": 20
+    },
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.4944,
+    "good_pct": 0.8248,
+    "perfect_std": 19.345283662949996,
+    "good_std": 9.108238029388561,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        489,
+        479,
+        475,
+        500,
+        529
+      ],
+      "good": [
+        821,
+        822,
+        812,
+        830,
+        839
+      ]
+    }
+  },
+  {
+    "title": "NN-LGR-RAVE player",
+    "player": "AdaptiveRaveNetworkPlayer",
+    "configuration": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "max_steps": 50
+    },
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.5922,
+    "good_pct": 0.8758,
+    "perfect_std": 7.95989949685296,
+    "good_std": 5.035871324805669,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        588,
+        579,
+        596,
+        602,
+        596
+      ],
+      "good": [
+        880,
+        874,
+        881,
+        867,
+        877
+      ]
+    }
+  },
+  {
+    "title": "NN-LGR-RAVE player",
+    "player": "AdaptiveRaveNetworkPlayer",
+    "configuration": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "max_steps": 100
+    },
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.639,
+    "good_pct": 0.9004,
+    "perfect_std": 13.206059215375342,
+    "good_std": 7.059745037889116,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        663,
+        627,
+        643,
+        633,
+        629
+      ],
+      "good": [
+        910,
+        890,
+        903,
+        904,
+        895
+      ]
+    }
+  },
+  {
+    "title": "NN-LGR-RAVE player",
+    "player": "AdaptiveRaveNetworkPlayer",
+    "configuration": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "max_steps": 200
+    },
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.6832,
+    "good_pct": 0.9228,
+    "perfect_std": 5.192301994298868,
+    "good_std": 3.059411708155671,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        678,
+        679,
+        689,
+        680,
+        690
+      ],
+      "good": [
+        918,
+        921,
+        927,
+        924,
+        924
+      ]
+    }
+  },
+  {
+    "title": "NN-LGR-RAVE player",
+    "player": "AdaptiveRaveNetworkPlayer",
+    "configuration": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "max_steps": 400
+    },
+    "repeats": 5,
+    "n_positions": 1000,
+    "perfect_pct": 0.7008,
+    "good_pct": 0.9336,
+    "perfect_std": 4.354308211415448,
+    "good_std": 2.8000000000000003,
+    "raw_results": {
+      "total": 5000,
+      "perfect": [
+        695,
+        702,
+        698,
+        701,
+        708
+      ],
+      "good": [
+        932,
+        935,
+        937,
+        935,
+        929
+      ]
+    }
+  }
+]

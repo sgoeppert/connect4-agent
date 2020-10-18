@@ -1,0 +1,128 @@
+[
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 20
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.4641,
+    "good_pct": 0.7922,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 4641,
+      "good": 7922
+    }
+  },
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 50
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.5756,
+    "good_pct": 0.8561,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 5756,
+      "good": 8561
+    }
+  },
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 100
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6657,
+    "good_pct": 0.8973,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 6657,
+      "good": 8973
+    }
+  },
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 200
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7185,
+    "good_pct": 0.9209,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 7185,
+      "good": 9209
+    }
+  },
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 400
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7496,
+    "good_pct": 0.9331,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 7496,
+      "good": 9331
+    }
+  },
+  {
+    "title": "LGR-RAVE player",
+    "player": "AdaptiveRavePlayer",
+    "configuration": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false,
+      "max_steps": 800
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7675,
+    "good_pct": 0.9453,
+    "raw_results": {
+      "total": 10000,
+      "perfect": 7675,
+      "good": 9453
+    }
+  }
+]
