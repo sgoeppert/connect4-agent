@@ -7,6 +7,20 @@ from bachelorarbeit.players.mcts import Node, MCTSPlayer
 from bachelorarbeit.tools import flip_board
 
 
+def Q(v, a=None):
+    if a is None:
+        return v.average_value
+    else:
+        return v.child_values[a]
+
+
+def N(v, a=None):
+    if a is None:
+        return v.number_visits
+    else:
+        return v.child_visits[a]
+
+
 class TranspositionNode(Node):
     def __init__(self, *args, **kwargs):
         super(TranspositionNode, self).__init__( *args, **kwargs)
@@ -24,27 +38,20 @@ class TranspositionNode(Node):
                 actions.append(m)
         return actions
 
-    def Qsa(self, move):
-        return self.child_values[move]
-
-    def Nsa(self, move):
-        return self.child_visits[move]
-
     def best_child(self, C_p: float = 1.0, uct_method: str = "UCT") -> "Node":
         n_p = math.log(self.number_visits)
-        parent = self
+        v = self
 
-        def UCT1(action, _):
-            return parent.Qsa(action) + C_p * math.sqrt(n_p / parent.Nsa(action))
+        def UCT1(a, _): return Q(v, a) + C_p * math.sqrt(n_p / N(v, a))
 
-        def UCT2(action, child):
-            return child.Q() + C_p * math.sqrt(n_p / parent.Nsa(action))
+        def UCT2(a, child):
+            return Q(child) + C_p * math.sqrt(n_p / N(v, a))
 
-        def UCT3(action, child):
-            return child.UCT3_val + C_p * math.sqrt(n_p / parent.Nsa(action))
+        def UCT3(a, child):
+            return child.UCT3_val + C_p * math.sqrt(n_p / N(v, a))
 
         def default(_, child):
-            return child.Q() + C_p * math.sqrt(n_p / child.number_visits)
+            return Q(child) + C_p * math.sqrt(n_p / N(child))
 
         selection_method = default
         if uct_method == "UCT1":
@@ -81,10 +88,10 @@ class TranspositionNode(Node):
         else:
             summed = 0
             for a, c in self.children.items():
-                c_n = self.child_visits[a]
+                c_n = N(self, a)
                 c_v = -c.UCT3_val
                 summed += c_n * c_v
-            self.UCT3_val = (self.sim_reward + summed) / self.number_visits
+            self.UCT3_val = (self.sim_reward + summed) / N(self)
 
     def remove_children(self, player: "TranspositionPlayer", keep_node: "TranspositionNode"):
         children = list(self.children.items())
@@ -211,7 +218,7 @@ if __name__ == "__main__":
 
     steps = 3000
     conf = Configuration()
-    p = TranspositionPlayer(max_steps=steps, uct_method="UCT2", exploration_constant=3.0, with_symmetry=True)
+    p = TranspositionPlayer(max_steps=steps, uct_method="default", exploration_constant=1.0, with_symmetry=True)
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
 
