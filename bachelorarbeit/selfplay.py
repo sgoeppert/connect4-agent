@@ -139,12 +139,15 @@ class MoveEvaluation:
                  player: Type[Player],
                  dataset_file: str,
                  player_config: Union[dict, None] = None,
-                 num_processes: int = config.NUM_PROCESSES
+                 num_processes: int = config.NUM_PROCESSES,
+                 max_tasks: Optional[int] = None
                  ):
         self.player_class = player
         self.player_config = player_config
         self.dataset_file = dataset_file
         self.num_processes = num_processes
+        self.max_tasks = max_tasks
+        self.player = None
 
     def instantiate_player(self):
         if self.player_config:
@@ -164,11 +167,12 @@ class MoveEvaluation:
         data = json.loads(line)
         board = data["board"]
 
-        player = self.instantiate_player()
+        if self.player is None:
+            self.player = self.instantiate_player()
         _conf = Configuration()
 
         mark = (np.count_nonzero(board) % 2) + 1
-        agent_move = player.get_move(Observation(board=board, mark=mark), _conf)
+        agent_move = self.player.get_move(Observation(board=board, mark=mark), _conf)
 
         moves = data["move score"]
         perfect_score = max(moves)
@@ -191,7 +195,7 @@ class MoveEvaluation:
 
         with open(self.dataset_file, "r") as f:
             lines = f.readlines()
-            with mp.Pool(processes=self.num_processes) as pool:
+            with mp.Pool(processes=self.num_processes, maxtasksperchild=self.max_tasks) as pool:
                 pending_results = pool.imap_unordered(self.evaluate_position, lines)
                 if show_progress_bar:
                     pending_results = tqdm(pending_results, total=len(lines))

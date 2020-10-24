@@ -122,6 +122,7 @@ def run_move_evaluation_experiment(
         player: Type[Player],
         player_config: Optional[dict] = None,
         num_processes: int = config.NUM_PROCESSES,
+        max_tasks: Optional[int] = None,
         repeats: int = 1,
         show_progress_bar: bool = False
 ):
@@ -135,7 +136,8 @@ def run_move_evaluation_experiment(
             player=player,
             player_config=player_config,
             dataset_file=dataset_file,
-            num_processes=num_processes
+            num_processes=num_processes,
+            max_tasks=max_tasks
         )
         _good, _perfect, _total = evaluator.score_player(show_progress_bar)
         g.append(_good / _total)
