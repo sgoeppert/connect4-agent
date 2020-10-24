@@ -1,0 +1,362 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 10,
+      "alpha": 0.3
+    },
+    "wins": 27,
+    "draws": 0,
+    "losses": 17,
+    "q": 0.6136363636363636,
+    "n": 22
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.3
+    },
+    "wins": 23,
+    "draws": 2,
+    "losses": 15,
+    "q": 0.6,
+    "n": 20
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.3
+    },
+    "wins": 20,
+    "draws": 2,
+    "losses": 16,
+    "q": 0.5526315789473685,
+    "n": 19
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": null
+    },
+    "wins": 22,
+    "draws": 2,
+    "losses": 18,
+    "q": 0.5476190476190477,
+    "n": 21
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null
+    },
+    "wins": 22,
+    "draws": 2,
+    "losses": 18,
+    "q": 0.5476190476190477,
+    "n": 21
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null
+    },
+    "wins": 20,
+    "draws": 1,
+    "losses": 17,
+    "q": 0.5394736842105263,
+    "n": 19
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null
+    },
+    "wins": 18,
+    "draws": 1,
+    "losses": 17,
+    "q": 0.5138888888888888,
+    "n": 18
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 10,
+      "alpha": 0.5
+    },
+    "wins": 19,
+    "draws": 2,
+    "losses": 19,
+    "q": 0.5,
+    "n": 20
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.3
+    },
+    "wins": 16,
+    "draws": 1,
+    "losses": 17,
+    "q": 0.4852941176470588,
+    "n": 17
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.3
+    },
+    "wins": 14,
+    "draws": 1,
+    "losses": 19,
+    "q": 0.4264705882352941,
+    "n": 17
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null
+    },
+    "wins": 14,
+    "draws": 1,
+    "losses": 21,
+    "q": 0.4027777777777778,
+    "n": 18
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 10,
+      "alpha": null
+    },
+    "wins": 15,
+    "draws": 2,
+    "losses": 23,
+    "q": 0.4,
+    "n": 20
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 100,
+      "alpha": null
+    },
+    "wins": 13,
+    "draws": 4,
+    "losses": 21,
+    "q": 0.39473684210526316,
+    "n": 19
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 100,
+      "alpha": null
+    },
+    "wins": 11,
+    "draws": 1,
+    "losses": 18,
+    "q": 0.38333333333333336,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null
+    },
+    "wins": 12,
+    "draws": 0,
+    "losses": 22,
+    "q": 0.35294117647058826,
+    "n": 17
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.5
+    },
+    "wins": 11,
+    "draws": 3,
+    "losses": 22,
+    "q": 0.3472222222222222,
+    "n": 18
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.5
+    },
+    "wins": 11,
+    "draws": 1,
+    "losses": 22,
+    "q": 0.3382352941176471,
+    "n": 17
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 200,
+      "alpha": null
+    },
+    "wins": 9,
+    "draws": 2,
+    "losses": 23,
+    "q": 0.29411764705882354,
+    "n": 17
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 200,
+      "alpha": null
+    },
+    "wins": 8,
+    "draws": 1,
+    "losses": 21,
+    "q": 0.2833333333333333,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.5
+    },
+    "wins": 7,
+    "draws": 1,
+    "losses": 20,
+    "q": 0.26785714285714285,
+    "n": 14
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 200,
+      "alpha": null
+    },
+    "wins": 7,
+    "draws": 2,
+    "losses": 21,
+    "q": 0.26666666666666666,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.5
+    },
+    "wins": 7,
+    "draws": 2,
+    "losses": 21,
+    "q": 0.26666666666666666,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 200,
+      "alpha": null
+    },
+    "wins": 6,
+    "draws": 3,
+    "losses": 21,
+    "q": 0.25,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 100,
+      "alpha": null
+    },
+    "wins": 6,
+    "draws": 3,
+    "losses": 23,
+    "q": 0.234375,
+    "n": 16
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "k": 10,
+      "alpha": 0.8
+    },
+    "wins": 6,
+    "draws": 0,
+    "losses": 24,
+    "q": 0.2,
+    "n": 15
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 200,
+      "alpha": null
+    },
+    "wins": 4,
+    "draws": 0,
+    "losses": 20,
+    "q": 0.16666666666666666,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.8
+    },
+    "wins": 3,
+    "draws": 1,
+    "losses": 24,
+    "q": 0.125,
+    "n": 14
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.8
+    },
+    "wins": 3,
+    "draws": 0,
+    "losses": 23,
+    "q": 0.11538461538461539,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.8
+    },
+    "wins": 1,
+    "draws": 0,
+    "losses": 21,
+    "q": 0.045454545454545456,
+    "n": 11
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.8
+    },
+    "wins": 0,
+    "draws": 0,
+    "losses": 20,
+    "q": 0.0,
+    "n": 10
+  }
+]
