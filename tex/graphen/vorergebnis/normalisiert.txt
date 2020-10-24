@@ -1,0 +1,13 @@
+Normalisiert
+
+orange - naive network
+blue regular network
+green cnn
+
+best loss naive 0.2337
+best loss regular 0.1844
+best loss cnn 0.1534
+
+best mae naive 0.461
+best mae regular 0.3977
+best mae cnn 0.2614
