@@ -11,7 +11,6 @@ class RaveEvaluator(Evaluator):
         self.moves = []
 
     def __call__(self, game_state: ConnectFour):
-        self.moves.clear()
         game = game_state.copy()
         scoring = game.get_other_player(game.get_current_player())
         while not game.is_terminal():
@@ -50,7 +49,7 @@ class RaveNode(Node):
         m, c = max(self.children.items(), key=lambda c: UCT_Rave(c[1]))
         return c, m
 
-    def expand_one_child(self) -> "RaveNode":
+    def expand_one_child(self) -> Tuple["RaveNode", int]:
         nodeclass = type(self)
         move = random.choice(self.possible_moves)  # wähle zufälligen Zug
 
@@ -63,7 +62,7 @@ class RaveNode(Node):
         self.children[move] = nodeclass(game_state=child_state, parent=self)
         self.rave_children[move_name] = self.children[move]
 
-        return self.children[move]
+        return self.children[move], move_name
 
     def increment_rave_visit_and_add_reward(self, reward):
         self.rave_count += 1
@@ -89,9 +88,11 @@ class RavePlayer(MCTSPlayer):
             if current.is_expanded():
                 current, m = current.best_child(self.exploration_constant, alpha=self.alpha)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
-                # self.move_list.append(current.game_state.get_move_name(m, played=True))
+                self.evaluate.moves.append(current.game_state.get_move_name(m, played=True))
             else:
-                return current.expand_one_child()
+                child, m = current.expand_one_child()
+                self.evaluate.moves.append(m)
+                return child
 
         return current
 
@@ -113,6 +114,7 @@ class RavePlayer(MCTSPlayer):
 
     def perform_search(self, root):
         while self.has_resources():
+            self.evaluate.moves.clear()
             # self.move_list.clear()  # Bereinige die move_list aber behalte die selbe Referenz bei, da der Evaluator sie braucht
             leaf = self.tree_policy(root)
             reward = self.evaluate(leaf.game_state)
@@ -132,12 +134,53 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 100
-    pl = RavePlayer(max_steps=steps, exploration_constant=0.5)
-    conf = Configuration()
-    game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
-    obs = Observation(board=game.board.copy(), mark=game.mark)
+    # steps = 20000
+    # pl = RavePlayer(max_steps=steps, exploration_constant=0.4, alpha=None)
+    # conf = Configuration()
+    # game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
+    # obs = Observation(board=game.board.copy(), mark=game.mark)
+    #
+    # with timer(f"{steps} steps"):
+    #     m = pl.get_move(obs, conf)
+    #     print(m)
 
-    with timer(f"{steps} steps"):
-        m = pl.get_move(obs, conf)
-        print(m)
+    from bachelorarbeit.selfplay import Arena
+
+    test_steps = 809
+    regular_steps = 1000
+
+    arena = Arena(players=(RavePlayer, MCTSPlayer),
+                  constructor_args=(
+                      {
+                          "max_steps": test_steps,
+                          "exploration_constant": 0.4,
+                          "alpha": 0.5,
+                      },
+                      # {"max_steps": regular_steps, "exploration_constant": 0.4, "alpha": 0.5, "keep_replies": True}),
+                      {
+                          "max_steps": regular_steps
+                      }),
+                  num_games=500,
+                  num_processes=8
+                  )
+    arena.run_game_mp(show_progress_bar=True)
+
+
+    test_steps = 834
+    regular_steps = 1000
+
+    arena = Arena(players=(RavePlayer, MCTSPlayer),
+                  constructor_args=(
+                      {
+                          "max_steps": test_steps,
+                          "exploration_constant": 0.4,
+                          "alpha": None,
+                      },
+                      # {"max_steps": regular_steps, "exploration_constant": 0.4, "alpha": 0.5, "keep_replies": True}),
+                      {
+                          "max_steps": regular_steps
+                      }),
+                  num_games=500,
+                  num_processes=8
+                  )
+    arena.run_game_mp(show_progress_bar=True)
