@@ -1,0 +1,62 @@
+[
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 80,
+    "draws": 1,
+    "losses": 23,
+    "q": 0.7740384615384616,
+    "n": 52
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 76,
+    "draws": 6,
+    "losses": 22,
+    "q": 0.7596153846153846,
+    "n": 52
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 70,
+    "draws": 2,
+    "losses": 24,
+    "q": 0.7395833333333334,
+    "n": 48
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 67,
+    "draws": 3,
+    "losses": 30,
+    "q": 0.685,
+    "n": 50
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "keep_replies": false,
+      "forgetting": false
+    },
+    "wins": 62,
+    "draws": 5,
+    "losses": 29,
+    "q": 0.671875,
+    "n": 48
+  }
+]

@@ -1,0 +1,33 @@
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  1
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 850}
+Result:  [0.4925 0.5075]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  1
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 695}
+Result:  [0.3925 0.6075]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 809}
+Result:  [0.545 0.455]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.4, 'alpha': None, 'max_steps': 834}
+Result:  [0.4725 0.5275]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_playout.AdaptivePlayoutPlayer'>
+Scale:  1
+Config:  {'_steps': 654, 'exploration_constant': 0.8, 'keep_replies': True, 'max_steps': 654}
+Result:  [0.675 0.325]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave.AdaptiveRavePlayer'>
+Scale:  1
+Config:  {'_steps': 563, 'exploration_constant': 0.4, 'alpha': 0.5, 'keep_replies': True, 'max_steps': 563}
+Result:  [0.77 0.23]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f3d903def70>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 52}

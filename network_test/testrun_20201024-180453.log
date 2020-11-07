@@ -1,0 +1,48 @@
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.5, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7fd8c2696e50>, 'transform_output': <function denormalize at 0x7fd8c269e040>}
+Elapsed:  499.74194145202637
+Weight:  0.5
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm
+Result:  [0.541 0.459]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.5, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn', 'transform_func': <function transform_board_cnn at 0x7fd8c2696e50>, 'transform_output': None}
+Elapsed:  368.9492835998535
+Weight:  0.5
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn
+Result:  [0.467 0.533]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.5, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7fd8c2696dc0>, 'transform_output': <function denormalize at 0x7fd8c269e040>}
+Elapsed:  247.09323525428772
+Weight:  0.5
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm
+Result:  [0.468 0.532]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.5, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular', 'transform_func': <function transform_board_nega at 0x7fd8c2696dc0>, 'transform_output': None}
+Elapsed:  170.81505465507507
+Weight:  0.5
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular
+Result:  [0.3 0.7]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.85, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7fd8c2696e50>, 'transform_output': <function denormalize at 0x7fd8c269e040>}
+Elapsed:  420.2462537288666
+Weight:  0.85
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm
+Result:  [0.342 0.658]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.85, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn', 'transform_func': <function transform_board_cnn at 0x7fd8c2696e50>, 'transform_output': None}
+Elapsed:  294.05524134635925
+Weight:  0.85
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn
+Result:  [0.201 0.799]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.85, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7fd8c2696dc0>, 'transform_output': <function denormalize at 0x7fd8c269e040>}
+Elapsed:  185.92708802223206
+Weight:  0.85
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm
+Result:  [0.222 0.778]
+==========
+{'max_steps': 100, 'exploration_constant': 0.8, 'network_weight': 0.85, 'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular', 'transform_func': <function transform_board_nega at 0x7fd8c2696dc0>, 'transform_output': None}
+Elapsed:  146.713210105896
+Weight:  0.85
+Model:  /home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular
+Result:  [0.169 0.831]
+==========

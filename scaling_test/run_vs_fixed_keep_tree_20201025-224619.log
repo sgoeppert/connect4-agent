@@ -1,0 +1,260 @@
+Player:  <class 'bachelorarbeit.players.mcts.MCTSPlayer'>
+Scale:  0.5
+Config:  {'_steps': 1000, 'exploration_constant': 0.9, 'max_steps': 500, 'keep_tree': True}
+Result:  [0.21166667 0.78833333]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  0.5
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 425, 'keep_tree': True}
+Result:  [0.155 0.845]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  0.5
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 347, 'keep_tree': True}
+Result:  [0.11333333 0.88666667]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  0.5
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 404, 'keep_tree': True}
+Result:  [0.19333333 0.80666667]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  0.5
+Config:  {'_steps': 834, 'exploration_constant': 0.4, 'alpha': None, 'max_steps': 417, 'keep_tree': True}
+Result:  [0.19666667 0.80333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_playout.AdaptivePlayoutPlayer'>
+Scale:  0.5
+Config:  {'_steps': 654, 'exploration_constant': 0.8, 'keep_replies': True, 'max_steps': 327, 'keep_tree': True}
+Result:  [0.36666667 0.63333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave.AdaptiveRavePlayer'>
+Scale:  0.5
+Config:  {'_steps': 563, 'exploration_constant': 0.4, 'alpha': 0.5, 'keep_replies': True, 'max_steps': 281, 'keep_tree': True}
+Result:  [0.39833333 0.60166667]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 26, 'keep_tree': True}
+Result:  [0.035 0.965]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 129, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 64, 'keep_tree': True}
+Result:  [0.17666667 0.82333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 26, 'keep_tree': True}
+Result:  [0.06 0.94]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 119, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 59, 'keep_tree': True}
+Result:  [0.21333333 0.78666667]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 26, 'keep_tree': True}
+Result:  [0.105 0.895]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  0.5
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 110, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 55, 'keep_tree': True}
+Result:  [0.36333333 0.63666667]
+==========
+Player:  <class 'bachelorarbeit.players.mcts.MCTSPlayer'>
+Scale:  1
+Config:  {'_steps': 1000, 'exploration_constant': 0.9, 'max_steps': 1000, 'keep_tree': True}
+Result:  [0.32333333 0.67666667]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  1
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 850, 'keep_tree': True}
+Result:  [0.25333333 0.74666667]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  1
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 695, 'keep_tree': True}
+Result:  [0.22666667 0.77333333]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 809, 'keep_tree': True}
+Result:  [0.37166667 0.62833333]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.4, 'alpha': None, 'max_steps': 834, 'keep_tree': True}
+Result:  [0.28666667 0.71333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_playout.AdaptivePlayoutPlayer'>
+Scale:  1
+Config:  {'_steps': 654, 'exploration_constant': 0.8, 'keep_replies': True, 'max_steps': 654, 'keep_tree': True}
+Result:  [0.45166667 0.54833333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave.AdaptiveRavePlayer'>
+Scale:  1
+Config:  {'_steps': 563, 'exploration_constant': 0.4, 'alpha': 0.5, 'keep_replies': True, 'max_steps': 563, 'keep_tree': True}
+Result:  [0.57333333 0.42666667]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 52, 'keep_tree': True}
+Result:  [0.13833333 0.86166667]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 129, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 129, 'keep_tree': True}
+Result:  [0.28166667 0.71833333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 52, 'keep_tree': True}
+Result:  [0.20666667 0.79333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 119, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 119, 'keep_tree': True}
+Result:  [0.40666667 0.59333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 52, 'keep_tree': True}
+Result:  [0.34 0.66]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 110, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 110, 'keep_tree': True}
+Result:  [0.51833333 0.48166667]
+==========
+Player:  <class 'bachelorarbeit.players.mcts.MCTSPlayer'>
+Scale:  2
+Config:  {'_steps': 1000, 'exploration_constant': 0.9, 'max_steps': 2000, 'keep_tree': True}
+Result:  [0.43 0.57]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  2
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 1700, 'keep_tree': True}
+Result:  [0.42166667 0.57833333]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  2
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 1390, 'keep_tree': True}
+Result:  [0.36166667 0.63833333]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 1618, 'keep_tree': True}
+Result:  [0.47166667 0.52833333]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 834, 'exploration_constant': 0.4, 'alpha': None, 'max_steps': 1668, 'keep_tree': True}
+Result:  [0.34833333 0.65166667]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_playout.AdaptivePlayoutPlayer'>
+Scale:  2
+Config:  {'_steps': 654, 'exploration_constant': 0.8, 'keep_replies': True, 'max_steps': 1308, 'keep_tree': True}
+Result:  [0.67166667 0.32833333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave.AdaptiveRavePlayer'>
+Scale:  2
+Config:  {'_steps': 563, 'exploration_constant': 0.4, 'alpha': 0.5, 'keep_replies': True, 'max_steps': 1126, 'keep_tree': True}
+Result:  [0.66833333 0.33166667]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 104, 'keep_tree': True}
+Result:  [0.32166667 0.67833333]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 129, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 258, 'keep_tree': True}
+Result:  [0.51 0.49]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 104, 'keep_tree': True}
+Result:  [0.51333333 0.48666667]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 119, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 238, 'keep_tree': True}
+Result:  [0.59 0.41]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 104, 'keep_tree': True}
+Result:  [0.575 0.425]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 110, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 220, 'keep_tree': True}
+Result:  [0.74166667 0.25833333]
+==========
+Player:  <class 'bachelorarbeit.players.mcts.MCTSPlayer'>
+Scale:  3
+Config:  {'_steps': 1000, 'exploration_constant': 0.9, 'max_steps': 3000, 'keep_tree': True}
+Result:  [0.535 0.465]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  3
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 2550, 'keep_tree': True}
+Result:  [0.51 0.49]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  3
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 2085, 'keep_tree': True}
+Result:  [0.40666667 0.59333333]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  3
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 2427, 'keep_tree': True}
+Result:  [0.57 0.43]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  3
+Config:  {'_steps': 834, 'exploration_constant': 0.4, 'alpha': None, 'max_steps': 2502, 'keep_tree': True}
+Result:  [0.425 0.575]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_playout.AdaptivePlayoutPlayer'>
+Scale:  3
+Config:  {'_steps': 654, 'exploration_constant': 0.8, 'keep_replies': True, 'max_steps': 1962, 'keep_tree': True}
+Result:  [0.75 0.25]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave.AdaptiveRavePlayer'>
+Scale:  3
+Config:  {'_steps': 563, 'exploration_constant': 0.4, 'alpha': 0.5, 'keep_replies': True, 'max_steps': 1689, 'keep_tree': True}
+Result:  [0.80666667 0.19333333]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 156, 'keep_tree': True}
+Result:  [0.48166667 0.51833333]
+==========
+Player:  <class 'bachelorarbeit.players.network_player.NetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 129, 'exploration_constant': 0.8, 'network_weight': 0.5, 'max_steps': 387, 'keep_tree': True}
+Result:  [0.66666667 0.33333333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 156, 'keep_tree': True}
+Result:  [0.62166667 0.37833333]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_network_player.AdaptiveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 119, 'exploration_constant': 0.8, 'network_weight': 0.5, 'keep_replies': True, 'max_steps': 357, 'keep_tree': True}
+Result:  [0.77333333 0.22666667]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f97f35b8040>, '_steps': 52, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 156, 'keep_tree': True}
+Result:  [0.71 0.29]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f97f35b3f70>, '_steps': 110, 'exploration_constant': 0.4, 'network_weight': 0.5, 'alpha': None, 'keep_replies': True, 'max_steps': 330, 'keep_tree': True}
+Result:  [0.74333333 0.25666667]
+==========
