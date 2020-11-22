@@ -40,6 +40,9 @@ Für diese Arbeit wurden mehrere Agenten auf Basis der Monte-Carlo-Baumsuche ent
 
 Sowie verschieden Kombinationen der oben beschriebenen Spieler.
 
+In `config.py` kann konfiguriert werden, wie viele Prozesse gestartet werden sollen, wenn ein Programm parallelisiert ist.
+
+
 Für die Auswertung der Spieler wurden verschiedene Hilfsprogramme in `bachelorarbeit.selfplay` und `bachelorarbeit.tools` entwickelt, die unter anderem ein paralleles Ausführen einer großen Anzahl von Spielen erlauben.
 
 Die folgenden Skripte können im Hauptverzeichnis gestartet werden.  
