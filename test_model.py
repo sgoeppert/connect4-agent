@@ -69,7 +69,7 @@ if __name__ == "__main__":
             start = time.time()
             arena = Arena(players=(NetworkPlayer, MCTSPlayer),
                           constructor_args=(player_config, {"max_steps": 400, "exploration_constant": 0.8}),
-                          num_processes=8,
+                          num_processes=4,
                           num_games=500,
                           )
             results = arena.run_game_mp()
