@@ -25,22 +25,22 @@ base_configs = [
 
 configs = [
     {
-        "model_path": config.ROOT_DIR + "/best_models/400000/padded_cnn_norm",
+        "model_path": config.ROOT_DIR + "/models/padded_cnn_norm",
         "transform_func": transform_board_cnn,
         "transform_output": denormalize,
     },
     {
-        "model_path": config.ROOT_DIR + "/best_models/400000/padded_cnn",
+        "model_path": config.ROOT_DIR + "/models/padded_cnn",
         "transform_func": transform_board_cnn,
         "transform_output": None,
     },
     {
-        "model_path": config.ROOT_DIR + "/best_models/400000/regular_norm",
+        "model_path": config.ROOT_DIR + "/models/regular_norm",
         "transform_func": transform_board_nega,
         "transform_output": denormalize,
     },
     {
-        "model_path": config.ROOT_DIR + "/best_models/400000/regular",
+        "model_path": config.ROOT_DIR + "/models/regular",
         "transform_func": transform_board_nega,
         "transform_output": None,
     },
