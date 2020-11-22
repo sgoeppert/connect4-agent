@@ -1,3 +1,7 @@
+"""
+Verwendet den MCTSTuner aus bachelorarbeit.tuner um die Parameter der entwickelten Agenten zu erforschen.
+"""
+
 from bachelorarbeit.players.adaptive_network_player import AdaptiveNetworkPlayer
 from bachelorarbeit.players.adaptive_rave_network_player import AdaptiveRaveNetworkPlayer
 from bachelorarbeit.players.mcts import MCTSPlayer
@@ -11,10 +15,28 @@ from bachelorarbeit.tuner import create_tuner, load_tuner, Parametrization
 from bachelorarbeit.tools import get_range
 
 CHECKPOINT_INTERVAL = 250
+OPPONENT_STEPS = 1000
+OPPONENT_CP = 1.0
 
 
 if __name__ == "__main__":
     print("Tuning parameters")
+
+    """
+    Beispielanwendung des Tuners um die exploration_constant des MCTSPlayers zu erforschen.
+    Die Ergebnisse werden in das Verzeichnis ./mcts_tuner/MCTSPlayer geschrieben.
+    """
+    print("MCTS")
+    mcts_params = Parametrization()
+    mcts_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
+    tuner = create_tuner(
+        MCTSPlayer, mcts_params,
+        checkpoint_interval=CHECKPOINT_INTERVAL,
+        opponent_config={"max_steps": 1000, "exploration_constant": OPPONENT_CP},
+        exploration=2.0  # explore options more evenly
+    )
+    tuner.search(2000)
+
     # OPPONENT_STEPS = 1000
     # print("Running Network Search")
     # nn_params = Parametrization()
@@ -39,6 +61,47 @@ if __name__ == "__main__":
     # tuner.exploration = 1.0
     # tuner.search(10000)
 
+
+    # print("Running Transpos Search")
+    # transpos_params = Parametrization()
+    # transpos_params.choice("exploration_constant", get_range(0.9, 7), default=0.9)
+    # transpos_params.add_default_option("uct_method", "UCT1")
+    # transpos_params.boolean("with_symmetry", default=False)
+    # tuner = create_tuner(TranspositionPlayer, transpos_params, checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      name="TransposUCT1")
+    # tuner.exploration = 2.0
+    # tuner.search(4000)
+    #
+    #
+    # transpos_params = Parametrization()
+    # transpos_params.choice("exploration_constant", get_range(0.9, 7), default=0.9)
+    # transpos_params.add_default_option("uct_method", "UCT2")
+    # transpos_params.boolean("with_symmetry", default=False)
+    # tuner = create_tuner(TranspositionPlayer, transpos_params, checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      name="TransposUCT2")
+    # tuner.exploration = 2.0
+    # tuner.search(4000)
+    #
+    #
+    # transpos_params = Parametrization()
+    # transpos_params.choice("exploration_constant", get_range(0.9, 7), default=0.9)
+    # transpos_params.add_default_option("uct_method", "UCT3")
+    # transpos_params.boolean("with_symmetry", default=False)
+    # tuner = create_tuner(TranspositionPlayer, transpos_params, checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      name="TransposUCT3")
+    # tuner.exploration = 2.0
+    # tuner.search(4000)
+    #
+    #
+    # transpos_params = Parametrization()
+    # transpos_params.choice("exploration_constant", get_range(0.9, 7), default=0.9)
+    # transpos_params.add_default_option("uct_method", "UCT0")
+    # transpos_params.boolean("with_symmetry", default=False)
+    # tuner = create_tuner(TranspositionPlayer, transpos_params, checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      name="TransposUCT0")
+    # tuner.exploration = 2.0
+    # tuner.search(4000)
+
     # print("Running AdaptivePlayout Search")
     # adap_params = Parametrization()
     # adap_params.choice("exploration_constant", get_range(0.8, 5, step=0.1), default=0.8)
@@ -50,27 +113,31 @@ if __name__ == "__main__":
 
     # print("Running Rave Search")
     # rave_params = Parametrization()
-    # rave_params.choice("exploration_constant", get_range(0.4, 5, step=0.1), default=0.4)
+    # rave_params.add_default_option("max_steps", 110)
+    # rave_params.choice("exploration_constant", get_range(0.4, 5, step=0.1), default=0.2)
     # rave_params.add_default_option("alpha", None)
-    # # rave_params.choice("alpha", [None, 0.3, 0.5, 0.8], default=None)
-    # # rave_params.xor(("k", [10, 100, 200]), ("alpha", [0.3, 0.5, 0.8]), default=(("k", 10), ("alpha", None)))
-    # tuner = create_tuner(RavePlayer, rave_params, checkpoint_interval=CHECKPOINT_INTERVAL, exploration=2.5)
-    # # tuner = load_tuner("RavePlayer")
-    # tuner.search(2000)
+    ## rave_params.choice("alpha", [None, 0.3, 0.5, 0.8], default=None)
+    # rave_params.choice("k", [10, 20, 50, 100, 200], default=10)
+    # rave_params.choice("alpha", [0.8, 0.9], default=0.8)
+    # rave_params.xor(("k", [10, 20, 50, 100, 200]), ("alpha", [0.3, 0.5, 0.8]), default=(("k", 50), ("alpha", None)))
+    # tuner = create_tuner(RavePlayer, rave_params, checkpoint_interval=1000, exploration=5, name="RAVE_LowSteps",
+    #                      opponent_config={"max_steps": 200})
+    # tuner = load_tuner("RAVE_Small")
+    # tuner.search(20000)
     #
     # print("Running AdaptiveRave Search")
     # adarave_params = Parametrization()
     # adarave_params.choice("exploration_constant", get_range(0.4, 5, step=0.1), default=0.4)
-    # adarave_params.add_default_option("alpha", None)
+    # # adarave_params.add_default_option("alpha", None)
     # # adarave_params.choice("alpha", [None, 0.3, 0.5, 0.8], default=None)
-    # # adarave_params.xor(("k", [10, 100, 200]), ("alpha", [0.3, 0.5, 0.8]), default=(("k", 10), ("alpha", None)))
-    # adarave_params.add_default_option("keep_replies", False)
+    # adarave_params.xor(("k", [10, 20, 50, 100, 200]), ("alpha", [0.3, 0.5, 0.8]), default=(("k", 10), ("alpha", None)))
+    # adarave_params.add_default_option("keep_replies", True)
     # adarave_params.add_default_option("forgetting", False)
     # # adarave_params.boolean("keep_replies", default=False)
     # # adarave_params.boolean("forgetting", default=False)
-    # tuner = create_tuner(AdaptiveRavePlayer, adarave_params, checkpoint_interval=CHECKPOINT_INTERVAL, exploration=2.0)
-    # # tuner = load_tuner("AdaptiveRavePlayer")
-    # tuner.search(2000)
+    # tuner = create_tuner(AdaptiveRavePlayer, adarave_params, checkpoint_interval=500, exploration=5.0, name="AMAF_LGR")
+    # tuner = load_tuner("AMAF_LGR")
+    # tuner.search(4000)
 
     # print("Running MCTS Search")
     # mcts_params = Parametrization()
@@ -100,49 +167,49 @@ if __name__ == "__main__":
     # tuner.search(4000)
 
 
-    print("Running AdaptivePlayout Search")
-    adap_params = Parametrization()
-    adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
-    adap_params.add_default_option("keep_replies", False)
-    adap_params.add_default_option("forgetting", False)
-    tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
-                         checkpoint_interval=CHECKPOINT_INTERVAL,
-                         exploration=2.0,
-                         name="NoKeepNoForgetLGR")
-    tuner.search(2000)
-
-
-    adap_params = Parametrization()
-    adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
-    adap_params.add_default_option("keep_replies", True)
-    adap_params.add_default_option("forgetting", False)
-    tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
-                         checkpoint_interval=CHECKPOINT_INTERVAL,
-                         exploration=2.0,
-                         name="KeepNoForgetLGR")
-    tuner.search(2000)
-
-
-    adap_params = Parametrization()
-    adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
-    adap_params.add_default_option("keep_replies", True)
-    adap_params.add_default_option("forgetting", True)
-    tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
-                         checkpoint_interval=CHECKPOINT_INTERVAL,
-                         exploration=2.0,
-                         name="KeepForgetLGR")
-    tuner.search(2000)
-
-
-    adap_params = Parametrization()
-    adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
-    adap_params.add_default_option("keep_replies", False)
-    adap_params.add_default_option("forgetting", True)
-    tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
-                         checkpoint_interval=CHECKPOINT_INTERVAL,
-                         exploration=2.0,
-                         name="NoKeepForgetLGR")
-    tuner.search(2000)
+    # print("Running AdaptivePlayout Search")
+    # adap_params = Parametrization()
+    # adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
+    # adap_params.add_default_option("keep_replies", False)
+    # adap_params.add_default_option("forgetting", False)
+    # tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
+    #                      checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      exploration=2.0,
+    #                      name="NoKeepNoForgetLGR")
+    # tuner.search(2000)
+    #
+    #
+    # adap_params = Parametrization()
+    # adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
+    # adap_params.add_default_option("keep_replies", True)
+    # adap_params.add_default_option("forgetting", False)
+    # tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
+    #                      checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      exploration=2.0,
+    #                      name="KeepNoForgetLGR")
+    # tuner.search(2000)
+    #
+    #
+    # adap_params = Parametrization()
+    # adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
+    # adap_params.add_default_option("keep_replies", True)
+    # adap_params.add_default_option("forgetting", True)
+    # tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
+    #                      checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      exploration=2.0,
+    #                      name="KeepForgetLGR")
+    # tuner.search(2000)
+    #
+    #
+    # adap_params = Parametrization()
+    # adap_params.choice("exploration_constant", get_range(1.0, 5), default=1.0)
+    # adap_params.add_default_option("keep_replies", False)
+    # adap_params.add_default_option("forgetting", True)
+    # tuner = create_tuner(AdaptivePlayoutPlayer, adap_params,
+    #                      checkpoint_interval=CHECKPOINT_INTERVAL,
+    #                      exploration=2.0,
+    #                      name="NoKeepForgetLGR")
+    # tuner.search(2000)
 
 
     # print("Running AdaptiveNetwork Search")

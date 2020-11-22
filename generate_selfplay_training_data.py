@@ -1,6 +1,10 @@
+"""
+Erzeugt Daten für das Training der neuronalen Netze.
+"""
+from bachelorarbeit.selfplay import Arena, Memory
+from bachelorarbeit.players.mcts import MCTSPlayer
+
 if __name__ == "__main__":
-    from bachelorarbeit.selfplay import Arena, Memory
-    from bachelorarbeit.players.mcts import MCTSPlayer
 
     memory = Memory("selfplay_mcts_strong_v2.pickle")
     arena = Arena(players=(MCTSPlayer, MCTSPlayer),

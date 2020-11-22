@@ -1,3 +1,14 @@
+"""
+Bereitet die gesammelten Daten so auf, dass die unterschiedlichen Netzwerk-Typen damit arbeiten können. Danach wird
+autokeras benutzt um NUM_TRIALS Netzwerke pro Konfiguration zu trainieren und vergleichen.
+
+Die transformierten Daten werden nach ./memory_ak/[SAMPLE_SIZE]/[PROJECT_NAME] geschrieben, z.B.
+    ./memory_ak/400000/transform_board_cnn_data_400000_norm.pickle
+
+Während des Trainings schreibt autokeras die untersuchten Netzwerke nach ./auto_models/[SAMPLE_SIZE] und nach dem
+Training die fertigen Modelle nach ./best_models/[SAMPLE_SIZE]/[PROJECT_NAME] z.B.
+    ./best_models/400000/padded_cnn_norm
+"""
 import os
 import tensorflow as tf
 import autokeras as ak
@@ -6,8 +17,7 @@ import pickle
 import itertools
 
 import config
-from bachelorarbeit.tools import transform_board, transform_board_large as large, transform_board_nega as regular, \
-    transform_board_cnn as cnn
+from bachelorarbeit.tools import transform_board, transform_board_nega as regular, transform_board_cnn as cnn
 from bachelorarbeit.selfplay import Memory
 from bachelorarbeit.network import transform_memory, split_data
 from bachelorarbeit.autokeras import PaddedConvBlock
@@ -20,15 +30,14 @@ OVERWRITE = True
 AUGMENT_DATA = True
 
 CUSTOM_CNN = True
-# TRANSFORMATIONS = [regular, large, cnn]
-TRANSFORMATIONS = [cnn]
-# NORMALIZE = [True, False]
-NORMALIZE = [False]
+TRANSFORMATIONS = [regular, transform_board, cnn]
+# TRANSFORMATIONS = [cnn]
+NORMALIZE = [True, False]
+# NORMALIZE = [False]
 DUPLICATES = "average"
 
 MODEL_NAMES = {
     'transform_board': 'naive',
-    'transform_board_large': 'large',
     'transform_board_nega': 'regular',
     'transform_board_cnn': 'cnn'
 }
