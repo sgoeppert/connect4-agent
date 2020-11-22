@@ -1,12 +1,14 @@
 import random
 import math
-from typing import Type, TypeVar
 
 from bachelorarbeit.games import Observation, Configuration, ConnectFour
 from bachelorarbeit.players.base_players import TreePlayer
 
 
 class Evaluator:
+    """
+    Der Evaluator nimmt einen Spielzustand entgegen und führt so lange zufällige Züge aus, bis das Spiel zu Ende ist.
+    """
     def __call__(self, game_state: ConnectFour) -> float:
         game = game_state.copy()
         scoring = game.get_other_player(game.get_current_player())
@@ -35,6 +37,11 @@ class Node:
         return self.average_value
 
     def best_child(self, C_p: float = 1.0):
+        """
+        Wählt das beste Kind dieses Knotens mit Hilfe der UCT-Regel aus und gibt es zurück.
+        :param C_p:
+        :return:
+        """
         n_p = math.log(self.number_visits)
 
         def UCT(child: Node):
@@ -56,6 +63,10 @@ class Node:
         return self.expanded
 
     def expand_one_child(self):
+        """
+        Expandiere diesen Knoten und gebe das erstellte Kind zurück.
+        :return:
+        """
         node_class = type(self)
 
         move = random.choice(self.possible_moves)
@@ -71,6 +82,11 @@ class Node:
         return self.children[move]
 
     def remove_parent(self, player):
+        """
+        Entferne die Referenz auf den Elternknoten um den Spielbaum zu reduzieren.
+        :param player:
+        :return:
+        """
         self.parent = None
 
     def __repr__(self):
@@ -95,10 +111,21 @@ class MCTSPlayer(TreePlayer):
         self.evaluate = Evaluator()
 
     def reset(self, conf: Configuration = None):
+        """
+        Setzt den internen Zustand zurück.
+        :param conf:
+        :return:
+        """
         super(MCTSPlayer, self).reset(conf)
         self.evaluate.reset()
 
     def tree_policy(self, root):
+        """
+        Durchlaufe den Baum bis ein terminaler oder unvollständiger Knoten erreicht wurde. Gibt den letzten
+        Knoten zurück.
+        :param root:
+        :return:
+        """
         current = root
         while not current.game_state.is_terminal():
             if current.is_expanded():
@@ -108,6 +135,12 @@ class MCTSPlayer(TreePlayer):
         return current
 
     def backup(self, node, reward: float):
+        """
+        Hangelt sich vom Knoten bis zur Wurzel hinauf und aktualisiert alle Knoten des Baumes auf dem Weg.
+        :param node:
+        :param reward:
+        :return:
+        """
         current = node
         while current is not None:
             current.increment_visit_and_add_reward(reward)
@@ -147,7 +180,7 @@ if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
 
-    steps = 50000
+    steps = 20000
     p = MCTSPlayer(max_steps=steps)
     conf = Configuration()
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)

@@ -209,16 +209,18 @@ class TranspositionPlayer(MCTSPlayer):
         return self.best_move(root)
 
     def init_root_node(self, root_game):
+        self.transpositions = {}
         return TranspositionNode(root_game)
 
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer
+    from bachelorarbeit.selfplay import Arena
 
-    steps = 3000
+    steps = 20000
     conf = Configuration()
-    p = TranspositionPlayer(max_steps=steps, uct_method="default", exploration_constant=1.0, with_symmetry=True)
+    p = TranspositionPlayer(max_steps=steps, uct_method="UCT2", exploration_constant=0.8, with_symmetry=True)
     game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
     obs = Observation(board=game.board.copy(), mark=game.mark)
 

@@ -1,7 +1,7 @@
 from bachelorarbeit.games import ConnectFour
 from bachelorarbeit.players.adaptive_rave import AdaptiveRavePlayer, AdaptiveRaveEvaluator
 from bachelorarbeit.players.network_player import NNEvaluator
-from bachelorarbeit.tools import denormalize, transform_board_cnn
+from bachelorarbeit.tools import denormalize, transform_board_cnn, transform_board_nega
 
 import config
 
@@ -53,25 +53,30 @@ if __name__ == "__main__":
     from bachelorarbeit.selfplay import Arena
     import config
 
-    # steps = 400
-    #
-    # play = AdaptiveRaveNetworkPlayer(max_steps=steps)
-    # g = ConnectFour()
-    # obs = Observation(board=g.board[:], mark=g.mark)
-    # conf = Configuration()
-    #
-    # with timer():
-    #     m = play.get_move(obs, conf)
-    #     print(m)
+    steps = 2000
+
+    play = AdaptiveRaveNetworkPlayer(max_steps=steps,
+                                     model_path=config.ROOT_DIR + "/best_models/400000/regular_norm",
+                                     transform_func=transform_board_nega)
+    g = ConnectFour()
+    obs = Observation(board=g.board[:], mark=g.mark)
+    conf = Configuration()
+
+    with timer():
+        m = play.get_move(obs, conf)
+        print(m)
 
     # exit()
 
     rave_steps = 52
+    rave_steps = 110
     regular_steps = 1000
 
     arena = Arena(players=(AdaptiveRaveNetworkPlayer, MCTSPlayer),
                   constructor_args=(
                       {
+                          "model_path": config.ROOT_DIR + "/best_models/400000/padded_cnn_norm",
+                          "transform_func": transform_board_cnn,
                           "max_steps": rave_steps,
                           "exploration_constant": 0.4,
                           "network_weight": 0.5,

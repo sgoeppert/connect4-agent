@@ -2,7 +2,7 @@ from bachelorarbeit.games import ConnectFour
 from bachelorarbeit.players.mcts import MCTSPlayer
 from bachelorarbeit.players.network_player import NetworkPlayer, NNEvaluator
 from bachelorarbeit.players.adaptive_playout import AdaptiveEvaluator
-from bachelorarbeit.tools import transform_board_cnn, denormalize
+from bachelorarbeit.tools import transform_board_cnn, denormalize, transform_board_nega
 import config
 
 
@@ -59,6 +59,18 @@ if __name__ == "__main__":
     from tqdm import tqdm
     import config
 
+    steps = 2000
+
+    model_path = config.ROOT_DIR + "/best_models/400000/regular_norm"
+
+    play = AdaptiveNetworkPlayer(max_steps=steps, model_path=model_path, transform_func=transform_board_nega)
+    g = ConnectFour()
+    obs = Observation(board=g.board[:], mark=g.mark)
+    conf = Configuration()
+
+    with timer():
+        m = play.get_move(obs, conf)
+        print(m)
 
     # arena = TinyArena(players=(AdaptiveNetworkPlayer, MCTSPlayer),
     #                   opponent_config={"max_steps": regular_steps, "exploration_constant": 1.0})
@@ -68,22 +80,22 @@ if __name__ == "__main__":
     #     "exploration_constant": 0.8,
     #     "keep_replies": True
     # }
-    nn_steps = 200
-    regular_steps = 2000
-
-    arena = Arena(players=(AdaptiveNetworkPlayer, MCTSPlayer),
-                  constructor_args=(
-                      {
-                          "max_steps": nn_steps,
-                          "network_weight": 0.5,
-                          "exploration_constant": 0.8,
-                          "keep_replies": True
-                      },
-                      {"max_steps": regular_steps, "exploration_constant": 1.0}),
-                  num_games=400,
-                  num_processes=8
-                  )
-    arena.run_game_mp(show_progress_bar=True)
+    # nn_steps = 200
+    # regular_steps = 2000
+    #
+    # arena = Arena(players=(AdaptiveNetworkPlayer, MCTSPlayer),
+    #               constructor_args=(
+    #                   {
+    #                       "max_steps": nn_steps,
+    #                       "network_weight": 0.5,
+    #                       "exploration_constant": 0.8,
+    #                       "keep_replies": True
+    #                   },
+    #                   {"max_steps": regular_steps, "exploration_constant": 1.0}),
+    #               num_games=400,
+    #               num_processes=8
+    #               )
+    # arena.run_game_mp(show_progress_bar=True)
     # all_rewards = []
     # games_per = 200
     # pbar = tqdm(total=games_per * 2)

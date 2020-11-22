@@ -46,6 +46,12 @@ class TreePlayer(Player):
         self.time_buffer_pct = time_buffer_pct
 
     def reset(self, conf):
+        """
+        Löscht den gespeicherten baum, wenn keep_tree = False ist. Außerdem wird der Schrittzähler und die Ausführungszeit
+        zurückgesetzt um den neuen durchlauf korrekt abbrechen zu können.
+        :param conf:
+        :return:
+        """
         self.start_time = time.time()
         self.steps_taken = 0
 
@@ -63,6 +69,10 @@ class TreePlayer(Player):
         self.initialized = True
 
     def has_resources(self) -> bool:
+        """
+        Gibt True zurück, so lange das Ressourcenlimit (Zeit oder Schritte) nicht erreicht ist.
+        :return:
+        """
         if self.time_limit > 0:
             return time.time() - self.start_time < self.time_limit
         else:
@@ -71,6 +81,13 @@ class TreePlayer(Player):
 
     @staticmethod
     def determine_opponent_move(new_board: List[int], old_board: List[int], columns: int = 7) -> int:
+        """
+        Vergleicht das neue Spielfeld mit dem alten Spielfeld um den Zug des Gegners zu finden.
+        :param new_board:
+        :param old_board:
+        :param columns:
+        :return:
+        """
         i = 0
         for new_s, old_s in zip(new_board, old_board):
             if new_s != old_s:
@@ -79,6 +96,13 @@ class TreePlayer(Player):
         return -1
 
     def _restore_root(self, observation, configuration):
+        """
+        Versucht den gespeicherten Baum wiederzuverwenden. Dafür wird bestimmt, welchen Zug der Gegenspieler ausgeführt hat
+        und der entsprechende Knoten im Baum gesucht.
+        :param observation:
+        :param configuration:
+        :return:
+        """
         root = None
         # if we're keeping the tree and have a stored node, try to determine the opponents move and apply that move
         # the resulting node is out starting root-node

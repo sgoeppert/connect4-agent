@@ -1,6 +1,14 @@
 from dataclasses import dataclass
 from typing import List
 
+"""
+Configuration und Observation sind Dataclasses, die den Aufbau der entsprechenden Datenstrukturen des Kaggle-Wettbewerbs
+spiegeln. Auf die Variablen kann mit dem Punkt-Operator zugegriffen werden, z.B. 
+
+    conf = Configuration()
+    rows = conf.rows
+
+"""
 @dataclass
 class Configuration:
     rows: int = 6
@@ -18,6 +26,9 @@ class Observation:
 
 
 class ConnectFour:
+    """
+    Eine Implementierung des Spiels VierGewinnt.
+    """
     def __init__(
             self,
             columns: int = 7,
@@ -39,18 +50,36 @@ class ConnectFour:
         self.winner = None
 
     def is_terminal(self) -> bool:
+        """
+        :return: True wenn das Spiel zu Ende ist, sonst False
+        """
         return self.finished
 
     def list_moves(self) -> List[int]:
+        """
+        :return: Die Liste aller legalen Spielzüge in diesem Zustand
+        """
         return [c for c in range(self.cols) if self.board[c] == 0]
 
     def get_current_player(self) -> int:
+        """
+        :return: Der Spieler der gerade am Zug ist
+        """
         return self.mark
 
     def get_other_player(self, player: int) -> int:
+        """
+        :param player:
+        :return: Der andere Spieler
+        """
         return 3 - player
 
     def play_move(self, col: int) -> "ConnectFour":
+        """
+        Setzt einen Stein in die angegebene Spalte und prüft danach ob das Spiel vorüber ist
+        :param col:
+        :return:
+        """
         try:
             row = max([r for r in range(self.rows) if self.board[col + (r * self.cols)] == 0])
             self.board[col + (row * self.cols)] = self.mark
@@ -69,6 +98,14 @@ class ConnectFour:
         return self
 
     def is_win(self, column: int, mark: int, has_played: bool = False) -> bool:
+        """
+        Prüft, ob das Spiel gewonnen wird oder gewonnen ist, wenn der Spieler _mark_ einen Stein in Spalte _column_ setzt.
+        Die implementierung dieser Methode stammt aus dem Paket kaggle_environments.
+        :param column:
+        :param mark:
+        :param has_played:
+        :return:
+        """
         columns = self.cols
         rows = self.rows
         inarow = self.inarow - 1
@@ -103,6 +140,12 @@ class ConnectFour:
         return all(mark != 0 for mark in self.board)
 
     def get_move_name(self, column: int, played: bool = False) -> int:
+        """
+        Berechnet den einzigartigen Namen für einen Zug
+        :param column:
+        :param played:
+        :return:
+        """
         stones_in_col = self.stones_per_column[column]
         player = self.get_current_player()
         if played:
@@ -111,6 +154,11 @@ class ConnectFour:
         return 10 * (stones_in_col * self.cols + column) + player
 
     def get_reward(self, mark: int) -> int:
+        """
+        Gibt die Belohnung für den übergebenen Spieler zurück.
+        :param mark:
+        :return:
+        """
         if not self.finished:
             raise RuntimeError("get_reward called on non terminal game")
 

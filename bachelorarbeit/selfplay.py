@@ -18,6 +18,11 @@ GameResult = Tuple[float, float]
 
 
 class Arena:
+    """
+    Diese Klasse lässt zwei Spieler gegeneinander spielen. Die Arena kann eine große Anzahl an Spielen durchführen und
+    diese Ausführung durch Parallelisierung beschleunigen. Die Besuchten Spielzustände und Ergebnisse der Spiele können,
+    bei Bedarf, in einem Memory Objekt gespeichert werden.
+    """
     def __init__(
             self,
             players: Tuple[Type[Player], Type[Player]],
@@ -135,6 +140,10 @@ class Arena:
 
 
 class MoveEvaluation:
+    """
+    Die MoveEvaluation bewertet den Spieler anhand eines Datensatzes mit Spielpositionen. Für jede Spielposition muss
+    der Spieler einen guten oder den optimalen Spielzug auswählen. Die MoveEvaluation wird parallelisiert durchgeführt.
+    """
     def __init__(self,
                  player: Type[Player],
                  dataset_file: str,
@@ -222,6 +231,9 @@ class MoveEvaluation:
 
 
 class Memory:
+    """
+    Diese Klasse kann Spielzustände wie sie in der Arena erzeugt werden verarbeiten und in einer Datei speichern oder laden.
+    """
     def __init__(self, file_name: str, save_interval: int = 5000):
         self.file_name = Path(config.ROOT_DIR) / "memory" / file_name
         self.save_interval = save_interval
@@ -276,12 +288,3 @@ class Memory:
         num_to_forget = math.floor(self.num_states * amount)
         self.game_data = self.game_data[num_to_forget:]
         self.num_states -= num_to_forget
-
-
-if __name__ == "__main__":
-    from bachelorarbeit.players.mcts import MCTSPlayer
-
-    # memory = Memory(file_name="random_data.pkl")
-    arena = Arena(players=(MCTSPlayer, MCTSPlayer), num_games=1, num_processes=6)
-
-    arena.run_game_mp()

@@ -29,20 +29,22 @@ class RaveNode(Node):
         self.rave_score: float = 0
         self.rave_children: Dict[int, "RaveNode"] = {}
 
-    def beta(self) -> float:
-        return self.rave_count / (self.rave_count + self.number_visits)
+    def beta(self, k=200) -> float:
+        # return self.rave_count / (self.rave_count + self.number_visits)
+        # k = 200
+        return math.sqrt(k / (3 * self.number_visits + k))
 
     def QRave(self) -> float:
         return self.rave_score
 
-    def best_child(self, C_p: float = 1.0, alpha: float = None) -> Tuple["RaveNode", int]:
+    def best_child(self, C_p: float = 1.0, alpha: float = None, k: int = 200) -> Tuple["RaveNode", int]:
         n_p = math.log(self.number_visits)
 
         def UCT_Rave(child: RaveNode):
             if alpha is not None:
                 beta = alpha
             else:
-                beta = child.beta()
+                beta = child.beta(k)
             return (1 - beta) * child.Q() + beta * child.QRave() \
                    + C_p * math.sqrt(n_p / child.number_visits)
 
@@ -75,18 +77,19 @@ class RaveNode(Node):
 class RavePlayer(MCTSPlayer):
     name = "RavePlayer"
 
-    def __init__(self, alpha: float = None, *args, **kwargs):
+    def __init__(self, alpha: float = None, k: int = 200, *args, **kwargs):
         super(RavePlayer, self).__init__(*args, **kwargs)
         # self.move_list = []
         self.evaluate = RaveEvaluator()
         self.alpha = alpha
+        self.k = k
 
     def tree_policy(self, root: "RaveNode") -> "RaveNode":
         current = root
 
         while not current.game_state.is_terminal():
             if current.is_expanded():
-                current, m = current.best_child(self.exploration_constant, alpha=self.alpha)
+                current, m = current.best_child(self.exploration_constant, alpha=self.alpha, k=self.k)
                 # Hole den eindeutigen Namen des Spielzugs und merke ihn
                 self.evaluate.moves.append(current.game_state.get_move_name(m, played=True))
             else:
@@ -126,61 +129,5 @@ class RavePlayer(MCTSPlayer):
         return RaveNode(game_state=root_game)
 
     def best_move(self, node: RaveNode) -> int:
-        n, move = node.best_child(C_p=0, alpha=self.alpha)
+        n, move = node.best_child(C_p=0, alpha=self.alpha, k=self.k)
         return move
-
-
-if __name__ == "__main__":
-    from bachelorarbeit.games import Observation, Configuration, ConnectFour
-    from bachelorarbeit.tools import timer
-
-    # steps = 20000
-    # pl = RavePlayer(max_steps=steps, exploration_constant=0.4, alpha=None)
-    # conf = Configuration()
-    # game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
-    # obs = Observation(board=game.board.copy(), mark=game.mark)
-    #
-    # with timer(f"{steps} steps"):
-    #     m = pl.get_move(obs, conf)
-    #     print(m)
-
-    from bachelorarbeit.selfplay import Arena
-
-    test_steps = 809
-    regular_steps = 1000
-
-    arena = Arena(players=(RavePlayer, MCTSPlayer),
-                  constructor_args=(
-                      {
-                          "max_steps": test_steps,
-                          "exploration_constant": 0.4,
-                          "alpha": 0.5,
-                      },
-                      # {"max_steps": regular_steps, "exploration_constant": 0.4, "alpha": 0.5, "keep_replies": True}),
-                      {
-                          "max_steps": regular_steps
-                      }),
-                  num_games=500,
-                  num_processes=8
-                  )
-    arena.run_game_mp(show_progress_bar=True)
-
-
-    test_steps = 834
-    regular_steps = 1000
-
-    arena = Arena(players=(RavePlayer, MCTSPlayer),
-                  constructor_args=(
-                      {
-                          "max_steps": test_steps,
-                          "exploration_constant": 0.4,
-                          "alpha": None,
-                      },
-                      # {"max_steps": regular_steps, "exploration_constant": 0.4, "alpha": 0.5, "keep_replies": True}),
-                      {
-                          "max_steps": regular_steps
-                      }),
-                  num_games=500,
-                  num_processes=8
-                  )
-    arena.run_game_mp(show_progress_bar=True)

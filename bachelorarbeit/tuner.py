@@ -1,3 +1,4 @@
+
 import multiprocessing
 import random
 import itertools
@@ -25,17 +26,28 @@ def get_timestamp():
 
 
 class TinyArena:
+    """
+    TinyArena verwendet die Parameter in einem Knoten des MCTSTuners um damit zwei Spieler gegeneinander spielen zu lassen.
+    """
     def __init__(
             self,
             players: Tuple[Type[Player], Type[Player]],
             opponent_config: dict
     ):
+        """
+        :param players: Die Klassen der Spieler, die gegeneinander spielen sollen
+        :param opponent_config: Die Konfiguration des Gegners. In der Regel ist dies der MCTSSpieler
+        """
         self.player_classes = players
         self.opponent_config = opponent_config
         self.player_config = None
         self.flip_players = False
 
     def instantiate_players(self) -> List[Player]:
+        """
+        Benutzt die player_config aus dem Knoten und die opponent_config um die beiden Spieler zu instanziieren
+        :return: Die erstellten Player
+        """
         players = []
         for pclass, arg in zip(self.player_classes, (self.player_config, self.opponent_config)):
             if arg:
@@ -48,6 +60,10 @@ class TinyArena:
         return players
 
     def run_game(self):
+        """
+        Führt ein Spiel aus und gibt die Belohnungen für beide Spieler zurück
+        :return:
+        """
         conf = Configuration()
         game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
         players = self.instantiate_players()
@@ -64,6 +80,12 @@ class TinyArena:
         return game.get_reward(1), game.get_reward(2)
 
     def run(self, leaf: "TunerNode"):
+        """
+        Simuliert zwei Spiele zwischen dem Spieler der in leaf konfiguriert ist, und dem Vergleichsspieler. Nach dem
+        ersten Spiel tauschen die beiden Spieler die Plätze und der Vergleichsspieler fängt an.
+        :param leaf:
+        :return:
+        """
         self.player_config = leaf.fixed_parameters
 
         results = [self.run_game()]
@@ -73,33 +95,70 @@ class TinyArena:
 
 
 class Parametrization:
+    """
+    Die Parametrisierung eines Spielers. Es können konstante Parameter mit 'add_default_option', variable Parameter mit
+    'choice' oder 'boolean' und Optionen, die sich gegenseitig ausschließen mit 'xor' hinzugefügt werden.
+
+    Bei der Verarbeitung der Parametrisierung wird wiederholt 'pop_option' aufgerufen, um einen Parameter nach dem anderen
+    zu entnehmen.
+    """
     def __init__(self):
         self.options = []
         self.default_config = {}
 
     def add_default_option(self, name, value):
+        """
+        Fügt einen konstanten Wert zur Parametrisierung hinzu
+        :param name:
+        :param value:
+        """
         self._check_key(name)
         self.default_config[name] = value
 
     def pop_option(self) -> List:
+        """
+        Gibt die nächste Option als Liste zurück
+        :return:
+        """
         return list(self.options.pop(0))
 
     def _check_key(self, key: str):
+        """
+        Prüft ob der Key bereits in der Parametrisierung enthalten ist
+        :param key:
+        :return:
+        """
         if key in self.default_config:
             raise KeyError("Duplicate name " + key)
 
     def choice(self, name: str, values: List, default: Any):
+        """
+        Fügt einen Parameter mit variablen Werten hinzu
+        :param name:
+        :param values: Liste der möglichen Werte für diesen Parameter
+        :param default: Default-Wert des Parameters
+        """
         self._check_key(name)
 
         self.default_config[name] = default
         self.options.append(tuple([(name, val) for val in values]))
 
     def boolean(self, name: str, default: bool = False):
+        """
+        Fügt einen Wahrheitswert hinzu
+        :param name:
+        :param default:
+        """
         self._check_key(name)
         self.default_config[name] = default
         self.options.append(tuple([(name, b) for b in [default, not default]]))
 
     def xor(self, *options, default: Tuple = None):
+        """
+        Fügt mehrere Parameter mit eigenen Werten hinzu. Diese Parameter schließen sich gegenseitig aus.
+        :param options:
+        :param default:
+        """
         if default is None:
             raise ValueError("XOR needs default values")
         if len(options) != len(default):
@@ -118,6 +177,10 @@ class Parametrization:
         self.options.append(tuple(new_options))
 
     def to_simple_dict(self):
+        """
+        Erzeugt ein dict aus den Parametern
+        :return:
+        """
         out_dict = {}
         for option in self.options:
             for key, value in option:
@@ -138,6 +201,9 @@ class Parametrization:
 
 
 class TunerNode:
+    """
+    Ein Knoten im Baum des MCTSTuners. Jeder Knoten enthält eine Kopie der Parametrisierung
+    """
     def __init__(self, free_parameters: Parametrization, fixed_parameters: dict, parent: "TunerNode" = None):
         self.free_parameters = free_parameters
         self.fixed_parameters = fixed_parameters
@@ -203,6 +269,32 @@ class TunerNode:
 
 
 class MCTSTuner:
+    """
+    Der MCTSTuner benutzt die Monte-Carlo-Baumsuche um eine Reihe von Parametern zu untersuchen.
+
+    Die übergebene Parametrisierung wird in ihre möglichen Parameter zerlegt. Wenn ein Knoten expandiert wird, wird
+    ein Parameter aus der Parametrisierung entnommen und fixiert. Die Kanten, die in die Knoten führen sind die
+    möglichen Werte dieses einen Parameters.
+
+    Beispiel:
+    mcts_params = Parametrization()
+    mcts_params.choice("exploration_constant", [0.8,0.9,1.0,1.1,1.2], default=1.0)
+
+    tuner = MCTSTuner(MCTSPlayer, mcts_params)
+    tuner.search(1000)
+
+    Der Wurzelknoten hat 5 Kinder, die Kanten in diese Kinder haben die "Namen" (exploration_constant, 0.8),
+    (exploration_constant, 0.9) ...
+
+    Der Baum wird expandiert bis alle Parameter aus der Parametrisierung verarbeitet sind. Danach werden in den
+    Blattknoten Simulationen durchgeführt. Jedes Blatt ist eine andere Kombination aus allen Parametern.
+
+    Der MCTSTuner kann für eine beliebige Anzahl Spiele ausgeführt werden, die Konfigurationen die zu den besten Ergebnissen
+    geführt haben, werden dabei am häufigsten besucht um genauere Einschätzungen über ihre Qualität zu erhalten.
+
+    In regelmäßigen Abständen wird der Zustand des MCTSTuners in einem Checkpoint gespeichert und die Werte der Blattknoten
+    in eine Datei geschrieben.
+    """
     def __init__(self, player: Type[Player], parameters: Parametrization, opponent: Type[Player], opponent_config: dict,
                  name: str = None, directory: str = DEFAULT_DIR, checkpoint_interval: int = 100, exploration: float = 1.0):
 
@@ -439,18 +531,6 @@ class MCTSTuner:
             self.write_checkpoint()
         pbar.close()
 
-        # Runs n games in each leaf node in parallel
-        # for _ in tqdm(range(iterations)):
-        #     root = self.root
-        #     leaf = self.tree_policy(root, 1.0)
-        #     score = self.evaluate(leaf)
-        #     self.backup(leaf, score)
-        #
-        #     self.n += 1
-        #
-        #     if self.n % self.checkpoint_interval == 0:
-        #         self.write_checkpoint()
-
         self.write_checkpoint()
 
     def get_best_parameters(self):
@@ -469,6 +549,18 @@ def create_tuner(player: Type["Player"], parametrization: Parametrization,
                  checkpoint_interval=100,
                  exploration: float = 1.0
                  ) -> MCTSTuner:
+    """
+    Methode um einen Tuner zu erstellen
+    :param player:
+    :param parametrization:
+    :param name:
+    :param directory:
+    :param opponent:
+    :param opponent_config:
+    :param checkpoint_interval:
+    :param exploration:
+    :return:
+    """
 
     if opponent_config is None:
         opponent_config = {}
@@ -480,6 +572,14 @@ def create_tuner(player: Type["Player"], parametrization: Parametrization,
 
 
 def load_tuner(name, directory=DEFAULT_DIR, run_nr=None, checkpoint=None) -> MCTSTuner:
+    """
+    Methode um einen MCTSTuner mit einem bestimmten Namen von einem Durchlauf oder Checkpoint fortzusetzen
+    :param name:
+    :param directory:
+    :param run_nr:
+    :param checkpoint:
+    :return:
+    """
     project_dir = Path(config.ROOT_DIR) / directory / name
 
     if not os.path.exists(project_dir):
@@ -506,14 +606,3 @@ def load_tuner(name, directory=DEFAULT_DIR, run_nr=None, checkpoint=None) -> MCT
     tuner.name = name
 
     return tuner
-
-if __name__ == "__main__":
-    from bachelorarbeit.players.mcts import MCTSPlayer
-    from bachelorarbeit.tools import get_range
-
-    # params = Parametrization()
-    # params.choice("exploration_constant", get_range(1.0, 9), default=1.0)
-
-    # tuner = create_tuner(MCTSPlayer, params, checkpoint_interval=1, opponent_config={"max_steps": 10})
-    tuner = load_tuner("MCTSPlayer")
-    tuner.search(10)

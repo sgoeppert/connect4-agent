@@ -1,120 +1,16 @@
 import json
 import os
 from datetime import datetime
-from typing import Tuple, Optional, Type
+from typing import  Optional, Type
 import numpy as np
 from pathlib import Path
 from contextlib import contextmanager
 import time
 import numbers
 
-from bachelorarbeit.selfplay import Arena, MoveEvaluation
-from bachelorarbeit.players.base_players import Player, RandomPlayer
+from bachelorarbeit.selfplay import MoveEvaluation
+from bachelorarbeit.players.base_players import Player
 import config
-
-
-def run_selfplay_experiment(
-        title: str,
-        players: Tuple[Type[Player], Type[Player]],
-        constructor_args: Tuple[any, any] = (None, None),
-        num_games: int = 100,
-        num_processes: int = config.NUM_PROCESSES,
-        show_progress_bar: bool = False,
-        max_tasks_per_child: int = 10,
-        repeats: int = 1
-):
-    # print("Running Experiment: ", title)
-    arena = Arena(players, constructor_args=constructor_args, num_processes=num_processes, num_games=num_games)
-
-    all_results = []
-    all_means = []
-    for i in range(repeats):
-        results = arena.run_game_mp(show_progress_bar=show_progress_bar, max_tasks=max_tasks_per_child)
-        mean_scores = (np.mean(results, axis=0) + 1) / 2  # calculate the mean score per player as value between 0 and 1
-        all_results.append(results)
-        all_means.append(mean_scores.tolist())
-
-    mean = np.mean(all_means, axis=0)
-    std = np.std(all_means, axis=0)[0]
-
-    return {
-        "title": title,
-        "num_games": num_games,
-        "players": [p.name for p in players],
-        "configurations": constructor_args,
-        "raw_results": all_results,
-        "raw_means": all_means,
-        "mean": mean.tolist(),
-        "std": std,
-        "repeats": repeats
-    }
-
-
-def explore_parameter_against_fixed_opponent(
-        player: Type["Player"], opponent: Type["Player"],
-        player_conf: dict, opponent_conf: dict,
-        values: list, parameter="exploration_constant",
-        num_games: int = 100,
-        repeats: int = 1,
-        variable_opponent: bool = False,
-        verbose: bool = True
-) -> Tuple[list, list]:
-    base_setting = player_conf
-
-    shortened_results = []
-    raw_results = []
-    for v in values:
-        settings = base_setting.copy()
-        settings[parameter] = v
-        player_desc = f"{player.name} {parameter}:{v}"
-
-        comparison = opponent_conf.copy()
-        enemy_desc = f"{opponent.name}"
-        if variable_opponent:
-            comparison[parameter] = v
-            enemy_desc += f"{parameter}:{v}"
-
-        if verbose:
-            print(player_desc, "vs", enemy_desc)
-
-        res = run_selfplay_experiment(
-            "",
-            players=(player, opponent),
-            constructor_args=(settings, comparison),
-            num_games=num_games,
-            repeats=repeats,
-            show_progress_bar=True
-        )
-        del(res["title"])
-        raw_results.append(res)
-        shortened = {**res}
-        shortened.pop("raw_results")
-        shortened.pop("raw_means")
-        shortened_results.append(shortened)
-    return shortened_results, raw_results
-
-
-def evaluate_against_random(
-        player: Type[Player],
-        constructor_args: Optional[dict] = None,
-        num_games: int = 100,
-        num_processes: int = config.NUM_PROCESSES
-):
-    # print("Evaluation against random player: ", player, constructor_args)
-    arena = Arena(players=(player, RandomPlayer), constructor_args=(constructor_args, None),
-                  num_processes=num_processes, num_games=num_games)
-
-    results = arena.run_game_mp(show_progress_bar=False)
-    mean_scores = (np.mean(results, axis=0) + 1) / 2  # calculate the mean score per player as value between 0 and 1
-
-    return {
-        "title": "Eval against random",
-        "num_games": num_games,
-        "player": player.name,
-        "configuration": constructor_args,
-        # "raw_results": results,
-        "mean": mean_scores.tolist()
-    }
 
 
 def run_move_evaluation_experiment(
@@ -126,6 +22,17 @@ def run_move_evaluation_experiment(
         repeats: int = 1,
         show_progress_bar: bool = False
 ):
+    """
+    Bewertet die Gena
+    :param title:
+    :param player:
+    :param player_config:
+    :param num_processes:
+    :param max_tasks:
+    :param repeats:
+    :param show_progress_bar:
+    :return:
+    """
     dataset_file = str(Path(config.ROOT_DIR) / "auswertungen" / "data" / "refmoves1k_kaggle")
 
     good, perfect, total = 0, 0, 0
@@ -186,6 +93,11 @@ def dump_json(filename, data):
     print("Wrote results to file ", out_file)
 
 
+"""
+Verschiedene Methoden für die Transformation des Spielfelds in eine Repräsentation für das neuronale Netz:
+"""
+
+
 def transform_board_large(board):
     b = np.asarray(board)
     if b.ndim == 1:
@@ -217,19 +129,13 @@ def transform_board_cnn(board):
     return np.moveaxis(new_board, -3, -1).tolist()
 
 
-def transform_board_cnn_nega(board):
-    b = np.asarray(board)
-    if b.ndim == 1:
-        b.shape = (1,) + b.shape
-    b[b == 2] = -1
-    return b.reshape((-1,6,7)).tolist()
-
-
 def normalize(val):
     return (val + 1) / 2
 
+
 def denormalize(val):
     return (2 * val) - 1
+
 
 def flip_board(board, rows=6, cols=7):
     return np.array(board).reshape((rows, cols))[:, ::-1].reshape(-1).tolist()
@@ -244,6 +150,9 @@ def timer(name="Timer"):
 
 
 class Table:
+    """
+    Eine Klasse für die Erstellung von Tabellen und die Ausgabe in einem für Latex geeigneten Format
+    """
     def __init__(self):
         self.rows = []
         self.row_header = []

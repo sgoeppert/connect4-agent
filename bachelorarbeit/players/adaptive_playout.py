@@ -67,20 +67,3 @@ class AdaptivePlayoutPlayer(MCTSPlayer):
     def __init__(self, forgetting=False, keep_replies=False, *args, **kwargs):
         super(AdaptivePlayoutPlayer, self).__init__(*args, **kwargs)
         self.evaluate = AdaptiveEvaluator(forgetting, keep_replies)
-
-
-if __name__ == "__main__":
-    from bachelorarbeit.games import Observation, Configuration, ConnectFour
-    from bachelorarbeit.tools import timer
-
-    steps = 50000
-    pl = AdaptivePlayoutPlayer(max_steps=steps, exploration_constant=0.85)
-    conf = Configuration()
-    game = ConnectFour(columns=conf.columns, rows=conf.rows, inarow=conf.inarow, mark=1)
-    obs = Observation(board=game.board.copy(), mark=game.mark)
-
-    with timer(f"{steps} steps"):
-        m = pl.get_move(obs, conf)
-        print(m)
-
-    # print(pl.replies)

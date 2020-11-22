@@ -2,26 +2,10 @@ import numpy as np
 
 from bachelorarbeit.games import ConnectFour
 from bachelorarbeit.players.mcts import MCTSPlayer, Evaluator
-from bachelorarbeit.tools import flip_board, transform_board_cnn, denormalize
-from requests import Session
+from bachelorarbeit.tools import flip_board, transform_board_cnn, denormalize, transform_board_nega
 import config
 
 DEBUG = False
-
-
-class RequestEvaluator(Evaluator):
-    def __init__(self, alpha=0.9):
-        self.session = Session()
-        self.alpha = alpha
-
-    def __call__(self, game_state: ConnectFour):
-        payload = {"input": game_state.board[:]}
-        resp = self.session.post('http://127.0.0.1:5000/predict', json=payload)
-        pred = resp.json()["predictions"]
-        playout_reward = super().__call__(game_state)
-        score = self.alpha * pred + (1 - self.alpha) * playout_reward
-
-        return score
 
 
 class NNEvaluator(Evaluator):
@@ -79,34 +63,31 @@ class NetworkPlayer(MCTSPlayer):
             self,
             network_weight: float = 0.5,
             model_path: str = config.DEFAULT_MODEL,
-            transform_func: callable = transform_board_cnn,
+            transform_func: callable = transform_board_nega,
             transform_output: callable = denormalize,
-            use_server: bool = False,
             **kwargs
     ):
         super(NetworkPlayer, self).__init__(**kwargs)
-
-        if use_server:
-            self.evaluate = RequestEvaluator(alpha=network_weight)
-        else:
-            self.evaluate = NNEvaluator(model_path=model_path,
-                                        transform_input=transform_func,
-                                        transform_output=transform_output,
-                                        alpha=network_weight)
+        self.evaluate = NNEvaluator(model_path=model_path,
+                                    transform_input=transform_func,
+                                    transform_output=transform_output,
+                                    alpha=network_weight)
 
 
 
 if __name__ == "__main__":
     from bachelorarbeit.games import Observation, Configuration, ConnectFour
     from bachelorarbeit.tools import timer, transform_board_cnn
+    from bachelorarbeit.players.adaptive_rave import AdaptiveRavePlayer
     import config
 
-    steps = 100
+    steps = 2000
 
     # from tensorflow import keras
-    model_path = config.ROOT_DIR + "/best_models/400000/padded_cnn_norm"
+    model_path = config.ROOT_DIR + "/best_models/400000/regular_norm"
 
-    play = NetworkPlayer(model_path=model_path, transform_func=transform_board_cnn, max_steps=steps)
+    play = NetworkPlayer(model_path=model_path, transform_func=transform_board_nega, max_steps=steps)
+    # play = AdaptiveRavePlayer(max_steps=steps)
     g = ConnectFour()
     obs = Observation(board=g.board[:], mark=g.mark)
     conf = Configuration()

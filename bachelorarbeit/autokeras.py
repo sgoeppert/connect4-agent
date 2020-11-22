@@ -5,6 +5,12 @@ from tensorflow.python.util import nest
 
 
 class PaddedConvBlock(ak.ConvBlock):
+    """
+    Der PaddedConvBlock ist eine eigene Implementierung des ConvBlocks aus der AutoKeras Bibliothek.
+    Er limitiert die Anzahl der Filter pro Block und benutzt padding="same" statt padding="valid" um die Größe
+    des Spielfelds über mehrere Schichten des Netzwerks beizubehalten. Mit padding="valid" würde das Spielfeld bereits
+    nach zwei Schichten auf 1x2 Felder schrumpfen.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
