@@ -1,0 +1,170 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 52,
+    "draws": 2,
+    "losses": 38,
+    "q": 0.5760869565217391,
+    "n": 46
+  },
+  {
+    "config": {
+      "exploration_constant": 0.8,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 41,
+    "draws": 5,
+    "losses": 32,
+    "q": 0.5576923076923077,
+    "n": 39
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 40,
+    "draws": 3,
+    "losses": 33,
+    "q": 0.5460526315789473,
+    "n": 38
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 41,
+    "draws": 3,
+    "losses": 34,
+    "q": 0.5448717948717948,
+    "n": 39
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 33,
+    "draws": 8,
+    "losses": 29,
+    "q": 0.5285714285714286,
+    "n": 35
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 32,
+    "draws": 3,
+    "losses": 35,
+    "q": 0.4785714285714286,
+    "n": 35
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 31,
+    "draws": 4,
+    "losses": 35,
+    "q": 0.4714285714285714,
+    "n": 35
+  },
+  {
+    "config": {
+      "exploration_constant": 1.0,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 28,
+    "draws": 4,
+    "losses": 34,
+    "q": 0.45454545454545453,
+    "n": 33
+  },
+  {
+    "config": {
+      "exploration_constant": 1.2,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 32,
+    "draws": 1,
+    "losses": 39,
+    "q": 0.4513888888888889,
+    "n": 36
+  },
+  {
+    "config": {
+      "exploration_constant": 1.1,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 28,
+    "draws": 5,
+    "losses": 35,
+    "q": 0.4485294117647059,
+    "n": 34
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 27,
+    "draws": 5,
+    "losses": 34,
+    "q": 0.44696969696969696,
+    "n": 33
+  },
+  {
+    "config": {
+      "exploration_constant": 0.7,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 31,
+    "draws": 0,
+    "losses": 39,
+    "q": 0.44285714285714284,
+    "n": 35
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "uct_method": "UCT1",
+      "with_symmetry": false
+    },
+    "wins": 23,
+    "draws": 2,
+    "losses": 39,
+    "q": 0.375,
+    "n": 32
+  },
+  {
+    "config": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true
+    },
+    "wins": 20,
+    "draws": 2,
+    "losses": 38,
+    "q": 0.35,
+    "n": 30
+  }
+]

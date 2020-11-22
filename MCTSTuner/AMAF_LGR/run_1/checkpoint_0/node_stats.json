@@ -1,0 +1,562 @@
+[
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 50,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 26,
+    "draws": 1,
+    "losses": 1,
+    "q": 0.9464285714285714,
+    "n": 14
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 23,
+    "draws": 2,
+    "losses": 1,
+    "q": 0.9230769230769231,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 23,
+    "draws": 0,
+    "losses": 3,
+    "q": 0.8846153846153846,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 2,
+    "losses": 2,
+    "q": 0.8846153846153846,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 1,
+    "losses": 3,
+    "q": 0.8653846153846154,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 50,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 1,
+    "losses": 3,
+    "q": 0.8653846153846154,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.8461538461538461,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.8461538461538461,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.8461538461538461,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 22,
+    "draws": 0,
+    "losses": 4,
+    "q": 0.8461538461538461,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 50,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 21,
+    "draws": 1,
+    "losses": 4,
+    "q": 0.8269230769230769,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 21,
+    "draws": 1,
+    "losses": 4,
+    "q": 0.8269230769230769,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.3,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 21,
+    "draws": 1,
+    "losses": 4,
+    "q": 0.8269230769230769,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 1,
+    "losses": 4,
+    "q": 0.8125,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 20,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 21,
+    "draws": 0,
+    "losses": 5,
+    "q": 0.8076923076923077,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 200,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 0,
+    "losses": 5,
+    "q": 0.7916666666666666,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 20,
+    "draws": 1,
+    "losses": 5,
+    "q": 0.7884615384615384,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.3,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 3,
+    "losses": 4,
+    "q": 0.7884615384615384,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 3,
+    "losses": 4,
+    "q": 0.7884615384615384,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 20,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 18,
+    "draws": 1,
+    "losses": 5,
+    "q": 0.7708333333333334,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 10,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 18,
+    "draws": 1,
+    "losses": 5,
+    "q": 0.7708333333333334,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 20,
+    "draws": 0,
+    "losses": 6,
+    "q": 0.7692307692307693,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 20,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 1,
+    "losses": 6,
+    "q": 0.75,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 50,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 18,
+    "draws": 0,
+    "losses": 6,
+    "q": 0.75,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 200,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 17,
+    "draws": 2,
+    "losses": 5,
+    "q": 0.75,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 200,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 18,
+    "draws": 0,
+    "losses": 6,
+    "q": 0.75,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.3,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 17,
+    "draws": 2,
+    "losses": 5,
+    "q": 0.75,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 20,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 0,
+    "losses": 7,
+    "q": 0.7307692307692307,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 50,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 19,
+    "draws": 0,
+    "losses": 7,
+    "q": 0.7307692307692307,
+    "n": 13
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 17,
+    "draws": 1,
+    "losses": 6,
+    "q": 0.7291666666666666,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 20,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 16,
+    "draws": 2,
+    "losses": 6,
+    "q": 0.7083333333333334,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 200,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 17,
+    "draws": 0,
+    "losses": 7,
+    "q": 0.7083333333333334,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.3,
+      "k": 10,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 17,
+    "draws": 0,
+    "losses": 7,
+    "q": 0.7083333333333334,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 16,
+    "draws": 1,
+    "losses": 7,
+    "q": 0.6875,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.3,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 16,
+    "draws": 1,
+    "losses": 7,
+    "q": 0.6875,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 10,
+      "alpha": 0.5,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 15,
+    "draws": 3,
+    "losses": 6,
+    "q": 0.6875,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.6,
+      "k": 10,
+      "alpha": 0.8,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 16,
+    "draws": 1,
+    "losses": 7,
+    "q": 0.6875,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.5,
+      "k": 200,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 14,
+    "draws": 2,
+    "losses": 8,
+    "q": 0.625,
+    "n": 12
+  },
+  {
+    "config": {
+      "exploration_constant": 0.4,
+      "k": 100,
+      "alpha": null,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 12,
+    "draws": 2,
+    "losses": 8,
+    "q": 0.5909090909090909,
+    "n": 11
+  },
+  {
+    "config": {
+      "exploration_constant": 0.2,
+      "k": 10,
+      "alpha": 0.3,
+      "keep_replies": true,
+      "forgetting": false
+    },
+    "wins": 11,
+    "draws": 0,
+    "losses": 11,
+    "q": 0.5,
+    "n": 11
+  }
+]
