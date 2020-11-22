@@ -1,12 +1,12 @@
 from bachelorarbeit.players.transposition import TranspositionPlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 
-NUM_PROCESSES = 6
+NUM_PROCESSES = 10
 
 if __name__ == "__main__":
     player_config = {
       "exploration_constant": 0.9,
-      "uct_method": "UCT2",
+      "uct_method": "UCT1",
       "with_symmetry": True
     }
 
@@ -25,4 +25,4 @@ if __name__ == "__main__":
         )
         results.append(res)
         print(res)
-    dump_json("data/transposition_{}.json", results)
+    dump_json("data/transposition_uct1_{}.json", results)

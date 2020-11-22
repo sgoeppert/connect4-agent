@@ -1,0 +1,260 @@
+[
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 20
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.3999,
+    "good_pct": 0.7572,
+    "perfect_std": 0.01160560209553988,
+    "good_std": 0.010989085494252933,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.397,
+        0.399,
+        0.409,
+        0.41,
+        0.389,
+        0.417,
+        0.386,
+        0.394,
+        0.383,
+        0.415
+      ],
+      "good": [
+        0.758,
+        0.759,
+        0.776,
+        0.772,
+        0.746,
+        0.767,
+        0.74,
+        0.75,
+        0.754,
+        0.75
+      ]
+    }
+  },
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 50
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.4902,
+    "good_pct": 0.8099,
+    "perfect_std": 0.011417530380953677,
+    "good_std": 0.007687002016391001,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.504,
+        0.484,
+        0.489,
+        0.496,
+        0.503,
+        0.473,
+        0.492,
+        0.488,
+        0.47,
+        0.503
+      ],
+      "good": [
+        0.817,
+        0.803,
+        0.807,
+        0.8,
+        0.808,
+        0.817,
+        0.805,
+        0.822,
+        0.801,
+        0.819
+      ]
+    }
+  },
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 100
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.5857,
+    "good_pct": 0.8527,
+    "perfect_std": 0.01608757284365791,
+    "good_std": 0.010000499987500635,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.581,
+        0.605,
+        0.585,
+        0.595,
+        0.6,
+        0.568,
+        0.561,
+        0.598,
+        0.562,
+        0.602
+      ],
+      "good": [
+        0.851,
+        0.86,
+        0.854,
+        0.847,
+        0.856,
+        0.841,
+        0.839,
+        0.873,
+        0.844,
+        0.862
+      ]
+    }
+  },
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 200
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6436,
+    "good_pct": 0.8794,
+    "perfect_std": 0.011774548823628031,
+    "good_std": 0.006974238309665084,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.644,
+        0.659,
+        0.645,
+        0.632,
+        0.648,
+        0.646,
+        0.652,
+        0.647,
+        0.649,
+        0.614
+      ],
+      "good": [
+        0.871,
+        0.887,
+        0.878,
+        0.874,
+        0.89,
+        0.879,
+        0.887,
+        0.885,
+        0.872,
+        0.871
+      ]
+    }
+  },
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 400
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.6855,
+    "good_pct": 0.8968,
+    "perfect_std": 0.009478923989567553,
+    "good_std": 0.0040199502484483595,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.683,
+        0.683,
+        0.701,
+        0.677,
+        0.672,
+        0.695,
+        0.697,
+        0.673,
+        0.689,
+        0.685
+      ],
+      "good": [
+        0.894,
+        0.899,
+        0.9,
+        0.893,
+        0.898,
+        0.893,
+        0.904,
+        0.89,
+        0.9,
+        0.897
+      ]
+    }
+  },
+  {
+    "title": "Transposition player",
+    "player": "TranspositionPlayer",
+    "configuration": {
+      "exploration_constant": 0.9,
+      "uct_method": "UCT1",
+      "with_symmetry": true,
+      "max_steps": 800
+    },
+    "repeats": 10,
+    "n_positions": 1000,
+    "perfect_pct": 0.7061,
+    "good_pct": 0.9095,
+    "perfect_std": 0.011013173929435589,
+    "good_std": 0.007116881339463241,
+    "raw_results": {
+      "total": 10000,
+      "perfect": [
+        0.703,
+        0.684,
+        0.716,
+        0.706,
+        0.714,
+        0.698,
+        0.705,
+        0.725,
+        0.713,
+        0.697
+      ],
+      "good": [
+        0.906,
+        0.894,
+        0.909,
+        0.911,
+        0.913,
+        0.909,
+        0.912,
+        0.923,
+        0.914,
+        0.904
+      ]
+    }
+  }
+]

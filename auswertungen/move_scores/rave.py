@@ -4,14 +4,14 @@ from bachelorarbeit.players.rave import RavePlayer
 from bachelorarbeit.tools import run_move_evaluation_experiment, dump_json
 import gc
 
-NUM_PROCESSES = 6
+NUM_PROCESSES = 10
 
 if __name__ == "__main__":
 
     player_config = {
-      "exploration_constant": 0.2,
-      "k": 100,
-      "alpha": None
+      "exploration_constant": 0.4,
+      # "k": 100,
+      "alpha": 0.5
     }
 
     results = []
@@ -29,4 +29,4 @@ if __name__ == "__main__":
         )
         results.append(res)
         print(res)
-    dump_json("data/rave_{}.json", results)
+    dump_json("data/rave_amaf_{}.json", results)
