@@ -1,0 +1,58 @@
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 809, 'exploration_constant': 0.15, 'alpha': 0.8, 'max_steps': 809, 'keep_tree': True}
+Result:  [0.585 0.415]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 809, 'keep_tree': True}
+Result:  [0.572 0.428]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 20, 'max_steps': 834, 'keep_tree': True}
+Result:  [0.561 0.439]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 100, 'max_steps': 834, 'keep_tree': True}
+Result:  [0.615 0.385]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 200, 'max_steps': 834, 'keep_tree': True}
+Result:  [0.598 0.402]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  1
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 300, 'max_steps': 834, 'keep_tree': True}
+Result:  [0.547 0.453]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 809, 'exploration_constant': 0.15, 'alpha': 0.8, 'max_steps': 1618, 'keep_tree': True}
+Result:  [0.616 0.384]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 809, 'exploration_constant': 0.4, 'alpha': 0.5, 'max_steps': 1618, 'keep_tree': True}
+Result:  [0.578 0.422]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 20, 'max_steps': 1668, 'keep_tree': True}
+Result:  [0.573 0.427]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 100, 'max_steps': 1668, 'keep_tree': True}
+Result:  [0.607 0.393]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 200, 'max_steps': 1668, 'keep_tree': True}
+Result:  [0.608 0.392]
+==========
+Player:  <class 'bachelorarbeit.players.rave.RavePlayer'>
+Scale:  2
+Config:  {'_steps': 834, 'exploration_constant': 0.2, 'alpha': None, 'k': 300, 'max_steps': 1668, 'keep_tree': True}

@@ -1,0 +1,40 @@
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f3ab27463a0>, '_steps': 52, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 52, 'keep_tree': True}
+Result:  [0.388 0.612]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  1
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f3ab2746310>, '_steps': 110, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 110, 'keep_tree': True}
+Result:  [0.655 0.345]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f3ab27463a0>, '_steps': 52, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 104, 'keep_tree': True}
+Result:  [0.636 0.364]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  2
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f3ab2746310>, '_steps': 110, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 220, 'keep_tree': True}
+Result:  [0.764 0.236]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f3ab27463a0>, '_steps': 52, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 156, 'keep_tree': True}
+Result:  [0.765 0.235]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  3
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f3ab2746310>, '_steps': 110, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 330, 'keep_tree': True}
+Result:  [0.779 0.221]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  4
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/padded_cnn_norm', 'transform_func': <function transform_board_cnn at 0x7f3ab27463a0>, '_steps': 52, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 208, 'keep_tree': True}
+Result:  [0.782 0.218]
+==========
+Player:  <class 'bachelorarbeit.players.adaptive_rave_network_player.AdaptiveRaveNetworkPlayer'>
+Scale:  4
+Config:  {'model_path': '/home/shadex91/PycharmProjects/connect4-agent/best_models/400000/regular_norm', 'transform_func': <function transform_board_nega at 0x7f3ab2746310>, '_steps': 110, 'exploration_constant': 0.3, 'network_weight': 0.5, 'k': 100, 'keep_replies': True, 'max_steps': 440, 'keep_tree': True}
+Result:  [0.849 0.151]
+==========

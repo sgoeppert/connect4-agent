@@ -1,0 +1,15 @@
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  30
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT1', 'with_symmetry': True, 'max_steps': 25500, 'keep_tree': True}
+Result:  [0.55375 0.44625]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  30
+Config:  {'_steps': 850, 'exploration_constant': 0.9, 'uct_method': 'UCT2', 'with_symmetry': True, 'max_steps': 25500, 'keep_tree': True}
+Result:  [0.56125 0.43875]
+==========
+Player:  <class 'bachelorarbeit.players.transposition.TranspositionPlayer'>
+Scale:  30
+Config:  {'_steps': 695, 'exploration_constant': 0.9, 'uct_method': 'UCT3', 'with_symmetry': True, 'max_steps': 20850, 'keep_tree': True}
+Result:  [0.61875 0.38125]
+==========
